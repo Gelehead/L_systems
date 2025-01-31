@@ -1,0 +1,5 @@
+S A
+a b c
+S
+S -> aSa|A|e
+A -> caA|e

@@ -1,0 +1,9 @@
+# non terminal symbols
+# terminal symbols
+# start symbol
+<rule 1, prob r1>
+<rule 2, prob r2>
+...
+<rule n, prob rn>
+
+e always means the empty symbol
