@@ -95,6 +95,9 @@ class grammar {
                     std::string left = match[1].str();
                     std::string right = match[2].str();
 
+                    // find symbol in non terminal symbols list
+                    
+
                     // assign follow up symbols in rules
                     
                 } else {
@@ -116,6 +119,6 @@ std::ostream operator << (std::ostream& os, grammar& gram) {
     os << std::string("Start symbol -> ") << gram.s.getChar() << std::endl;
 
     for ( size_t i = 0 ; i < gram.m.size() ; i++ ) { 
-        os << gram.m.at(i);
+        os << gram.m.at(i) << std::endl;
     }
 }
