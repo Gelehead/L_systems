@@ -4,4 +4,6 @@
 
 int main(){
     grammar g = grammar::read_grammar(FIRST_LANGUAGE);
+
+    std::cout << g << std::endl;
 }

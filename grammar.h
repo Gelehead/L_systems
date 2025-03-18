@@ -7,6 +7,7 @@
 #include <string>
 #include <regex>
 #include <iterator>
+#include <map>
 
 class grammar {
     public:
@@ -19,8 +20,8 @@ class grammar {
         // start symbol
         symbol s;
 
-        // rules ( only a string representation of them )
-        std::vector<std::string> r;
+        // rules
+        std::map<symbol, std::vector<symbol>> r;
 
         grammar(
             const std::vector<symbol> non_terminal, 
@@ -61,7 +62,10 @@ class grammar {
                     m.push_back(symbol(token[0]));
                 }
             }
-        
+
+            std::cout << m.at(0) << std::endl;
+            
+
             // Read terminal symbols
             std::getline(file, str);
             std::istringstream iss_t(str);
@@ -90,10 +94,9 @@ class grammar {
                 if (std::regex_match(str, match, rule_regex)) {
                     std::string left = match[1].str();
                     std::string right = match[2].str();
+
+                    // assign follow up symbols in rules
                     
-                    // Create a rule string in the format "LEFT->RIGHT"
-                    std::string rule = left + "->" + right;
-                    r.push_back(rule);
                 } else {
                     std::cerr << "Warning: Ignoring malformed rule: " << str << std::endl;
                 }
@@ -102,6 +105,17 @@ class grammar {
             return grammar(m, t, s, r);
         }
 
-    private:
+    friend std::ostream& operator<<(std::ostream& os, const grammar& gram);
 
 };
+
+// overload of << operator to have a reasonable way to track progress
+std::ostream operator << (std::ostream& os, grammar& gram) { 
+    os << std::string("non terminal symbols -> ") << gram.m << std::endl;
+    os << std::string("terminal symbols -> ") << gram.t << std::endl;
+    os << std::string("Start symbol -> ") << gram.s.getChar() << std::endl;
+
+    for ( size_t i = 0 ; i < gram.m.size() ; i++ ) { 
+        os << gram.m.at(i);
+    }
+}
