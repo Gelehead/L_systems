@@ -6,4 +6,7 @@
 ...
 <rule n, prob rn>
 
+rule template :
+non terminal symbol -> concatenation of already declared symbols strings
+
 e always means the empty symbol

@@ -8,6 +8,7 @@
 #include <regex>
 #include <iterator>
 #include <map>
+#include <tuple>
 
 class grammar {
     public:
@@ -18,10 +19,14 @@ class grammar {
         std::vector<symbol> t;
 
         // start symbol
+        // TODO: transform into symbol and handle it properly 
         symbol s;
 
         // rules
         std::map<symbol, std::vector<symbol>> r;
+
+        // map from char to symbol ( helping scalability )
+        static std::map<char, symbol> mapper;
 
         grammar(
             const std::vector<symbol> non_terminal, 
@@ -59,19 +64,29 @@ class grammar {
             std::string token;
             while (iss_m >> token) {
                 if (!token.empty()) {
-                    m.push_back(symbol(token[0]));
+                    symbol nt_symbol = symbol(token[0]);
+                    // add to non terminal symbol vector 
+                    m.push_back(nt_symbol);
+
+                    // add to mapper 
+                    mapper.insert(std::make_pair(token[0], nt_symbol));
                 }
             }
 
+            // ?? why you here 
             std::cout << m.at(0) << std::endl;
-            
 
             // Read terminal symbols
             std::getline(file, str);
             std::istringstream iss_t(str);
             while (iss_t >> token) {
                 if (!token.empty()) {
-                    t.push_back(symbol(token[0]));
+                    symbol t_symbol = symbol(token[0]);
+                    // add to terminal symbol vector
+                    t.push_back(t_symbol);
+
+                    // add to mapper
+                    mapper.insert(std::make_pair(token[0], t_symbol));
                 }
             }
         
@@ -79,6 +94,7 @@ class grammar {
             std::getline(file, str);
             if (!str.empty()) {
                 s = symbol(str[0]);
+                mapper.insert(std::make_pair(str[0], s));
             } else {
                 throw std::runtime_error("Start symbol line is empty");
             }
@@ -92,13 +108,15 @@ class grammar {
                 
                 std::smatch match;
                 if (std::regex_match(str, match, rule_regex)) {
-                    std::string left = match[1].str();
+                    std::string left = (std::string) match[1].str();
                     std::string right = match[2].str();
 
-                    // find symbol in non terminal symbols list
-                    
+                    // add as symbols reference every  
+                    std::vector<symbol> next;
+                    for (char c : right) { next.push_back(mapper.at(c)); } 
 
                     // assign follow up symbols in rules
+                    r.at(mapper.at(left[0]))
                     
                 } else {
                     std::cerr << "Warning: Ignoring malformed rule: " << str << std::endl;
