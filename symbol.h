@@ -25,6 +25,10 @@ class symbol {
             return s;
         }
 
+        bool operator<(const symbol& s2) const {
+            return this->getChar() < s2.getChar();
+        }
+
         bool isTerminal(){ return c >= 'a' && c <= 'z'; }
         
         char getChar() const { return c; }

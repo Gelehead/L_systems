@@ -10,6 +10,7 @@
 #include <map>
 #include <tuple>
 
+
 class grammar {
     public:
         // non terminal symbols
@@ -19,21 +20,18 @@ class grammar {
         std::vector<symbol> t;
 
         // start symbol
-        // TODO: transform into symbol and handle it properly 
+        // TODO: transform into symbol VECTOR and handle it properly 
         symbol s;
 
         // rules
-        std::map<symbol, std::vector<symbol>> r;
-
-        // map from char to symbol ( helping scalability )
-        static std::map<char, symbol> mapper;
+        std::map<symbol, std::vector<std::vector<symbol>>> r;
 
         grammar(
             const std::vector<symbol> non_terminal, 
             const std::vector<symbol> terminal, 
             const symbol start,
-            const std::vector<std::string> rules
-        ) : m(non_terminal), t(terminal), s(start) {}
+            std::map<symbol, std::vector<std::vector<symbol>>> rules
+        ) : m(non_terminal), t(terminal), s(start), r(rules) {}
 
         // executes n times the generation rules starting from string str
         // @returns symbol vector of the nth generation
@@ -48,6 +46,7 @@ class grammar {
         }
 
         static grammar read_grammar(std::string filename) {
+            
             std::ifstream file(filename);
             if (!file.is_open()) {
                 throw std::runtime_error("Could not open file: " + filename);
@@ -56,7 +55,10 @@ class grammar {
             std::string str;
             std::vector<symbol> m, t;
             symbol s;
-            std::vector<std::string> r;
+            std::map<symbol, std::vector<std::vector<symbol>>> r;
+
+            // map from char to symbol ( helping scalability for huuuge grammars )
+            std::map<char, symbol> mapper;
         
             // Read non-terminal symbols
             std::getline(file, str);
@@ -72,9 +74,6 @@ class grammar {
                     mapper.insert(std::make_pair(token[0], nt_symbol));
                 }
             }
-
-            // ?? why you here 
-            std::cout << m.at(0) << std::endl;
 
             // Read terminal symbols
             std::getline(file, str);
@@ -113,10 +112,20 @@ class grammar {
 
                     // add as symbols reference every  
                     std::vector<symbol> next;
-                    for (char c : right) { next.push_back(mapper.at(c)); } 
+                    for (char c : right) { 
+                        if ( mapper.find(c) != mapper.end() ){
+                            next.push_back(mapper.at(c)); 
+                        } else {
+                            std::cerr << "Symbol in rules not found amongst declared symbols" << std::endl;
+                        }
+                    } 
 
                     // assign follow up symbols in rules
-                    r.at(mapper.at(left[0]))
+                    symbol leftSymbol = mapper.at(left[0]);
+                    if (r.find(leftSymbol) == r.end()) {
+                        r[leftSymbol] = std::vector<std::vector<symbol>>();
+                    }
+                    r[leftSymbol].push_back(next);
                     
                 } else {
                     std::cerr << "Warning: Ignoring malformed rule: " << str << std::endl;
@@ -126,17 +135,25 @@ class grammar {
             return grammar(m, t, s, r);
         }
 
-    friend std::ostream& operator<<(std::ostream& os, const grammar& gram);
+    friend std::ostream& operator<<(std::ostream& os, grammar& gram);
 
 };
 
 // overload of << operator to have a reasonable way to track progress
-std::ostream operator << (std::ostream& os, grammar& gram) { 
+std::ostream& operator << (std::ostream& os, grammar& gram) { 
     os << std::string("non terminal symbols -> ") << gram.m << std::endl;
     os << std::string("terminal symbols -> ") << gram.t << std::endl;
     os << std::string("Start symbol -> ") << gram.s.getChar() << std::endl;
 
-    for ( size_t i = 0 ; i < gram.m.size() ; i++ ) { 
-        os << gram.m.at(i) << std::endl;
+    // for every symbol, print it and iterate over its vector symbols
+    // ?? smh iterates from the end
+    for ( const auto& pair : gram.r ){
+        symbol key = pair.first;
+        std::cout << key.getChar() << std::endl;
+        for ( std::vector<symbol> next : pair.second ){
+            std::cout << next << std::endl;
+        }
     }
+
+    return os;
 }
