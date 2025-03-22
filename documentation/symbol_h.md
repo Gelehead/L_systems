@@ -3,9 +3,9 @@
 
 ## attributes
 
-#### attribute 1
-some quirky specific thing or good to know, how to use
-#### attribute 2
+#### c - character representation
+character
+#### next - 
 
 #### attribute 3
 

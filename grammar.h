@@ -8,9 +8,6 @@
 #include <regex>
 #include <iterator>
 #include <map>
-#include <tuple>
-
-
 class grammar {
     public:
         // non terminal symbols
@@ -21,7 +18,7 @@ class grammar {
 
         // start symbol
         // TODO: transform into symbol VECTOR and handle it properly 
-        symbol s;
+        std::vector<symbol> s;
 
         // rules
         std::map<symbol, std::vector<std::vector<symbol>>> r;
@@ -29,20 +26,29 @@ class grammar {
         grammar(
             const std::vector<symbol> non_terminal, 
             const std::vector<symbol> terminal, 
-            const symbol start,
+            const std::vector<symbol> start,
             std::map<symbol, std::vector<std::vector<symbol>>> rules
         ) : m(non_terminal), t(terminal), s(start), r(rules) {}
 
         // executes n times the generation rules starting from string str
-        // @returns symbol vector of the nth generation
-        std::vector<symbol> generate(int n, std::vector<symbol> str){
-            if (n == 0) return str;
+        // @returns symbol vector of the generation^th generation
+        std::vector<symbol> generate(int generation, std::vector<symbol> base){
+            if ( generation == 0 ) { return base; }
 
-            std::vector<symbol> result;
-            for (symbol s : m){
-                result.push_back(!s);
+            std::vector<symbol> next_gen;
+            for ( symbol sym : base ) {
+                if ( sym.isTerminal() ){
+                    next_gen.push_back(sym);
+                } else {
+                    // select randomly the next generation from the rules 
+                    // Note : still debating whether it s better to use '!sym' or r.at(sym)
+                    for ( symbol generated_sym : r.at(sym).at(std::rand() % r.at(sym).size()) ){
+                        next_gen.push_back(generated_sym);
+                    }
+                }
             }
-            return generate(n-1, result);
+
+            return generate(generation-1, next_gen);
         }
 
         static grammar read_grammar(std::string filename) {
@@ -54,7 +60,7 @@ class grammar {
             
             std::string str;
             std::vector<symbol> m, t;
-            symbol s;
+            std::vector<symbol> s;
             std::map<symbol, std::vector<std::vector<symbol>>> r;
 
             // map from char to symbol ( helping scalability for huuuge grammars )
@@ -89,11 +95,14 @@ class grammar {
                 }
             }
         
-            // Read start symbol
+            // Read start symbol(s)
             std::getline(file, str);
             if (!str.empty()) {
-                s = symbol(str[0]);
-                mapper.insert(std::make_pair(str[0], s));
+                for (char c : str) {
+                    symbol s_symbol = symbol(c);
+                    mapper.insert(std::make_pair(c, s_symbol));
+                    s.push_back(s_symbol);
+                }
             } else {
                 throw std::runtime_error("Start symbol line is empty");
             }
@@ -124,6 +133,7 @@ class grammar {
                     symbol leftSymbol = mapper.at(left[0]);
                     if (r.find(leftSymbol) == r.end()) {
                         r[leftSymbol] = std::vector<std::vector<symbol>>();
+                        leftSymbol|next;
                     }
                     r[leftSymbol].push_back(next);
                     
@@ -143,13 +153,13 @@ class grammar {
 std::ostream& operator << (std::ostream& os, grammar& gram) { 
     os << std::string("non terminal symbols -> ") << gram.m << std::endl;
     os << std::string("terminal symbols -> ") << gram.t << std::endl;
-    os << std::string("Start symbol -> ") << gram.s.getChar() << std::endl;
+    os << std::string("Start symbols -> ") << gram.s << std::endl;
 
     // for every symbol, print it and iterate over its vector symbols
     // ?? smh iterates from the end
     for ( const auto& pair : gram.r ){
         symbol key = pair.first;
-        std::cout << key.getChar() << std::endl;
+        std::cout << key << std::endl;
         for ( std::vector<symbol> next : pair.second ){
             std::cout << next << std::endl;
         }
