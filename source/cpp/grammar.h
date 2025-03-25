@@ -30,10 +30,20 @@ class grammar {
             std::map<symbol, std::vector<std::vector<symbol>>> rules
         ) : m(non_terminal), t(terminal), s(start), r(rules) {}
 
+        // @param generation vector of symbols 
+        // @return string corresponding to every character concatenated  
+        static std::string vec2string(std::vector<symbol> generation ) {
+            std::string out = "";
+            for ( symbol s : generation ) {
+                out += s.getChar();
+            }
+            return out;
+        }
+
         // executes n times the generation rules starting from string str
         // @returns symbol vector of the generation^th generation
         std::vector<symbol> generate(int generation, std::vector<symbol> base){
-            if ( generation == 0 ) { return base; }
+            if ( generation <= 0 ) { return base; }
 
             std::vector<symbol> next_gen;
             for ( symbol sym : base ) {
@@ -159,7 +169,7 @@ std::ostream& operator << (std::ostream& os, grammar& gram) {
     // ?? smh iterates from the end
     for ( const auto& pair : gram.r ){
         symbol key = pair.first;
-        std::cout << key << std::endl;
+        std::cout << key.getChar() << std::endl;
         for ( std::vector<symbol> next : pair.second ){
             std::cout << next << std::endl;
         }
