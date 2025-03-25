@@ -5,16 +5,21 @@ For now, the project isn't really more than creating an image of a flower / pant
 
 ## Images
 Cube Generation 2
-[cube_thing_gen2](documentation/images/cube_thing_gen2.PNG)
 
-Cueb Generation 3
-[cube_thing_gen2](documentation/images/cube_thing_gen3.PNG)
+![cube_thing_gen2](documentation/images/cube_thing_gen2.PNG)
+
+
+Cube Generation 3
+
+![cube_thing_gen2](documentation/images/cube_thing_gen3.PNG)
 
 Cube Generation 4
-[cube_thing_gen2](documentation/images/cube_thing_gen4.PNG)
+
+![cube_thing_gen2](documentation/images/cube_thing_gen4.PNG)
 
 Herb Generation 6
-[Herb gen 6](documentation/images/herb.PNG)
+
+![Herb gen 6](documentation/images/herb.PNG)
 
 
 
