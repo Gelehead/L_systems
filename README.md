@@ -1,15 +1,21 @@
 # L-Systems
-This is a project about pseudo ranodm procedural generation based on context-free grammars.
+This is a project about pseudo random procedural generation based on context-free grammars.
 
-For now, the project isn't really more than creating an image of a flower / pant from a set of rules.
+For now, the project isn't really more than creating an image of a flower / pant from a set of rules, the lindenmayer way.
 
-## Logs
-Only relevant commits will be mentionned, some are just daily commit things to have a pretty github profile
-#### First relevant commit 
-Main idea added, skeletons of classes
+## Images
+Cube Generation 2
+[cube_thing_gen2](documentation/images/cube_thing_gen2.PNG)
 
-#### Documentation and main symbol system
-working on debugging 
+Cueb Generation 3
+[cube_thing_gen2](documentation/images/cube_thing_gen3.PNG)
+
+Cube Generation 4
+[cube_thing_gen2](documentation/images/cube_thing_gen4.PNG)
+
+Herb Generation 6
+[Herb gen 6](documentation/images/herb.PNG)
+
 
 
 ### Documentation
