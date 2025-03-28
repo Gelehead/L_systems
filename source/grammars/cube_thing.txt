@@ -1,4 +1,4 @@
 F p m
 f
 FpFpFpF
-F -> FFpFmFpFpFF
+F -> FpFmFpFpF

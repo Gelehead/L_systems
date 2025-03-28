@@ -6,7 +6,11 @@
 ...
 <rule n, prob rn>
 
-rule template :
+rule template (1 dimension):
 non terminal symbol -> concatenation of already declared symbols strings
+
+2dim rule template 
+nt symbol -> <(concat for x-1 symbols), (concat for y-1), (x+1), (y+1)>
+// will be checked by regex
 
 e always means the empty symbol

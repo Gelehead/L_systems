@@ -3,12 +3,22 @@
 
 ## attributes
 
-#### c - character representation
-character
-#### next - 
+#### c
+character 
 
-#### attribute 3
+character representation of the symbol
 
-#### attribute 4
+
+#### next 
+vector of vectors of symbols
+
+conatains all possible transformations of the symbol.
+
+
+### isTerminal
+Boolean, returns whether the symbol is in lowercase. Which should signify whether it is terminal
+
+#### getChar
+Character, basically a getter
 
 ## function 1

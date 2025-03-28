@@ -31,7 +31,7 @@ class symbol {
             return (this->getChar() == s2.getChar()) && (this->next == s2.next);
         }
 
-        bool isTerminal(){ return c >= 'a' && c <= 'z'; }
+        bool isTerminal(){ return this->next.empty(); }
         
         char getChar() const { return c; }
 

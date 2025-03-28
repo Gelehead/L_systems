@@ -1,5 +1,5 @@
 @echo off
-set N_GENERATION=4
+set N_GENERATION=5
 set GRAMMAR_FILE=cube_thing.txt
 :: python script
 set PENCIL_SIZE=6
