@@ -86,6 +86,10 @@ class grammar {
                     m.push_back(symbol(token[0]));
                     // Store pointer to the symbol in the vector (safe because vector won't be reallocated)
                     mapper[token[0]] = &m.back();
+
+                    std::cout << token[0] << std::endl;
+                    std::cout << *mapper.at(token[0]) << std::endl;
+
                 }
             }
         
@@ -99,6 +103,10 @@ class grammar {
                     t.push_back(symbol(token[0]));
                     // Store pointer to the symbol in the vector
                     mapper[token[0]] = &t.back();
+
+                    std::cout << token[0] << std::endl;
+                    std::cout << *mapper.at(token[0]) << std::endl;
+                    
                 }
             }
 
