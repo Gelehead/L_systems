@@ -1,12 +1,6 @@
 import sys
 
-# small code so we re sure of having 
-f = open("../cpp/output/gram_gen.txt")
-instructions = f.readline()
-#print(instructions)
-f.close()
-
-def visualize_turtle_graphics(lsystem_result, angle=90, step_size=10):
+def visualize_turtle_graphics(grammar_path, angle=90, step_size=10):
     """
     Visualize the L-system using turtle graphics.
     
@@ -16,6 +10,11 @@ def visualize_turtle_graphics(lsystem_result, angle=90, step_size=10):
         step_size (int): The step size for forward movement
     """
     import turtle
+    
+    f = open("../"+grammar_path)
+    instructions = f.readline()
+    #print(instructions)
+    f.close()
     
     # Set up the turtle
     t = turtle.Turtle()
@@ -32,7 +31,7 @@ def visualize_turtle_graphics(lsystem_result, angle=90, step_size=10):
     # Define the turtle graphics rules
     stack = []
     
-    for char in lsystem_result:
+    for char in instructions:
         if char == 'F':  # Move forward and draw
             t.forward(step_size)
         elif char == 'f':  # Move forward without drawing
@@ -56,4 +55,4 @@ def visualize_turtle_graphics(lsystem_result, angle=90, step_size=10):
     turtle.update()
     turtle.exitonclick()
 
-visualize_turtle_graphics(instructions, float(sys.argv[2]), int(sys.argv[1]))
+visualize_turtle_graphics(sys.argv[3], float(sys.argv[2]), int(sys.argv[1]))

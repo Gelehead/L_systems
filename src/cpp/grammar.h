@@ -80,9 +80,9 @@ class grammar {
             // Read production pattern 
             // Dimension, mode 
             // (if 1d) Pensize, angles
-            std::getline(file, str);
+            /* std::getline(file, str);
             std::istringstream iss_pr(str);
-            std::string dimension, mode;
+            std::string dimension, mode; */
             
             // Read non-terminal symbols
             std::getline(file, str);
@@ -124,52 +124,40 @@ class grammar {
             } else {
                 throw std::runtime_error("Start symbol line is empty");
             }
-        
-            // Read production rules
-            switch (dimension + "_" + mode)
-            {
-                // if 
-                case "1D_Lsys":
-                /* code */
-                break;
-            
-            default:
-                break;
-            }
-                std::regex rule_regex(R"((\w+)\s*->\s*(.*))");
-                while (std::getline(file, str)) {
-                    if (str.empty() || str[0] == '#') {  // Skip empty lines and comments
-                        continue;
-                    }
-                    
-                    std::smatch match;
-                    if (std::regex_match(str, match, rule_regex)) {
-                        std::string left = (std::string) match[1].str();
-                        std::string right = match[2].str();
-
-                        // add as symbols reference every  
-                        std::vector<symbol> next;
-                        for (char c : right) { 
-                            if ( mapper.find(c) != mapper.end() ){
-                                next.push_back(mapper.at(c)); 
-                            } else {
-                                std::cerr << "Symbol in rules not found amongst declared symbols" << std::endl;
-                            }
-                        } 
-
-                        // assign follow up symbols in rules
-                        symbol leftSymbol = mapper.at(left[0]);
-                        if (r.find(leftSymbol) == r.end()) {
-                            r[leftSymbol] = std::vector<std::vector<symbol>>();
-                            leftSymbol|next;
-                        }
-                        r[leftSymbol].push_back(next);
-                        
-                    } else {
-                        std::cerr << "Warning: Ignoring malformed rule: " << str << std::endl;
-                    }
+            std::regex rule_regex(R"((\w+)\s*->\s*(.*))");
+            while (std::getline(file, str)) {
+                if (str.empty() || str[0] == '#') {  // Skip empty lines and comments
+                    continue;
                 }
-        
+                
+                std::smatch match;
+                if (std::regex_match(str, match, rule_regex)) {
+                    std::string left = (std::string) match[1].str();
+                    std::string right = match[2].str();
+
+                    // add as symbols reference every  
+                    std::vector<symbol> next;
+                    for (char c : right) { 
+                        if ( mapper.find(c) != mapper.end() ){
+                            next.push_back(mapper.at(c)); 
+                        } else {
+                            std::cerr << "Symbol in rules not found amongst declared symbols" << std::endl;
+                        }
+                    } 
+
+                    // assign follow up symbols in rules
+                    symbol leftSymbol = mapper.at(left[0]);
+                    if (r.find(leftSymbol) == r.end()) {
+                        r[leftSymbol] = std::vector<std::vector<symbol>>();
+                        leftSymbol|next;
+                    }
+                    r[leftSymbol].push_back(next);
+                    
+                } else {
+                    std::cerr << "Warning: Ignoring malformed rule: " << str << std::endl;
+                }
+            }
+    
             return grammar(m, t, s, r);
         }
 
