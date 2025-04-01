@@ -12,7 +12,7 @@ class symbol {
         symbol() : c('\0'), next() {}
 
         // adds another choice for the next generation
-        void operator|(std::vector<symbol> sv){this->next.push_back(sv); }
+        void add_to_next(std::vector<symbol> sv){next.push_back(sv); }
 
         // Return a random symbol in the next vector
         // Note : does the same as getting from the rules map ( see symbol_h.md )
@@ -31,7 +31,7 @@ class symbol {
             return (this->getChar() == s2.getChar()) && (this->next == s2.next);
         }
 
-        bool isTerminal(){ return this->next.empty(); }
+        bool isTerminal(){ return c >= 'a' && c <= 'z'; }
         
         char getChar() const { return c; }
 
@@ -49,7 +49,7 @@ std::ostream& operator<<(std::ostream& os, const symbol& symb) {
     os << "Symbol: " << symb.c;
     
     // ?? shouldnt this be replaced by the vector<symbol> cout method
-    os << "Possible follow-up symbols: ";
+    os << " Possible follow-up symbols: ";
     if (symb.next.empty()) {
         os << "{}";
     } else {

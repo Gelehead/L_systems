@@ -106,6 +106,12 @@
     "bitset": "cpp",
     "ctime": "cpp",
     "regex": "cpp",
-    "sstream": "cpp"
+    "sstream": "cpp",
+    "cstring": "cpp",
+    "set": "cpp",
+    "expected": "cpp",
+    "optional": "cpp",
+    "span": "cpp",
+    "cinttypes": "cpp"
   }
 }

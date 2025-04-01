@@ -10,17 +10,23 @@ class VulkanApp {
 public:
     void run();
 };
-
+/* arguments
+ 1- input grammar file
+ 2- generation
+ 3- 
+*/
 int main(int argc, char** argv) {
     // Process grammar first
     grammar g = argc > 1 ? grammar::read_grammar(argv[1]) : grammar::read_grammar(FIRST_LANGUAGE);
     std::string outputPath = (argc > 3) ? argv[3] : DEFAULT_OUTPUT_PATH;
 
-    std::cout << g << std::endl;
-    
     std::ofstream out(outputPath);
     out << grammar::vec2string(g.generate(atoi(argv[2]), g.s));
     out.close();
+
+    for (symbol sym : g.m) {
+        std::cout << sym << std::endl;
+    }
     
     // Create and run the Vulkan application
     /* try {

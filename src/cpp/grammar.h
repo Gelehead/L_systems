@@ -57,12 +57,11 @@ class grammar {
                     }
                 }
             }
-
+            std::cout << next_gen.size() << std::endl;
             return generate(generation-1, next_gen);
         }
 
         static grammar read_grammar(std::string filename) {
-            
             std::ifstream file(filename);
             if (!file.is_open()) {
                 throw std::runtime_error("Could not open file: " + filename);
@@ -72,17 +71,11 @@ class grammar {
             std::vector<symbol> m, t;
             std::vector<symbol> s;
             std::map<symbol, std::vector<std::vector<symbol>>> r;
+        
+            // map from char to symbol index in corresponding vector
+            std::map<char, symbol*> mapper;
 
-            // map from char to symbol ( helping scalability for huuuge grammars )
-            std::map<char, symbol> mapper;
-
-            // TODO: finish production rules 
-            // Read production pattern 
-            // Dimension, mode 
-            // (if 1d) Pensize, angles
-            /* std::getline(file, str);
-            std::istringstream iss_pr(str);
-            std::string dimension, mode; */
+            std::cout << "1" << std::endl;
             
             // Read non-terminal symbols
             std::getline(file, str);
@@ -90,40 +83,46 @@ class grammar {
             std::string token;
             while (iss_m >> token) {
                 if (!token.empty()) {
-                    symbol nt_symbol = symbol(token[0]);
-                    // add to non terminal symbol vector 
-                    m.push_back(nt_symbol);
-
-                    // add to mapper 
-                    mapper.insert(std::make_pair(token[0], nt_symbol));
+                    m.push_back(symbol(token[0]));
+                    // Store pointer to the symbol in the vector (safe because vector won't be reallocated)
+                    mapper[token[0]] = &m.back();
                 }
             }
+        
+            std::cout << "2" << std::endl;
 
             // Read terminal symbols
             std::getline(file, str);
             std::istringstream iss_t(str);
             while (iss_t >> token) {
                 if (!token.empty()) {
-                    symbol t_symbol = symbol(token[0]);
-                    // add to terminal symbol vector
-                    t.push_back(t_symbol);
-
-                    // add to mapper
-                    mapper.insert(std::make_pair(token[0], t_symbol));
+                    t.push_back(symbol(token[0]));
+                    // Store pointer to the symbol in the vector
+                    mapper[token[0]] = &t.back();
                 }
             }
-        
+
+            std::cout << "3" << std::endl;
+
             // Read start symbol(s)
             std::getline(file, str);
             if (!str.empty()) {
                 for (char c : str) {
-                    symbol s_symbol = symbol(c);
-                    mapper.insert(std::make_pair(c, s_symbol));
-                    s.push_back(s_symbol);
+                    if (mapper.find(c) != mapper.end()) {
+                        std::cout << c << std::endl;
+                        std::cout << *mapper.at(c) << std::endl;
+                        s.push_back(*mapper.at(c));
+                    } else {
+                        std::cerr << "Symbol in start symbols not found amongst declared symbols: " << c << std::endl;
+                    }
                 }
             } else {
                 throw std::runtime_error("Start symbol line is empty");
             }
+
+            std::cout << "4" << std::endl;
+        
+            // Read production rules
             std::regex rule_regex(R"((\w+)\s*->\s*(.*))");
             while (std::getline(file, str)) {
                 if (str.empty() || str[0] == '#') {  // Skip empty lines and comments
@@ -134,30 +133,36 @@ class grammar {
                 if (std::regex_match(str, match, rule_regex)) {
                     std::string left = (std::string) match[1].str();
                     std::string right = match[2].str();
-
-                    // add as symbols reference every  
-                    std::vector<symbol> next;
-                    for (char c : right) { 
-                        if ( mapper.find(c) != mapper.end() ){
-                            next.push_back(mapper.at(c)); 
-                        } else {
-                            std::cerr << "Symbol in rules not found amongst declared symbols" << std::endl;
-                        }
-                    } 
-
-                    // assign follow up symbols in rules
-                    symbol leftSymbol = mapper.at(left[0]);
-                    if (r.find(leftSymbol) == r.end()) {
-                        r[leftSymbol] = std::vector<std::vector<symbol>>();
-                        leftSymbol|next;
+        
+                    if (left.empty() || mapper.find(left[0]) == mapper.end()) {
+                        std::cerr << "Left symbol in rule not found amongst declared symbols: " << left << std::endl;
+                        continue;
                     }
-                    r[leftSymbol].push_back(next);
+        
+                    // Get the left symbol from the mapper
+                    symbol* leftSymbol = mapper[left[0]];
                     
+                    // Process right side of the rule
+                    std::vector<symbol> next;
+                    for (char c : right) {
+                        if (mapper.find(c) != mapper.end()) {
+                            next.push_back(*mapper[c]);  // Copy the symbol
+                        } else {
+                            std::cerr << "Symbol in rules not found amongst declared symbols: " << c << std::endl;
+                        }
+                    }
+        
+                    // Add the rule
+                    if (r.find(*leftSymbol) == r.end()) {
+                        r[*leftSymbol] = std::vector<std::vector<symbol>>();
+                    }
+                    leftSymbol->add_to_next(next);
+                    r[*leftSymbol].push_back(next);
                 } else {
                     std::cerr << "Warning: Ignoring malformed rule: " << str << std::endl;
                 }
             }
-    
+        
             return grammar(m, t, s, r);
         }
 
