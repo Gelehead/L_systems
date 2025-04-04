@@ -235,10 +235,10 @@ L_systems_IS_TOP_LEVEL:STATIC=ON
 L_systems_SOURCE_DIR:STATIC=C:/Users/oscar/OneDrive/Escritorio/Univ/Code/C & C++/L_systems
 
 //Path to a program.
-Vulkan_GLSLANG_VALIDATOR_EXECUTABLE:FILEPATH=Vulkan_GLSLANG_VALIDATOR_EXECUTABLE-NOTFOUND
+Vulkan_GLSLANG_VALIDATOR_EXECUTABLE:FILEPATH=C:/VulkanSDK/1.4.309.0/Bin/glslangValidator.exe
 
 //Path to a program.
-Vulkan_GLSLC_EXECUTABLE:FILEPATH=Vulkan_GLSLC_EXECUTABLE-NOTFOUND
+Vulkan_GLSLC_EXECUTABLE:FILEPATH=C:/VulkanSDK/1.4.309.0/Bin/glslc.exe
 
 //Path to a file.
 Vulkan_INCLUDE_DIR:PATH=Vulkan_INCLUDE_DIR-NOTFOUND

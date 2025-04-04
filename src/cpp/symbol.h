@@ -12,14 +12,14 @@ class symbol {
         symbol() : c('\0'), next() {}
 
         // adds another choice for the next generation
-        void add_to_next(std::vector<symbol> sv){next.push_back(sv); }
+        void add_to_next(std::vector<symbol*> sv){next.push_back(sv); }
 
         // Return a random symbol in the next vector
         // Note : does the same as getting from the rules map ( see symbol_h.md )
-        std::vector<symbol> operator!(){
-            if (next.empty()) {
+        std::vector<symbol*> operator!(){
+            if (this->isTerminal()) {
                 // Return a vector with only itself if no next symbols
-                return std::vector<symbol>{*this};
+                return std::vector<symbol*>{this};
             }
             return next.at(std::rand() % next.size());
         }
@@ -31,13 +31,13 @@ class symbol {
             return (this->getChar() == s2.getChar()) && (this->next == s2.next);
         }
 
-        bool isTerminal(){ return c >= 'a' && c <= 'z'; }
+        bool isTerminal(){ return next.empty(); }
         
         char getChar() const { return c; }
 
     private :
         char c;
-        std::vector<std::vector<symbol>> next;
+        std::vector<std::vector<symbol*>> next;
 
     // Declare friends
     friend std::ostream& operator<<(std::ostream& os, const symbol& symb);
@@ -54,10 +54,10 @@ std::ostream& operator<<(std::ostream& os, const symbol& symb) {
         os << "{}";
     } else {
         os << "{" << std::endl;
-        for ( std::vector<symbol> possibility : symb.next ){
+        for ( const std::vector<symbol*>& possibility : symb.next ){
             os << "[" ;
             for (size_t i = 0; i < possibility.size(); i++) {
-                os << possibility[i].c;
+                os << possibility[i]->c;
                 if (i < possibility.size() - 1) {
                     os << ", ";
                 }
@@ -72,7 +72,6 @@ std::ostream& operator<<(std::ostream& os, const symbol& symb) {
 }
 
 // Overload output operator for vector of symbols
-// Note : unused
 std::ostream& operator<<(std::ostream& os, const std::vector<symbol>& sym_vec) {
     os << '{';
     for (size_t i = 0; i < sym_vec.size(); i++) {
@@ -85,5 +84,19 @@ std::ostream& operator<<(std::ostream& os, const std::vector<symbol>& sym_vec) {
     
     return os;
 }
+
+std::ostream& operator<<(std::ostream& os, const std::vector<symbol*>& sym_vec) {
+    os << '{';
+    for (size_t i = 0; i < sym_vec.size(); i++) {
+        os << sym_vec[i]->getChar();
+        if (i < sym_vec.size() - 1) {
+            os << ", ";
+        }
+    }
+    os << '}';
+    
+    return os;
+}
+
 
 #endif

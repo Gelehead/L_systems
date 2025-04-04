@@ -1,6 +1,6 @@
 @echo off
-set N_GENERATION=0
-set GRAMMAR_FILE=cube_thing.txt
+set N_GENERATION=3
+set GRAMMAR_FILE=test.txt
 set OUTPUT_GRAMMAR_PATH="../build/grammars/gram_gen.txt"
 
 ::python script part

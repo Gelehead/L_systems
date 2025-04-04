@@ -181,30 +181,6 @@ src/cpp/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\L_systems.dir\build.make CMakeFiles/L_systems.dir/src/cpp/main.cpp.s
 .PHONY : src/cpp/main.cpp.s
 
-src/cpp/vulkan_app.obj: src/cpp/vulkan_app.cpp.obj
-.PHONY : src/cpp/vulkan_app.obj
-
-# target to build an object file
-src/cpp/vulkan_app.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\L_systems.dir\build.make CMakeFiles/L_systems.dir/src/cpp/vulkan_app.cpp.obj
-.PHONY : src/cpp/vulkan_app.cpp.obj
-
-src/cpp/vulkan_app.i: src/cpp/vulkan_app.cpp.i
-.PHONY : src/cpp/vulkan_app.i
-
-# target to preprocess a source file
-src/cpp/vulkan_app.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\L_systems.dir\build.make CMakeFiles/L_systems.dir/src/cpp/vulkan_app.cpp.i
-.PHONY : src/cpp/vulkan_app.cpp.i
-
-src/cpp/vulkan_app.s: src/cpp/vulkan_app.cpp.s
-.PHONY : src/cpp/vulkan_app.s
-
-# target to generate assembly for a file
-src/cpp/vulkan_app.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\L_systems.dir\build.make CMakeFiles/L_systems.dir/src/cpp/vulkan_app.cpp.s
-.PHONY : src/cpp/vulkan_app.cpp.s
-
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -219,9 +195,6 @@ help:
 	@echo ... src/cpp/main.obj
 	@echo ... src/cpp/main.i
 	@echo ... src/cpp/main.s
-	@echo ... src/cpp/vulkan_app.obj
-	@echo ... src/cpp/vulkan_app.i
-	@echo ... src/cpp/vulkan_app.s
 .PHONY : help
 
 

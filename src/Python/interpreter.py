@@ -13,7 +13,7 @@ def visualize_turtle_graphics(grammar_path, angle=90, step_size=10):
     
     f = open("../"+grammar_path)
     instructions = f.readline()
-    print(instructions)
+    print(instructions[:100])
     f.close()
     
     # Set up the turtle
@@ -38,13 +38,13 @@ def visualize_turtle_graphics(grammar_path, angle=90, step_size=10):
             t.penup()
             t.forward(step_size)
             t.pendown()
-        elif char == 'p':  # Turn right
+        elif char == 'p' or char == '+':  # Turn right
             t.right(angle)
-        elif char == 'm':  # Turn left
+        elif char == 'm' or char == '-':  # Turn left
             t.left(angle)
-        elif char == 'b':  # Save current state
+        elif char == 'b' or char == '[':  # Save current state
             stack.append((t.position(), t.heading()))
-        elif char == 'd':  # Restore saved state
+        elif char == 'd' or char == ']':  # Restore saved state
             position, heading = stack.pop()
             t.penup()
             t.goto(position)

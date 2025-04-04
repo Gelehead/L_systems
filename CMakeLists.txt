@@ -27,7 +27,6 @@ endif()
 # Add source files
 set(SOURCES 
     src/cpp/main.cpp
-    src/cpp/vulkan_app.cpp
 )
 
 # Create executable

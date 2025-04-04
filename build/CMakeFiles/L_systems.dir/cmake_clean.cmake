@@ -1,8 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/L_systems.dir/src/cpp/main.cpp.obj"
   "CMakeFiles/L_systems.dir/src/cpp/main.cpp.obj.d"
-  "CMakeFiles/L_systems.dir/src/cpp/vulkan_app.cpp.obj"
-  "CMakeFiles/L_systems.dir/src/cpp/vulkan_app.cpp.obj.d"
   "L_systems.exe"
   "L_systems.exe.manifest"
   "L_systems.pdb"
