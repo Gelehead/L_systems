@@ -1,5 +1,8 @@
 [summary](main_doc.md)
 # Grammar_h
+~1 dimension grammar output : you give some rules and it outputs deterministically (for now) a string corresponding to instructions for python turtle
+
+
 
 ## attributes
 
@@ -37,3 +40,6 @@ This leads to accessing junk data (hence the 'á' character) and eventually caus
 
 This is a subtle but dangerous bug that's common in C++ code, and it explains exactly the pattern of errors you're seeing.
 ```
+
+
+Other problem with pointers was solved adding pointers everywhere and instantiating symbols as REFERENCES instead of objects and modifying those so the changes are consistent when using the symbols

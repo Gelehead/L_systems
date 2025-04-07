@@ -17,12 +17,6 @@ int main(int argc, char** argv) {
 
     std::ofstream out(outputPath);
 
-    std::cout << " ----------------- main post read ----------------- " << std::endl;
-
-    for (symbol* start_symbol : g.s) {
-        std::cout << *start_symbol << std::endl;
-    }
-
     out << grammar::vec2string(g.generate(atoi(argv[2]), g.s));
     out.close();
     

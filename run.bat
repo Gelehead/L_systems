@@ -1,10 +1,10 @@
 @echo off
-set N_GENERATION=3
+set N_GENERATION=5
 set GRAMMAR_FILE=test.txt
 set OUTPUT_GRAMMAR_PATH="../build/grammars/gram_gen.txt"
 
 ::python script part
-set PENCIL_SIZE=4
+set PENCIL_SIZE=1
 set ANGLE=90
 
 :: build project

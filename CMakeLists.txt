@@ -5,77 +5,96 @@ project(L_systems VERSION 0.1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# set Vulkan SDK, library and include directories manually
-set(VULKAN_SDK_PATH "C:/VulkanSDK/1.4.309.0")
-
-set(Vulkan_INCLUDE_DIR "${VULKAN_SDK_PATH}/Include")
-set(Vulkan_LIBRARY "${VULKAN_SDK_PATH}/Lib/vulkan-1.lib") 
-
+# Define output directories in a platform-independent way
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-# Find Vulkan package
-find_package(Vulkan QUIET)
-find_package(glfw3 REQUIRED)
-
-if (NOT Vulkan_FOUND)
-    message(STATUS "Using manually specified Vulkan paths")
-    set(Vulkan_INCLUDE_DIRS ${Vulkan_INCLUDE_DIR})
-    set(Vulkan_LIBRARIES ${Vulkan_LIBRARY})
-    set(Vulkan_FOUND TRUE)
-endif()
-
-# Add source files
-set(SOURCES 
-    src/cpp/main.cpp
-)
-
-# Create executable
-add_executable(grammar_gen src/cpp/main.cpp)
-add_executable(${PROJECT_NAME} ${SOURCES})
-
-# Include directories
-target_include_directories(${PROJECT_NAME} 
-    PRIVATE 
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${Vulkan_INCLUDE_DIRS}
-)
-
-# Link libraries
-target_link_libraries(${PROJECT_NAME} 
-    PRIVATE 
-        ${Vulkan_LIBRARIES}
-        glfw
-)
-
-# Shader compilation
-# This assumes you have glslc installed (part of Vulkan SDK)
-set(SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(SHADER_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/shaders)
-
-# Create shader output directory
-file(MAKE_DIRECTORY ${SHADER_BINARY_DIR})
-
-# create grammars directory
+# Create output directories
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/grammars)
 
-# Find all shader files
-file(GLOB SHADERS
-    ${SHADER_SOURCE_DIR}/*.vert
-    ${SHADER_SOURCE_DIR}/*.frag
+# Define source and include directories relative to project root
+set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(CPP_DIR ${SRC_DIR}/cpp)
+set(GRAMMARS_DIR ${SRC_DIR}/grammars)
+set(PYTHON_DIR ${SRC_DIR}/Python)
+
+# Include directories
+include_directories(${INCLUDE_DIR})
+include_directories(${CPP_DIR})
+
+# Add grammar generator executable
+add_executable(grammar_gen ${CPP_DIR}/main.cpp)
+
+# Set the default grammar file and output path as compile definitions
+# These can be overridden at runtime
+set(DEFAULT_GRAMMAR_FILE "${GRAMMARS_DIR}/test.txt")
+set(DEFAULT_OUTPUT_PATH "${CMAKE_BINARY_DIR}/grammars/gram_gen.txt")
+
+target_compile_definitions(grammar_gen PRIVATE 
+    DEFAULT_GRAMMAR_FILE="${DEFAULT_GRAMMAR_FILE}"
+    DEFAULT_OUTPUT_PATH="${DEFAULT_OUTPUT_PATH}"
 )
 
-# Compile shaders
-foreach(SHADER IN LISTS SHADERS)
-    get_filename_component(FILENAME ${SHADER} NAME)
-    add_custom_command(
-        OUTPUT ${SHADER_BINARY_DIR}/${FILENAME}.spv
-        COMMAND ${Vulkan_GLSLC_EXECUTABLE} ${SHADER} -o ${SHADER_BINARY_DIR}/${FILENAME}.spv
-        DEPENDS ${SHADER}
-        COMMENT "Compiling shader ${FILENAME}"
-    )
-    list(APPEND SHADER_BINARIES ${SHADER_BINARY_DIR}/${FILENAME}.spv)
-endforeach()
+# Copy grammar files to build directory
+file(GLOB GRAMMAR_FILES "${GRAMMARS_DIR}/*.txt")
+file(COPY ${GRAMMAR_FILES} DESTINATION ${CMAKE_BINARY_DIR}/grammars)
 
-# Add shader compilation as a dependency
-add_custom_target(shaders DEPENDS ${SHADER_BINARIES})
-add_dependencies(${PROJECT_NAME} shaders)
+# Copy Python interpreter scripts
+file(GLOB PYTHON_FILES "${PYTHON_DIR}/*.py")
+file(COPY ${PYTHON_FILES} DESTINATION ${CMAKE_BINARY_DIR}/python)
+
+# Add install rules for better distribution
+install(TARGETS grammar_gen DESTINATION bin)
+install(FILES ${GRAMMAR_FILES} DESTINATION share/${PROJECT_NAME}/grammars)
+install(FILES ${PYTHON_FILES} DESTINATION share/${PROJECT_NAME}/python)
+
+# Create a platform-independent run script
+if(WIN32)
+    # Windows batch file
+    file(WRITE ${CMAKE_BINARY_DIR}/run.bat "
+@echo off
+set N_GENERATION=5
+set GRAMMAR_FILE=test.txt
+set OUTPUT_GRAMMAR_PATH=\"${CMAKE_BINARY_DIR}/grammars/gram_gen.txt\"
+set PENCIL_SIZE=1
+set ANGLE=90
+
+grammar_gen.exe \"${CMAKE_BINARY_DIR}/grammars/%GRAMMAR_FILE%\" %N_GENERATION% %OUTPUT_GRAMMAR_PATH%
+
+cd \"${CMAKE_BINARY_DIR}/python\"
+python interpreter.py %PENCIL_SIZE% %ANGLE% %OUTPUT_GRAMMAR_PATH%
+cd \"${CMAKE_BINARY_DIR}\"
+")
+else()
+    # Unix shell script
+    file(WRITE ${CMAKE_BINARY_DIR}/run.sh "#!/bin/bash
+N_GENERATION=5
+GRAMMAR_FILE=test.txt
+OUTPUT_GRAMMAR_PATH=\"${CMAKE_BINARY_DIR}/grammars/gram_gen.txt\"
+PENCIL_SIZE=1
+ANGLE=90
+
+\"${CMAKE_BINARY_DIR}/grammar_gen\" \"${CMAKE_BINARY_DIR}/grammars/$GRAMMAR_FILE\" $N_GENERATION \"$OUTPUT_GRAMMAR_PATH\"
+
+cd \"${CMAKE_BINARY_DIR}/python\"
+python interpreter.py $PENCIL_SIZE $ANGLE \"$OUTPUT_GRAMMAR_PATH\"
+cd \"${CMAKE_BINARY_DIR}\"
+")
+    # Make the shell script executable
+    execute_process(COMMAND chmod +x ${CMAKE_BINARY_DIR}/run.sh)
+endif()
+
+# Add a custom target to run the program
+add_custom_target(run
+    DEPENDS grammar_gen
+    COMMAND ${CMAKE_BINARY_DIR}/run${CMAKE_EXECUTABLE_SUFFIX}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMENT "Running L-systems generator"
+)
+
+# Output configuration information
+message(STATUS "L-systems configuration:")
+message(STATUS "  Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "  C++ standard: ${CMAKE_CXX_STANDARD}")
+message(STATUS "  Default grammar: ${DEFAULT_GRAMMAR_FILE}")
+message(STATUS "  Grammar output: ${DEFAULT_OUTPUT_PATH}")

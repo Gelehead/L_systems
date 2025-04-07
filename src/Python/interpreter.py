@@ -13,7 +13,7 @@ def visualize_turtle_graphics(grammar_path, angle=90, step_size=10):
     
     f = open("../"+grammar_path)
     instructions = f.readline()
-    print(instructions[:100])
+    #print(instructions[:100])
     f.close()
     
     # Set up the turtle

@@ -1,5 +1,0 @@
-C:/Users/oscar/OneDrive/Escritorio/Univ/Code/C & C++/L_systems/build/CMakeFiles/grammar_gen.dir
-C:/Users/oscar/OneDrive/Escritorio/Univ/Code/C & C++/L_systems/build/CMakeFiles/L_systems.dir
-C:/Users/oscar/OneDrive/Escritorio/Univ/Code/C & C++/L_systems/build/CMakeFiles/shaders.dir
-C:/Users/oscar/OneDrive/Escritorio/Univ/Code/C & C++/L_systems/build/CMakeFiles/edit_cache.dir
-C:/Users/oscar/OneDrive/Escritorio/Univ/Code/C & C++/L_systems/build/CMakeFiles/rebuild_cache.dir
