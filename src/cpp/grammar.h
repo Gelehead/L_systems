@@ -1,4 +1,7 @@
-#include "symbol.h"
+#ifndef GRAMMAR_H
+#define GRAMMAR_H
+
+#include "GrammarElement.h"
 
 #include <unistd.h>
 #include <iostream>
@@ -8,75 +11,99 @@
 #include <regex>
 #include <iterator>
 #include <map>
-class grammar {
+
+class GrammarUnified {
+    public :
+    // non terminal symbols
+    std::vector<GrammarElement*> nt;
+
+    // terminal symbols 
+    std::vector<GrammarElement*> t;
+
+    // start symbols
+    std::vector<GrammarElement*> s;
+
+    static GrammarUnified* readGrammar(std::string filePath){
+        // TODO:
+        // checks the file format with the first line
+        // 
+    }
+
+    virtual bool canGenerate2D() const = 0;
+
+    virtual std::vector<GrammarElement*> generate(int generation, std::vector<GrammarElement*> base) const {
+        if (canGenerate2D()) {
+            throw std::runtime_error("This grammar only supports 2D generation");
+        }
+        return generate1DImp(generation, base);
+    }
+
+    virtual std::vector<std::vector<GrammarElement*>> generate(int generation, std::vector<std::vector<GrammarElement*>> base) const {
+        if (!canGenerate2D()) {
+            throw std::runtime_error("This grammar does not support 2D generation");
+        }
+        return generate2pDImp(generation, base);
+    }
+
+    protected :
+        // "1D" and 2/3D generations 
+        virtual std::vector<GrammarElement*> generate1DImp(int generation, std::vector<GrammarElement*> base) const = 0;
+        virtual std::vector<std::vector<GrammarElement*>> generate2pDImp(int generation, std::vector<std::vector<GrammarElement*>> base)const = 0;
+};
+
+class grammar : public GrammarUnified {
     public:
         // non terminal symbols
-        std::vector<symbol*> m;
+        std::vector<GrammarElement*> m;
 
         // terminal symbols
-        std::vector<symbol*> t;
+        std::vector<GrammarElement*> t;
 
         // start symbol
-        // TODO: transform into symbol VECTOR and handle it properly 
-        std::vector<symbol*> s;
+        std::vector<GrammarElement*> s;
 
-        // rules
-        std::map<symbol, std::vector<std::vector<symbol*>>> r;
+        // rules - using pointers to GrammarElement for map keys to avoid object slicing
+        std::map<GrammarElement*, std::vector<std::vector<GrammarElement*>>> r;
 
         grammar(
-            const std::vector<symbol*> non_terminal, 
-            const std::vector<symbol*> terminal, 
-            const std::vector<symbol*> start,
-            std::map<symbol, std::vector<std::vector<symbol*>>> rules
+            const std::vector<GrammarElement*> non_terminal, 
+            const std::vector<GrammarElement*> terminal, 
+            const std::vector<GrammarElement*> start,
+            std::map<GrammarElement*, std::vector<std::vector<GrammarElement*>>> rules
         ) : m(non_terminal), t(terminal), s(start), r(rules) {}
 
-        // @param generation vector of symbols 
+        // Default constructor
+        grammar() : m(), t(), s(), r() {}
+
+        bool canGenerate2D() const override { return true; }
+
+        // @param generation vector of grammar elements 
         // @return string corresponding to every character concatenated  
-        static std::string vec2string(std::vector<symbol*> generation ) {
+        static std::string vec2string(std::vector<GrammarElement*> generation) {
             std::string out = "";
-            for ( symbol* s : generation ) {
+            for (GrammarElement* s : generation) {
                 out += s->getChar();
             }
             return out;
         }
 
-        // executes n times the generation rules starting from string str
-        // @returns symbol vector of the generation^th generation
-        std::vector<symbol*> generate(int generation, std::vector<symbol*> base){
-            if ( generation <= 0 ) { return base; }
-
-            std::vector<symbol*> next_gen;
-            for ( symbol* sym : base ) {
-                if ( sym->isTerminal() ){
-                    next_gen.push_back(sym);
-                } else {
-                    // select randomly the next generation from the rules
-                    std::vector<symbol*> generated_vec = !*sym;
-                    for (symbol* generated_sym : generated_vec) {
-                        next_gen.push_back(generated_sym);
-                    }
-                }
-            }
-            return generate(generation-1, next_gen);
-        }
-
-        static grammar read_grammar(std::string filename) {
+        static grammar* read_grammar(std::string filename) {
             std::ifstream file(filename);
             if (!file.is_open()) {
                 throw std::runtime_error("Could not open file: " + filename);
             }
             
             std::string str;
-            std::vector<symbol*> m, s, t;
-            std::map<symbol, std::vector<std::vector<symbol*>>> r;
+            std::vector<GrammarElement*> m, s, t;
+            std::map<GrammarElement*, std::vector<std::vector<GrammarElement*>>> r;
 
-            // check grammar_h.md for explanation
+            // Reserve space for elements
             m.reserve(100);
             t.reserve(100);
             s.reserve(100);
 
-            // map from char to symbol index in corresponding vector
-            std::map<char, symbol*> mapper;
+            // map from char to GrammarElement pointer
+            std::map<char, GrammarElement*> mapper;
             
             // Read non-terminal symbols
             std::getline(file, str);
@@ -133,10 +160,10 @@ class grammar {
                     }
 
                     // Get the left symbol from the mapper
-                    symbol* leftSymbol = mapper.at(left[0]);
+                    GrammarElement* leftSymbol = mapper.at(left[0]);
                     
                     // Process right side of the rule
-                    std::vector<symbol*> next;
+                    std::vector<GrammarElement*> next;
                     for (char c : right) {
                         if (mapper.find(c) != mapper.end()) {
                             next.push_back(mapper.at(c)); 
@@ -146,38 +173,94 @@ class grammar {
                     }
 
                     // Add the rule
-                    if (r.find(*leftSymbol) == r.end()) {
-                        r[*leftSymbol] = std::vector<std::vector<symbol*>>();
+                    if (r.find(leftSymbol) == r.end()) {
+                        r[leftSymbol] = std::vector<std::vector<GrammarElement*>>();
                     }
-                    mapper.at(leftSymbol->getChar())->add_to_next(next);
-                    r[*leftSymbol].push_back(next);
-    
+                    leftSymbol->addToNext(next);
+                    r[leftSymbol].push_back(next);
                 } else {
                     std::cerr << "Warning: Ignoring malformed rule: " << str << std::endl;
                 }
             }
-            return grammar(m, t, s, r);
+            return &grammar(m, t, s, r);
         }
-
     friend std::ostream& operator<<(std::ostream& os, grammar& gram);
 
+    protected :
+        // executes n times the generation rules starting from string str
+        // @returns grammar element vector of the generation^th generation
+        std::vector<GrammarElement*> generate1DImp(int generation, std::vector<GrammarElement*> base) const override{
+            if (generation <= 0) { return base; }
+
+            std::vector<GrammarElement*> next_gen;
+            for (GrammarElement* sym : base) {
+                if (sym->isTerminal()) {
+                    next_gen.push_back(sym);
+                } else {
+                    // select randomly the next generation from the rules
+                    std::vector<GrammarElement*> generated_vec = sym->selectRandomNext();
+                    for (GrammarElement* generated_sym : generated_vec) {
+                        next_gen.push_back(generated_sym);
+                    }
+                }
+            }
+            return generate(generation-1, next_gen);
+        }
+
+        // never called because canGenerate2D returns false
+        std::vector<std::vector<GrammarElement*>> generate2pDImp(int generation, std::vector<std::vector<GrammarElement*>> base) const override {
+            throw std::runtime_error("Not implemented");
+        }
 };
 
 // overload of << operator to have a reasonable way to track progress
-std::ostream& operator << (std::ostream& os, grammar& gram) { 
-    os << std::string("non terminal symbols -> ") << gram.m << std::endl;
-    os << std::string("terminal symbols -> ") << gram.t << std::endl;
-    os << std::string("Start symbols -> ") << gram.s << std::endl;
+std::ostream& operator<<(std::ostream& os, grammar& gram) { 
+    os << std::string("non terminal symbols -> ");
+    os << '{';
+    for (size_t i = 0; i < gram.m.size(); i++) {
+        os << gram.m[i]->getChar();
+        if (i < gram.m.size() - 1) {
+            os << ", ";
+        }
+    }
+    os << '}' << std::endl;
+    
+    os << std::string("terminal symbols -> ");
+    os << '{';
+    for (size_t i = 0; i < gram.t.size(); i++) {
+        os << gram.t[i]->getChar();
+        if (i < gram.t.size() - 1) {
+            os << ", ";
+        }
+    }
+    os << '}' << std::endl;
+    
+    os << std::string("Start symbols -> ");
+    os << '{';
+    for (size_t i = 0; i < gram.s.size(); i++) {
+        os << gram.s[i]->getChar();
+        if (i < gram.s.size() - 1) {
+            os << ", ";
+        }
+    }
+    os << '}' << std::endl;
 
-    // for every symbol, print it and iterate over its vector symbols
-    // ?? smh iterates from the end
-    for ( const auto& pair : gram.r ){
-        symbol key = pair.first;
-        std::cout << key.getChar() << std::endl;
-        for ( std::vector<symbol*> next : pair.second ){
-            std::cout << next << std::endl;
+    // for every grammar element, print it and iterate over its vector elements
+    for (const auto& pair : gram.r) {
+        os << pair.first->getChar() << std::endl;
+        for (const std::vector<GrammarElement*>& next : pair.second) {
+            os << '{';
+            for (size_t i = 0; i < next.size(); i++) {
+                os << next[i]->getChar();
+                if (i < next.size() - 1) {
+                    os << ", ";
+                }
+            }
+            os << '}' << std::endl;
         }
     }
 
     return os;
 }
+
+#endif // GRAMMAR_H

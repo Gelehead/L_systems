@@ -112,6 +112,8 @@
     "expected": "cpp",
     "optional": "cpp",
     "span": "cpp",
-    "cinttypes": "cpp"
+    "cinttypes": "cpp",
+    "chrono": "cpp",
+    "ratio": "cpp"
   }
 }

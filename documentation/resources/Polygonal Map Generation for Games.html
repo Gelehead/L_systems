@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<!-- saved from url=(0083)http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
+<title>Polygonal Map Generation for Games</title>
+<link rel="canonical" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/">
+<!--DO NOT EDIT: generated from game-programming/polygon-map-generation/index.bxml-->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="http://www-cs-students.stanford.edu/~amitp/favicon.ico">
+<link rel="apple-touch-icon" href="http://www-cs-students.stanford.edu/~amitp/red_blob.gif">
+<link rel="preload" as="image" href="http://www-cs-students.stanford.edu/~amitp/transparent-blob.png">
+<link rel="alternate" type="application/atom+xml" title="Blog posts" href="https://www.redblobgames.com/blog/posts.xml">
+<meta name="theme-color" content="hsl(0,50%,45%)">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@redblobgames">
+<meta property="og:title" content="Red Blob Games: Polygonal Map Generation for Games">
+<meta name="description" content="Procedural map generation using a Voronoi grid instead of a square or hexagonal grid">
+<meta property="og:description" content="Procedural map generation using a Voronoi grid instead of a square or hexagonal grid">
+<meta property="og:image" content="https://www.redblobgames.com/thumbnail/maps.jpg">
+<meta name="citation_title" content="Polygonal Map Generation for Games">
+<meta name="citation_author" content="Patel, Amit J.">
+<meta name="citation_publication_date" content="2010">
+<meta name="citation_fulltext_html_url" content="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/">
+<meta name="citation_technical_report_institution" content="Red Blob Games">
+<style>:root{--hue: 0;--bgurl: url("/~amitp/transparent-blob.png")}/*! CSS Copyright 2007-2023 by amitp@cs.stanford.edu (Amit J. Patel)  *//*! I don't mind if you copy my stylesheet.  However, I'd appreciate it if you gave me credit. */body{--serif: "Iowan Old Style",Cambria,Georgia,serif;--sans-serif: "Avenir Next",Candara,Ubuntu,"Fira Sans",system-ui,"Segoe UI",sans-serif;--monospace: "Roboto Mono","Cascadia Code",Consolas,monospace,"Segoe UI Symbol",Symbol;--body-width: calc(100vw - 2.25rem);--font-size: calc(0.625rem + 1vw);--line-height: calc(1.5 * var(--font-size));font-family:var(--sans-serif);font-size:var(--font-size);line-height:1.5em;min-height:95%}@media (min-width: 34.375em){body{--body-width: min(20.6rem + 33vw, 41.25rem);--font-size: calc(var(--body-width) / 33)}}main{font-family:var(--serif)}h1,h2,h3,h4,h5,h6,figcaption,.sans-serif{font-family:var(--sans-serif);text-wrap:balance}tt,code,kbd,samp,pre{font-family:var(--monospace);font-size:0.8em}pre :is(tt, code, kbd, samp){font-size:unset}#table-of-contents{background-color:#fff;padding-left:1em;width:18em;float:right}#table-of-contents:after{clear:right}nav,#table-of-contents{font-family:var(--sans-serif);font-size:calc(var(--font-size) / 1.25)}nav a,#table-of-contents a{text-decoration-color:hsl(var(--hue), 20%, 90%)}@media screen{header,section>h2{text-shadow:0px 2px 5px rgba(0,0,0,0.8);text-rendering:optimizeLegibility}}h1{font-size:2.0em;margin:0;line-height:calc(1.5 * var(--line-height))}h1 .subheading{font-size:0.5em;line-height:var(--line-height)}sup,sub{position:relative;vertical-align:baseline;font-size:0.75em;line-height:0;padding-left:0.125em}sup{top:-0.5em}sub{bottom:-0.25em}details summary{cursor:pointer}*{box-sizing:border-box}html,body{margin:0;padding:0}html{background-color:#e4e4e0;color:#000}body{background-color:#fff;color:#333}header{display:block;text-align:center}header>h1{padding-top:var(--line-height)}@media screen{header,footer,.divider,section>h2{color:#fff;background-color:hsl(var(--hue), 50%, 45%);background-image:var(--bgurl), var(--bgurl), linear-gradient(180deg, hsl(var(--hue), 50%, 45%) 0%, hsl(var(--hue), 75%, 30%) 100%);background-position:0 0, 16px 16px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}header a,footer a,.divider a,section>h2 a{color:hsl(var(--hue), 40%, 90%);background:unset;text-decoration:none}header a:hover,footer a:hover,.divider a:hover,section>h2 a:hover{background-color:rgba(0,0,0,0.5);text-decoration:underline}}footer a,.divider a{text-decoration:underline}main{margin-inline:0;padding-inline:0}section{margin:var(--line-height) 0}section>*{width:var(--body-width);max-width:100%}.comments{width:calc(1.5 * var(--body-width));max-width:100%}@media screen{.comments,.below-divider{background-color:#e6e6e5}}.comments{padding-bottom:1.25em;font-size:1.0em}.comments .comment-author{text-shadow:1px 1px 3px #fff}section>h2{--h2-margin: 3em;margin:var(--line-height) auto;padding:calc(var(--line-height) / 2 - 1px) 0;font-size:1.25em;width:calc(2 * var(--h2-margin) + var(--body-width));max-width:100%}section>h2>span{display:inline-block;margin-left:var(--h2-margin)}section>h2 a.anchor{float:right;width:calc(var(--h2-margin));text-align:center;color:hsl(var(--hue), 50%, 45%)}section>h2:hover a.anchor{color:hsl(var(--hue), 20%, 80%)}h3{--h2-margin: 3em;margin:var(--line-height) auto;font-size:1.125em}h3 a.anchor{float:right;width:calc(var(--h2-margin));text-align:center;color:hsl(var(--hue), 20%, 80%)}@media (min-width: 34.375em){h3 a.anchor{margin-right:calc(0em - var(--h2-margin))}}h4 a.anchor,h5 a.anchor,h6 a.anchor{padding-left:1em;color:hsl(var(--hue), 20%, 80%)}h3:hover a.anchor,h4:hover a.anchor,h5:hover a.anchor,h6:hover a.anchor{color:hsl(var(--hue), 50%, 40%)}header nav{display:block}header nav ul{display:flex;flex-flow:row wrap;justify-content:center;line-height:1.0;margin:0}header nav ul li{display:inline-block;padding:0.1em 0.3em;text-align:center;flex:0 0 4em;align-self:center;white-space:nowrap}header nav ul li a{display:block;font-weight:bold;text-decoration:none}header,.divider,section>h2{border-bottom:1px solid #000}.divider,section>h2{border-top:1px solid #000}.divider{min-height:calc(2 * var(--line-height));text-align:center}.below-divider{padding-top:var(--line-height);border-bottom:1px solid black}.below-divider>p:first-child{font-size:1.25em;text-align:center;margin-top:0}footer{--footer-padding-y: calc(var(--line-height) / 2);--footer-padding-x: var(--font-size);padding:var(--footer-padding-y) var(--footer-padding-x);border-top:1px solid #000}footer>div>address{display:block}footer>div>*{text-align:center}@media (min-width: 50em){footer>div{margin:0 auto;display:flex;flex-flow:row wrap;justify-content:center;max-width:calc(2 * var(--body-width));width:calc(100vw - 2 * var(--footer-padding-x))}footer>div>address{flex:0 1 20em;align-self:center;text-align:left}footer>div>div{flex:1 1 20em;align-self:center;text-align:right}footer>div>div>p,footer>div>div>div{margin-top:0}}h2:target{animation:target-attention 0.4s 1;font-size:2.0em}@keyframes target-attention{0%{transform:scale(1.1)}100%{transform:scale(1.1)}}div:target{border:1px dashed #888}kbd kbd{padding:0.1em 0.4em;margin:0 0.1em 0.2em 0.1em;font-size:0.75em;white-space:nowrap;background-color:#ddd;color:#242;border:1px solid rgba(0,0,0,0.2);border-radius:0.2em;box-shadow:inset 0 0 1px 1px #fff,0 2px 0 rgba(0,0,0,0.3)}samp,kbd{background-color:#f3f3f2}code,samp{color:#442}kbd{margin:0 0.4em;color:#252}section li::marker{font-family:var(--sans-serif);color:hsl(var(--hue), 50%, 40%)}img{max-width:100%;height:auto;-ms-interpolation-mode:bicubic}section figcaption{font-size:0.75em;line-height:1.1;text-align:center}a{color:hsl(var(--hue), 50%, 45%);text-decoration-color:hsl(var(--hue), 20%, 80%);text-underline-offset:0.25em}a:hover{text-decoration:underline;text-decoration-color:hsl(var(--hue), 50%, 45%);background:hsla(var(--hue), 50%, 50%, 0.1)}:focus-visible{outline-color:hsl(var(--hue), 50%, 45%)}.draft{font-family:var(--serif);font-size:calc(4 * var(--font-size));letter-spacing:-0.1em;color:#eee;opacity:0.5;text-align:center;transform:rotate(-5deg);line-height:1.0;position:absolute;top:0;height:0;left:25%;width:50%;pointer-events:none}@media (min-width: 34.375em){section p,section li{hanging-punctuation:first last;text-wrap:pretty;hyphens:auto;hyphenate-limit-chars:7}}nav,.section-number,address,time{font-variant-numeric:oldstyle-nums}.w-auto,section>.w-auto{width:auto}.w-full,section>.w-full{width:100%}.w-150b,section>.w-150b{width:calc(1.5 * var(--body-width))}.select-none{user-select:none;-webkit-user-select:none}.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.text-sm{font-size:0.875em}.font-sans{font-family:var(--sans-serif)}.font-serif{font-family:var(--serif)}.font-mono{font-family:var(--monospace)}.normal-nums{font-variant-numeric:normal}.oldstyle-nums{font-variant-numeric:oldstyle-nums}p,figure,ul,ol{margin:var(--line-height) 0}header>*,section>*,footer>*,main>address,.comments{margin-inline:auto}figure{text-align:center}figure pre{text-align:left}li>ul,li>ol{margin-top:0;margin-bottom:0}figure img,figure svg,figure canvas{max-width:100%}dt{font-weight:bold}pre{width:var(--body-width);max-width:100%;line-height:1.4;overflow:auto;border-block:1px solid #ccc;border-inline-width:0}pre.simple,.comments pre{overflow:auto;width:calc(var(--body-width) * 1.2);border:none;background:transparent;background-color:transparent;box-shadow:none}pre.snippet,pre.src{border-top-style:dashed;border-bottom-style:dashed}section>pre:only-child{padding-bottom:var(--font-size);border-bottom:1px solid rgba(0,0,0,0.5)}blockquote{font-style:italic;text-wrap:balance}table.standard{font-family:var(--sans-serif);font-size:0.875em;border:2px solid white;border-collapse:collapse;overflow-x:auto}table.standard th{background-color:#e8e8e3;border:2px solid white;padding:0 0.5em}table.standard td{background-color:#fff;border:1px solid #f3f3f2;border-right-color:#babaab;padding:0 0.5em}table.standard thead{border-bottom:2px solid #babaab}table.standard thead th{background:linear-gradient(to top, #e8e8e3, #f4f4f1, #fafaf9)}aside,p.note,div.note>p{width:calc(--body-width - 2em);padding:1em;background:#eee;border:1px solid #ddd;box-shadow:0 8px 6px -6px rgba(0,0,0,0.4)}tt,code{padding:0 2px}pre :is(tt, code){padding:unset}main>address,section>address,section>time{display:block;width:var(--body-width);max-width:100%;font-family:var(--sans-serif);text-align:right}form{margin:0}input{accent-color:hsl(var(--hue), 50%, 50%)}input[type="text"]{max-width:100%;border:1px solid rgba(0,0,0,0.7);background-color:#f8f8f4;color:#000;text-align:center;font-weight:bold}input[type="text"]:focus{background-color:#fffff4}input::-webkit-input-placeholder{color:#aaa}input::-moz-placeholder{color:#aaa}input[type="search"][name="q"]{box-shadow:inset 0 0.1em 0.3em 0 rgba(0,0,0,0.5);border-radius:0.6em;padding:0.3em 0.6em;border-width:0}button{touch-action:manipulation;cursor:pointer;user-select:none}.TODO{color:#bf4040;background:#e8e3e3;border:1px solid #bf4040;margin-left:0.5ex}.DONE{color:#4040bf;background:#e3e3e8;border:1px solid #4040bf}.src .constant{font-style:oblique}.src .comment-delimiter,.src .nxml-comment-delimiter{color:#4488ff}.src .comment,.src .nxml-comment-content{color:#006699}.src .builtin{color:#508b20}.src .warning{color:#cc0000}.src .function-name{color:#268bd2;font-weight:bold}.src .variable-name{font-weight:bold;color:#5c3d5c}.src .type{color:#6c71c4}.src .constant-face{color:#d33682}.src .doc{color:#666666;background-color:#e2e6e8}.src .string{color:#888888}.src .preprocessor{color:#859900}.src .negation-char,.src .sh-escaped-newline{color:#ff0000}.src .todo{color:#ffffff;background:#dc322f}.src .note{color:#ffffff;background:#2aa198}.src .hack{color:#ffffff;background:#859900}.src .operator{color:black;font-weight:bold}.src .paren{color:#a0a090;font-weight:bold}.src .keyword{color:#679;font-weight:bold}.src .minor-control-construct{color:#406abf;font-weight:bold}.src .major-control-construct{color:#bf4040}.src-cpp .constant{color:#999999}.src-emacs-lisp .paren{color:#c9c9c4}.src-sh .string,.src-sh .comment{color:inherit}.src-python .highlight-indentation{border-right:2px solid #eeeeee}.src-css .css-selector{color:#478547}.src-css .css-property{color:#406abf}.src-xml .nxml-element-prefix{color:#bf40bf}.src-xml .nxml-element-local-name{color:#406abf;font-weight:normal}.src-xml .nxml-attribute-local-name{color:#478547}.src-xml .nxml-element-colon{color:#a3adc2}.src-xml .nxml-tag-delimiter,.src-xml .nxml-tag-slash{color:#9cabc9;font-weight:bold}table.standard td.left,table.standard th.left{text-align:left}table.standard td.center,table.standard th.center{text-align:center}table.standard td.right,table.standard th.right{text-align:right}@media screen{*[class^="section-number"]{color:hsl(var(--hue), 20%, 50%)}h2 .section-number{display:inline-block;margin-left:0;padding-left:0.5em;text-align:center;width:var(--h2-margin);color:hsl(var(--hue), 50%, 80%)}h2 .section-number+span{margin-left:0}h3>.section-number{float:left;text-align:center;width:2.7em;margin-right:0.3em;color:hsl(var(--hue), 25%, 90%);background:hsl(var(--hue), 50%, 50%);background-image:var(--bgurl), var(--bgurl);background-position:0 0, 16px 16px;border-radius:0.25em;text-shadow:0px 2px 5px rgba(0,0,0,0.8)}}@media screen and (min-width: 34.375em){h3>.section-number{height:2em;margin-left:-3em;margin-top:-0.3em;padding-top:0.3em;border-block:1px solid black}h3>a.anchor{background:url(https://www.redblobgames.com/img/svg-blob-mini.svg) no-repeat center center;background-size:2cap 2cap}h3:hover>a.anchor{background:none}}.print-endnote{display:none}@media print{@page{margin:0.5in}body{--font-size: 14pt;--serif: "Book Antiqua", "Times New Roman", serif;--sans-serif: "Helvetica", sans-serif;--monospace: "Courier", "Courier New", monospace}h2,h3{page-break-after:avoid}figure{page-break-inside:avoid}p,li{orphans:5;widows:5}section p a,section li a{text-decoration:underline;text-decoration-color:#ddd}header nav,.comments{display:none}.print-endnote{display:unset}.print-endnote li{list-style-type:none;word-break:break-all}.print-endnote img{width:2.5em;vertical-align:bottom}}
+
+@media print{header::before{position:absolute;right:0;top:0;content:url(https://chart.apis.google.com/chart?chs=120x120&cht=qr&chl=http%3A%2F%2Fwww-cs-students.stanford.edu%2F~amitp%2Fgame-programming%2Fpolygon-map-generation%2F);}}
+	  
+  figure { text-align: center; } figure img[width="400"], figure img[width="450"] { width: 100%; height: auto; }
+  </style>
+<script>function $l(s,e,d){d=document;if(d.location.hostname!='localhost'){e=d.createElement('script');e.async=true;e.src=s;e.dataset.timestamp=+new Date();d.body.appendChild(e)}}</script>
+<script id="simplify-jobs-page-script" src="chrome-extension://pbanhockgagggenencehbnadejlgchfc/js/pageScript.bundle.js"></script></head>
+<body class="gameprog">
+<header><h1>Polygonal Map Generation for Games</h1>
+<nav><search><form action="https://www.google.com/search">
+<ul> <li><a href="https://www.redblobgames.com/">Home</a></li> <li><a href="https://www.redblobgames.com/blog/">Blog</a></li> <li><a href="https://pinboard.in/u:amitp/t:gamedev/">Links</a></li> <li><a href="https://bsky.app/profile/redblobgames.com">Bluesky</a></li> <li><a rel="me" href="http://www-cs-students.stanford.edu/~amitp/">About</a></li> <li>&nbsp;</li> <li><input type="search" name="q" placeholder="Search" size="8"></li>
+</ul>
+<input type="hidden" name="hq" value="site:www.redblobgames.com OR site:theory.stanford.edu/~amitp/ OR site:www-cs-students.stanford.edu/~amitp/ OR site:amitp.blogspot.com OR site:simblob.blogspot.com">
+</form></search></nav></header><main><section><address>written Sep 2010, updated Jan 2025</address>
+<nav id="table-of-contents" role="doc-toc"><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#polygons">Polygons</a></li>
+<li><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#graphs">Graph Representation</a></li>
+<li><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#islands">Islands</a></li>
+<li><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#elevation">Elevation</a></li>
+<li><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#rivers">Rivers</a></li>
+<li><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#moisture">Moisture</a></li>
+<li><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#biomes">Biomes</a></li>
+<li><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#edges">Noisy Edges</a></li>
+<li><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#demo"><b>Demo!</b></a></li>
+<li><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#source">Source code</a></li>
+<li><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#appendix">More features</a></li>
+<li><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#future">Future work</a></li>
+<li><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#references">More reading</a></li>
+</ul>
+</div></nav><p>I wanted to generate interesting game maps that weren’t constrained to be realistic, and I wanted to try some techniques I hadn’t tried before. I usually make tile maps but instead used a different structure. What could I do with 1,000 polygons instead of 1,000,000 tiles? The distinct player-recognizable areas might be useful for gameplay: locations of towns, places to quest, territory to conquer or settle, landmarks, pathfinding waypoints, difficulty zones, etc. I generated maps with polygons, then rasterized them into tile maps that looked like this:</p>
+<figure><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/voronoi-map-goal-16000-shaded.png"><img src="./Polygonal Map Generation for Games_files/voronoi-map-goal-16000-shaded.png" style="width:100%;height:auto" alt="Goal of map generation project"></a></figure><p>Most procedural map generators, including some of my own previous projects, use noise functions (simplex noise, midpoint displacement, fractal, diamond-square, perlin noise, etc.) to generate a height map. I did not do that here. Instead, I used a <strong>graph structure</strong> to model the things directed by gameplay constraints (elevation, roads, river flow, quest locations, monster types) and <strong>noise functions</strong> to model the variety not constrained by gameplay (coastline shape, river placement, tree placement).</p>
+<p>There were three main things I wanted for this project: good coastlines, mountains, and rivers. For the coastline, I wanted to make island maps that are surrounded by ocean, so that I don’t have to deal with people walking to the edge of the map. For the mountains, I started with something simple: mountains are whatever’s farthest from the coastline, so that you can always walk uphill to reach the top. For the rivers, I started with something simple: draw rivers from the coast to the mountains, so that you can always follow rivers down to the beach.</p>
+<p>First, try the <a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/demo.html">Flash demo</a> (2010) or an <strong><a href="https://www.redblobgames.com/maps/mapgen2/">HTML5 demo</a><sup class="print-endnote">[1]</sup></strong> (2017). Read on to learn how it works, or get the <a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#source">source code</a>. Here’s the overview of the process:</p>
+<figure><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/overview.svg"><img src="./Polygonal Map Generation for Games_files/overview.png" style="width:100%;height:auto"></a></figure><p>Every project will have its own gameplay constraints. For this project, the gameplay constraints were partially taken from <a href="https://en.wikipedia.org/wiki/Realm_of_the_Mad_God">Realm of the Mad God</a><sup class="print-endnote">[2]</sup>, a multiplayer RPG in which players start on the beach playing alone and then later join together on the mountaintop to fight bosses. Elevation directly corresponds to difficulty, and must monotonically increase, so that was a key constraint in the design. Elevation in Minecraft on the other hand isn’t constrained the same way, so the noise function they use works for that game. In multiplayer Age of Empires, the location of resources is constrained by the need to be somewhat balanced among the players; in Minecraft the distribution of resources is not constrained. When writing your own map generator, think about what which aspects of your map are set by the design and which can vary from map to map. Each of the ideas on this page can be used separately or together in your own map generator project.</p></section><section><h2 id="polygons">
+<span class="section-number">&nbsp;1&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#polygons"> Polygons</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#polygons">#</a>
+</h2>
+<p>The first step is to generate some polygons. The simplest approach would be to use a hexagonal grid and perturb it a bit to make it look irregular. This works (and the techniques on this page will work if you use a perturbed grid), but I wanted something even less regular than that, so I picked random points and generated <a href="https://en.wikipedia.org/wiki/Voronoi_diagram">Voronoi polygons</a><sup class="print-endnote">[3]</sup>, which are used for <a href="https://web.archive.org/web/20171101111828/http://www.voronoi.com/wiki/index.php?title=Voronoi_Applications">lots of things</a><sup class="print-endnote">[4]</sup>, including maps.</p>
+<p>Here’s an example of random dots (red) and the polygons that result:</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/voronoi-polygons.png" alt="Voronoi diagram"></figure><p>The polygon shapes and sizes are a bit irregular. Random numbers are more “clumpy” than what people expect. I want something closer to semi-random “blue noise”, or <a href="http://bit-player.org/2011/a-slight-discrepancy">quasirandomness</a><sup class="print-endnote">[5]</sup>, not random points. I approximate that by using a variant of <a href="https://en.wikipedia.org/wiki/Lloyd&#39;s_algorithm">Lloyd relaxation</a><sup class="print-endnote">[6]</sup>, which is a fairly simple tweak to the random point locations to make them more evenly distributed. Lloyd relaxation replaces each point by the <a href="https://en.wikipedia.org/wiki/Centroid#Centroid_of_polygon">centroid</a><sup class="print-endnote">[7]</sup> of the polygon. In my code I merely average the corners. Here’s the result after running approximate Lloyd relaxation twice:</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/voronoi-2-lloyd.png" alt="Voronoi diagram with Lloyd relaxation run twice"></figure><p>Compare it to running <a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/voronoi-1-lloyd.png">once</a> or <a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/voronoi-50-lloyd.png">fifty times</a>. The more iterations, the more regular the polygons get. Running it twice gives me good results but every game will vary in its needs. In newer projects I use a Poisson Disc algorithm, which generates a nice distribution of points from the start, without iterating through multiple steps of Lloyd relaxation.</p>
+<p>Polygon sizes are improved by moving polygon centers. The same approach works to improve edge lengths. Moving corners by averaging the nearby centers produces more uniform edge lengths, although it occasionally worsens the polygon sizes. However, moving corners changes it from a Voronoi diagram to a <a href="https://www.redblobgames.com/x/1721-voronoi-alternative/">barycentric dual mesh</a><sup class="print-endnote">[8]</sup>. The algorithms for this map generator work with either style. Voronoi polygons are more uniformly sized, with varying shapes; barycentric dual polygons are more uniformly shaped, and the corners are more uniformly spaced. In the rest of the article I still call them Voronoi polygons and use screenshots of Voronoi, but the final demo uses the barycentric dual instead.</p>
+<p>Alternatives to consider:</p>
+<ul class="org-ul">
+<li>A square or hexagon grid. I use these for most projects because using Voronoi adds quite a lot of implementation complexity. I chose Voronoi for this project because of the needs of the game (rivers and quests).</li>
+<li>A <a href="https://www.redblobgames.com/x/1830-jittered-grid/">jittered grid</a><sup class="print-endnote">[9]</sup> is a different way to get scattered points without running Voronoi repeatedly. The quality is lower though.</li>
+<li>Poisson Disc generation is a different way to get scattered points without running Voronoi repeatedly. The quality is good.</li>
+<li>Lloyd Relaxation normally moves the red seed point to the centroid of <em>all</em> the points of a polygon. The alternative I used was to move the red point to the average of the polygon corners. Another alternative is to move the red point to the average of the neighbors (red points of adjacent polygons).</li>
+</ul></section><section><h2 id="graphs">
+<span class="section-number">&nbsp;2&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#graphs"> Map Representation</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#graphs">#</a>
+</h2>
+<p>The map contains two related <a href="https://en.wikipedia.org/wiki/Graph_theory">graphs</a><sup class="print-endnote">[10]</sup> (nodes and edges). The first graph has nodes for each polygon and edges between adjacent polygons. It represents the <a href="https://en.wikipedia.org/wiki/Delaunay_triangulation">Delaunay triangulation</a><sup class="print-endnote">[11]</sup>, which is useful for anything involving adjacency (such as pathfinding). The second graph has nodes for each polygon <em>corner</em> and edges between corners. It contains the shapes of the polygons. It’s useful for anything involving the shapes (such as rendering borders).</p>
+<p>The two graphs are related. Every triangle in the Delaunay triangulation corresponds to a polygon corner in the Voronoi diagram. Every polygon in the Voronoi diagram corresponds to a corner of a Delaunay triangle. Every edge in the Delaunay graph corresponds to an edge in the Voronoi graph.</p>
+<figure><img src="./Polygonal Map Generation for Games_files/edge-duality.png" alt="Diagram showing how Voronoi and Delaunay are related"><figcaption>Voronoi and Delaunay graphs are duals of each other</figcaption></figure><p>Polygon <code>A</code> and <code>B</code> are adjacent to each other, so there is a (red) edge between <code>A</code> and <code>B</code> in the adjacency graph. For them to be adjacent there must be a polygon edge between them. The (blue) polygon edge connects corners <code>1</code> and <code>2</code> in the Voronoi shape graph. <em>Every</em> edge in the adjacency graph corresponds to exactly one edge in the shape graph.</p>
+<p>In the Delaunay triangulation, triangle <code>A</code>-<code>B</code>-<code>C</code> connects the three polygons, and can be represented by corner <code>2</code>. Thus, corners in the Delaunay triangulation are polygons in the Voronoi diagram, and vice versa. Here’s a larger example showing the relationship, with Voronoi polygon centers in red and corners in blue, and the Voronoi edges in white and the Delaunay triangulation in black:</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/voronoi-and-delaunay.png" alt="Example Voronoi diagram with Delaunay overlay"></figure><p>We could store these graphs independently, but storing them in a combined format allows moving back and forth between the two. For this project, instead of representing two edges in the two graph separately, I made edges point to <em>four</em> nodes: two polygon centers and two corners. For later projects I used <a href="https://mapbox.github.io/delaunator/">Delaunator</a><sup class="print-endnote">[12]</sup>’s compact integer represenation to store the two graphs together.</p></section><section><h2 id="islands">
+<span class="section-number">&nbsp;3&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#islands"> Islands</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#islands">#</a>
+</h2>
+<p>The second step is to draw the coastline. The borders of the map need to be water, but you can mark the other polygons as either water or land, using any approach you want. The coastline is then all the edges where land and water meet.</p>
+<p>Here’s an example that divides the world into land and water:</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/voronoi-land-water.png" alt="Polygon map with land and water chosen"></figure><p>In this project, I used a radial method (combination of sine waves on a polar plot), <a href="https://www.redblobgames.com/maps/terrain-from-noise/#islands">a noise function</a><sup class="print-endnote">[13]</sup>, a square, and my blob logo. In <a href="https://www.redblobgames.com/maps/mapgen4/">mapgen4</a><sup class="print-endnote">[14]</sup> I let the user draw their own shape. You can use any shape, including <a href="https://old.reddit.com/r/rpg/comments/187o0v/im_not_sure_what_other_folks_do_but_this_is_how_i/">pizza box stains</a><sup class="print-endnote">[15]</sup> or <a href="https://imgur.com/a/EwPAy">clouds</a><sup class="print-endnote">[16]</sup> or a <a href="https://imgur.com/a/Pl3qi">torn up sheet of paper</a><sup class="print-endnote">[17]</sup>.</p>
+<p>Since there are two graphs (visualized with red points and blue points), there’s a question of <em>which</em> graph to use here. For this project I first assigned land/water to the corners (blue points) using noise or some other algorithm, and then assigned land to the polygons (red points) by looking at what fraction of corners were under water. I don’t know if this is the best way.</p>
+<p>Some water points are not connected to the edges of the map. I ran flood fill starting from the border of the map to determine which water areas are oceans (connected to the border) and lakes (surrounded by land):</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/voronoi-land-ocean-lake.png" alt="Polygon map divided into land, ocean, and lake"></figure><p>Having two graphs means <em>there can be weird cases to figure out</em>. For example, what happens if a polygon has the north and south corners in water, but the east and west corners on land? Is that a land polygon or a water polygon? In every Voronoi-based map project, I have had to try out several different rules until I found something that worked for that project.</p></section><section><h2 id="elevation">
+<span class="section-number">&nbsp;4&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#elevation"> Elevation</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#elevation">#</a>
+</h2>
+<p>The most realistic approach would have been to define elevation first, and then define the coastline to be where the elevation reaches sea level. That’s what I did with <a href="https://www.redblobgames.com/maps/terrain-from-noise/">mapgen1</a><sup class="print-endnote">[18]</sup> and <a href="https://www.redblobgames.com/maps/mapgen4/">mapgen4</a><sup class="print-endnote">[19]</sup>. However, for this project, we wanted players to go uphill from the coast towards a small mountainous area. I started with generating coastlines and worked backwards from there. I set elevation to be the <strong>distance from the coast</strong>. I skipped lake polygons in the distance calculation, so that lakes would stay flat and contribute to forming valleys.</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/elevations.png" alt="Elevation map"></figure><p>Having two graphs means I need to decide whether elevation is set on the red center points (Delaunay graph) or blue corner points (Voronoi graph). After some experimentation, I decided for this project it worked better to set elevation on the blue points. Corner-to-corner edges can serve as ridges and valleys. Rivers flow through corner-to-corner edges. After setting the corner elevations, I set the polygon elevation to the average of the elevation at corners.</p>
+<p>One problem with the definition is that some islands have too many mountain polygons and others have too few. To fix this, I redistribute the elevations to match a desired distribution. I want more low elevation land (coastline) than high elevation land (mountains). First, I sort the corners by elevation, and then I reset the elevation <code>x</code> of each to match the inverse of the desired cumulative distribution: <code>y(x) = 1 - (1-x)^2</code>. Redistributing values to match a desired distribution is a generally useful technique in procedural generation.</p>
+<p>For any location, going downhill will eventually lead to the ocean. This diagram shows the steepest downhill direction from every corner:</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/downslopes.png" alt="Elevation map with arrows pointing downhill"></figure><p>By following the downhill arrows from any location, we eventually reach the ocean. This will be useful for rivers but may also be useful for calculating <a href="https://www.voronoi.com/wiki/index.php?title=Rivers_and_watersheds">watersheds</a><sup class="print-endnote">[20]</sup> and other features.</p>
+<p>I had two main goals for elevation:</p>
+<ol class="org-ol">
+<li>
+<strong>Biome</strong> types: high elevations get snow, rock, tundra; medium elevations get shrubs, deserts, forests, and grassland; low elevations get rain forests, grassland, and beaches.</li>
+<li>
+<strong>Rivers</strong> flow from high elevations down to the coast. Having elevations that always increase away from the coast means that there’s no local minima that complicate river generation.</li>
+</ol>
+<p>In the previous section I marked land and water polygons, and in this section I set the elevation to be the distance from the coast. This “elevation <em>after</em> oceans” approach worked nicely for the game’s needs. It generated the type of volcanic islands we wanted for Realm of the Mad God, but it’s not the right thing for all projects. A more common approach is “elevation <em>before</em> oceans”: <a href="https://www.redblobgames.com/maps/terrain-from-noise/">use noise to generate an elevation</a><sup class="print-endnote">[21]</sup>, and then use the elevation to mark land and water. A more realistic algorithm would also take into account plate tectonics, mountain ranges, rift valleys, and other geological processes.</p>
+<p>When using a different elevation algorithm, there can be local minima. The downhill arrows might <em>not</em> always lead to the ocean. There is no one solution to this problem. In mapgen4 I carved channels <em>uphill</em> from the oceans so that they would reach all points. I then reset the elevations to prevent local minima. An alternative to this is to fill the local minima with lakes.</p></section><section><h2 id="rivers">
+<span class="section-number">&nbsp;5&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#rivers"> Rivers</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#rivers">#</a>
+</h2>
+<p>I wanted fresh water features: rivers and lakes. The most realistic approach would be to define moisture with wind, clouds, humidity, and rainfall, and then define the rivers and lakes based on where it rains. Instead, I’m starting with the goal, which is good rivers, and working backwards from there.</p>
+<p>The island shape determines which areas are water and which are land. Lakes are water polygons that aren’t oceans.</p>
+<p>Rivers use the downhill directions shown earlier. I choose random corner locations in the mountains, and then followed the slope down the ocean. The rivers flow from corner to corner:</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/river.png" alt="Elevation map with one river"></figure><p>I tried both polygon centers and corners, but found that the corner graph made for much nicer looking rivers. Keeping lakes flat made elevation lower near lakes, so rivers naturally flowed into and out of lakes. Multiple rivers can share the lower portion of their path. When upper rivers of flow A and B merge, the lower river has flow A+B. I rendered the <em>width</em> of the river using the square root of the flow.</p></section><section><h2 id="moisture">
+<span class="section-number">&nbsp;6&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#moisture"> Moisture</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#moisture">#</a>
+</h2>
+<p>Since I’m working backwards, I don’t need moisture to form rivers. However, moisture is useful for defining <strong>biomes</strong> (deserts, swamps, forests, etc.). Since rivers and lakes should form in areas with high moisture, I defined moisture to decrease as <strong>distance from fresh water</strong> increases. I tweaked the formula until I got a result I liked:</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/moisture.png" alt="Moisture map"></figure><p>As with elevation, I redistribute moisture to match a desired distribution. In this case, I want roughly equal numbers of dry and wet regions. The desired cumulative distribution is <code>y(x) = x</code>, so the redistribution code is simple. I sort by moisture and then assign the moisture of each corner to that corner’s position in the sorted list.</p>
+<p>On the map, the moisture data is only used for biomes, but in the game (<a href="https://www.realmofthemadgod.com/">Realm of the Mad God</a><sup class="print-endnote">[22]</sup>) we also used moisture to distribute vegetation and monsters.</p></section><section><h2 id="biomes">
+<span class="section-number">&nbsp;7&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#biomes"> Biomes</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#biomes">#</a>
+</h2>
+<p>Biome types depend on temperature and moisture. On small volcanic island maps being generated here, elevation is a proxy for temperature. Higher elevations mean lower temperatures. In the <a href="https://www.redblobgames.com/maps/mapgen2/">html5 version of this project</a><sup class="print-endnote">[23]</sup>, I added temperature based on latitude (north/south can be colder than the equator).</p>
+<p>Biomes first depend on whether it’s water or land:</p>
+<ul class="org-ul">
+<li>
+<code>OCEAN</code> is any water polygon connected to the map border</li>
+<li>
+<code>LAKE</code> is any water polygon not connected to the map border, or <code>ICE</code> lake if the lake is at high elevation (low temperature), or <code>MARSH</code> if it’s at low elevation</li>
+<li>
+<code>BEACH</code> is any land polygon next to an ocean</li>
+</ul>
+<p>For all land polygons, I started with the <a href="http://pcg.wikidot.com/pcg-algorithm:whittaker-diagram">Whittaker diagram</a><sup class="print-endnote">[24]</sup> and adapted it to my needs:</p>
+<div><table class="standard" width="100%" style="font-size:0.7em">
+<thead>
+<tr>
+<th width="10%" rowspan="2">Elevation<br>Zone</th>
+<th colspan="6">Moisture Zone</th>
+</tr>
+<tr>
+<th width="15%">6<br>(wet)</th>
+<th width="15%">5</th>
+<th width="15%">4</th>
+<th width="15%">3</th>
+<th width="15%">2</th>
+<th width="15%">1<br>(dry)</th>
+</tr>
+</thead>
+<tbody style="text-align:center">
+<tr style="height:3em">
+<th>4<br>(high)</th>
+<td style="background:#f8f8f8" colspan="3"><code>SNOW</code></td>
+<td style="background:#ddddbb"><code>TUNDRA</code></td>
+<td style="background:#bbbbbb"><code>BARE</code></td>
+<td style="background:#999999"><code>SCORCHED</code></td>
+</tr>
+<tr style="height:3em">
+<th>3</th>
+<td style="background:#ccd4bb" colspan="2"><code>TAIGA</code></td>
+<td style="background:#c4ccbb" colspan="2"><code>SHRUBLAND</code></td>
+<td style="background:#e4e8ca" colspan="2"><code>TEMPERATE DESERT</code></td>
+</tr>
+<tr style="height:3em">
+<th>2</th>
+<td style="background:#a4c4a8"><code>TEMPERATE RAIN FOREST</code></td>
+<td style="background:#b4c9a9" colspan="2"><code>TEMPERATE DECIDUOUS FOREST</code></td>
+<td style="background:#c4d4aa" colspan="2"><code>GRASSLAND</code></td>
+<td style="background:#e4e8ca"><code>TEMPERATE DESERT</code></td>
+</tr>
+<tr style="height:3em">
+<th>1<br>(low)</th>
+<td style="background:#9cbba9" colspan="2"><code>TROPICAL RAIN FOREST</code></td>
+<td style="background:#a9cca4" colspan="2"><code>TROPICAL SEASONAL FOREST</code></td>
+<td style="background:#c4d4aa"><code>GRASSLAND</code></td>
+<td style="background:#e9ddc7"><code>SUBTROPICAL DESERT</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Here’s the result:</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/biomes.png" alt="Biome map"></figure><p>These biomes look good in the map generation demo, but each game will have its own needs. <a href="https://www.realmofthemadgod.com/">Realm of the Mad God</a><sup class="print-endnote">[25]</sup> used its own biome formula derived from the one I used here. My original biome assignment code was <a href="https://github.com/amitp/mapgen2/blob/master/Map.as#L718">ActionScript</a><sup class="print-endnote">[26]</sup> but I later rewrote it in <a href="https://github.com/redblobgames/mapgen2/blob/master/biomes.js">JavaScript</a><sup class="print-endnote">[27]</sup>.</p>
+<p>Alternatives to consider:</p>
+<ul class="org-ul">
+<li>In <a href="https://www.redblobgames.com/maps/terrain-from-noise/#biomes">mapgen1</a><sup class="print-endnote">[28]</sup> I used noise to set the moisture level.</li>
+<li>In <a href="https://www.redblobgames.com/maps/mapgen4/">mapgen4</a><sup class="print-endnote">[29]</sup> I implemented wind, evaporation, and rain shadows for transporting moisture around the map.</li>
+<li>In this project (mapgen2), moisture is the distance to fresh water.</li>
+<li>A more realistic generator would use groundwater, springs, snow, soil type, and other factors to set the soil moisture level.</li>
+<li>
+<a href="https://en.wikipedia.org/wiki/Holdridge_life_zones">Holdridge Life Zones</a><sup class="print-endnote">[30]</sup> are an alternative to the Whittaker biomes; there’s also <a href="https://en.wikipedia.org/wiki/K%C3%B6ppen_climate_classification">Koppen</a><sup class="print-endnote">[31]</sup> but it seems descriptive rather than something I can use in a calculation.</li>
+<li>If named biomes aren’t needed, a 2D color gradient can serve nicely; see <a href="https://www.shadedrelief.com/hypso/hypso.html">Tom Patterson’s article on hypsometric tints</a><sup class="print-endnote">[32]</sup>.</li>
+</ul></section><section><h2 id="edges">
+<span class="section-number">&nbsp;8&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#edges"> Noisy Edges</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#edges">#</a>
+</h2>
+<p>For some games, the polygonal maps are sufficient. However, in other games I want to hide the polygon structure. The main way I do that is to replace the polygon borders with a noisy line. Why would I want a polygon structure if I’m going to hide it? I think game mechanics and pathfinding benefit from the underlying structure.</p>
+<p>Recall from earlier that there are <em>two</em> graphs: one for Voronoi corners (<code>1</code>, <code>2</code> in the diagram below) and edges (blue lines), and one for polycon centers (<code>A</code>, <code>B</code>) and Delaunay edges (red lines) between them:</p>
+<figure><img src="./Polygonal Map Generation for Games_files/edge-duality.png" alt="Diagram showing duality between edges in two graphs"></figure><p>I wanted to make both types of line noisy without making them cross lines from other polygons. I also wanted to make them as noisy as feasible. I realized that points <code>A</code>, <code>1</code>, <code>B</code>, and <code>2</code> form a quadrilateral, and I could constrain the wanderings of the line segment to that quadrilateral:</p>
+<figure><img src="./Polygonal Map Generation for Games_files/edge-noisiness.png" alt="Diagram showing quadrilateral where noisy edges can be drawn"></figure><p>I further divided the quadrilateral into four quadrilaterals. Two were usable for the red (Delaunay) edge and two for the blue (Voronoi) edge. As long as the lines stayed within their allocated space and met in the center, they’d never cross each other. That takes care of constraining them. Note that the quadrilateral may not be convex; to divide it properly, I divide it at the midpoint of the Voronoi edge instead of at the intersection of the Voronoi and Delaunay edges.</p>
+<p>The entire map can be divided up into these quadrilateral regions, with no space left over:</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/quad-markings.png" alt="Map area divided into quadrilaterals"></figure><p>That ensures that the noisy lines aren’t constrained any more than necessary. These quadrilaterals might also be useful for game mechanics. I later used them <a href="https://www.redblobgames.com/x/1725-procedural-elevation/#rendering">for rendering</a><sup class="print-endnote">[33]</sup>.</p>
+<p>I can use any noisy line algorithm that fits within these constraints. I decided to subdivide the quadrilaterals recursively and stitch line segments together within the small quadrilaterals into a complete edge. The result is that the polygon edges are no longer straight:</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/biomes-noisy.png" alt="Map with noisy biome boundaries"></figure><p>Noisy edges turn out to have a large impact on the map appearance, especially for rivers and coastlines. For newer projects I’ve used a slightly different algorithm described <a href="https://www.redblobgames.com/maps/noisy-edges/">in this interactive guide</a><sup class="print-endnote">[34]</sup>. It took some tweaking to get something I liked.</p></section><section><h2 id="render-more-noise">
+<span class="section-number">&nbsp;9&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#render-more-noise"> More noise</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#render-more-noise">#</a>
+</h2>
+<p>I’m generally a fan of <a href="https://simblob.blogspot.com/2009/06/noise-in-game-art.html">noise in game art</a><sup class="print-endnote">[35]</sup>, and wanted to add a little bit of noise to these maps as well. In a real game map the noise might reflect vegetation or small variations in terrain. In the demo I filled the screen with a random noise texture by adding a noise bitmap on top. I also smoothed the borders between adjacent polygons by blending the colors in stages:</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/voronoi-map-goal.png" alt="Map with noisy boundaries and noise texture"></figure><p>Here’s a rendering with 16,000 polygons, noisy edges, a noise texture overlay, and simple lighting:</p>
+<figure><img width="450" height="450" src="./Polygonal Map Generation for Games_files/voronoi-map-goal-16000-shaded.png" alt="Shaded map with 16,000 polygons"></figure></section><section><h2 id="render-smooth-biomes">
+<span class="section-number">&nbsp;10&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#render-smooth-biomes"> Smooth biome transitions</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#render-smooth-biomes">#</a>
+</h2>
+<p>A different way of blending the biomes at polygon boundaries is to build gradients using the elevation and moisture at each <em>corner</em>, and then assigning biomes per pixel:</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/voronoi-map-goal-smooth.png" alt="Map with biomes computed per pixel"></figure><p>If the game doesn’t need an entire polygon to be the same biome, this approach can be useful for making more interesting boundaries.</p></section><section><h2 id="render-distorted-biomes">
+<span class="section-number">&nbsp;11&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#render-distorted-biomes"> Distorted biome transitions</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#render-distorted-biomes">#</a>
+</h2>
+<p>Another way to make the map look less polygon-like is to distort the elevation and moisture maps:</p>
+<ol class="org-ol">
+<li>Add Simplex or random noise to the elevation and moisture at each pixel.</li>
+<li>Sample nearby points using Simplex or random noise to change the coordinate.</li>
+</ol>
+<p>Here’s an example of what this can do:</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/voronoi-map-goal-distorted.png" alt="Map with distorted elevation and moisture"></figure><p>Adding noise to the elevation and moisture will produce “dithering” in the zones near transitions. Sampling nearby points using noise will distort the shapes of the boundaries.</p></section><section><h2 id="demo">
+<span class="section-number">&nbsp;12&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#demo"> Demo</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#demo">#</a>
+</h2>
+<p>I wrote a Flash demo to explore the generated maps:</p>
+<figure><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/demo.html"><img src="./Polygonal Map Generation for Games_files/mapgen2-ui.png" style="width:100%;height:auto" alt="Screenshot of mapgen2 demo"></a></figure><p><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/demo.html"><strong>Try the demo!</strong></a></p></section><section><h2 id="source">
+<span class="section-number">&nbsp;13&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#source"> Source</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#source">#</a>
+</h2>
+<p>I’ve placed the source code under the MIT license: <a href="https://github.com/amitp/mapgen2">Actionscript/Flash source code</a><sup class="print-endnote">[36]</sup>. If you can read Java or Javascript, I think you’ll have no trouble reading the Actionscript. Since Flash is no longer used, I don’t expect that the code will be immediately useful to anyone, but it might be a useful starting point if you’d like to use these techniques for making your own game maps.</p>
+<ul class="org-ul">
+<li>
+<code>Map.as</code> is the core map generation system</li>
+<li>
+<code>graph/*.as</code> is the representation of graphs (polygons, edges, corners)</li>
+<li>
+<code>mapgen2.as</code> is the demo, with rendering and GUI</li>
+<li>
+<code>Roads.as</code> is a module adding roads along contour lines</li>
+<li>
+<code>Lava.as</code> is a module adding lava fissures to high elevation edges</li>
+<li>
+<code>NoisyEdges.as</code> is used by the demo to build noisy edges</li>
+</ul>
+<p>The diagrams on this page are built with 300 polygons, the demo uses 2000 by default, and allows up to 8000. Some of the code for producing diagrams isn’t checked in because it was quick and dirty code only for the diagrams on this page, and not generally useful.</p>
+<p>If you find the code or ideas useful, I’d love to hear about it!</p>
+<p>I’ve written <a href="https://www.redblobgames.com/x/2022-voronoi-maps-tutorial/"><strong>a tutorial that takes you through generating a Voronoi map step-by-step</strong></a><sup class="print-endnote">[37]</sup> with Javascript code, including rendering. It’s a simplified version of the algorithms on this page, and it should be a good starting point. I also have the slightly fancier algorithms from this page available under the Apache v2 license: <a href="https://github.com/redblobgames/mapgen2/">Javascript source code</a><sup class="print-endnote">[38]</sup>. The web demo is <a href="https://www.redblobgames.com/maps/mapgen2/">here</a><sup class="print-endnote">[39]</sup>.</p>
+<h3 id="projects">
+<span class="section-number">&nbsp;13.1&nbsp;</span><span>Projects that explore different algorithms</span><a class="anchor" aria-hidden="true" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#projects">#</a>
+</h3>
+<ul class="org-ul">
+<li>Andy Gainey experimented with Voronoi diagrams on a sphere and decided to instead <a href="https://web.archive.org/web/20220617041817/http://experilous.com/1/blog/post/procedural-planet-generation">build a map with subdivided isocahedrons</a><sup class="print-endnote">[40]</sup>, with tectonic plates, air currents, temperature, moisture, and biomes. Several people asked me how to extend my map generator to handle continents; take a look at this project and <a href="https://experilous.com/1/project/planet-generator/2015-04-07/version-2">demo</a><sup class="print-endnote">[41]</sup>. His site is unfortunately gone, but the Wayback Machine preserved some of it.</li>
+<li>Martin O’Leary’s <a href="http://mewo2.com/notes/terrain/">beautifully explained map generator</a><sup class="print-endnote">[42]</sup> uses Voronoi diagrams with a different terrain generator, erosion simulation, a stylized renderer, city/region generation, a name generator, and a label placement algorithm; you can run it online <a href="https://map-gen.netlify.app/">here</a><sup class="print-endnote">[43]</sup>.</li>
+<li>
+<a href="https://heredragonsabound.blogspot.com/2016/10/welcome.html">Scott Turner</a><sup class="print-endnote">[44]</sup> has explored <a href="https://imgur.com/gallery/z2hnk">shading</a><sup class="print-endnote">[45]</sup>, contour lines, <a href="https://imgur.com/a/rVI6F">wind patterns</a><sup class="print-endnote">[46]</sup>, and procedural mountain/hill icons on his blog.</li>
+<li>
+<a href="https://github.com/Azgaar">Azgaar</a><sup class="print-endnote">[47]</sup> has built an <em>amazing</em><a href="https://azgaar.github.io/Fantasy-Map-Generator/">vector map generator</a><sup class="print-endnote">[48]</sup> with the ideas from Scott and Martin, and has a great <a href="https://azgaar.wordpress.com/">blog</a><sup class="print-endnote">[49]</sup> with writeups on <a href="https://azgaar.wordpress.com/2017/06/30/biomes-generation-and-rendering/">biomes</a><sup class="print-endnote">[50]</sup>, <a href="https://azgaar.wordpress.com/2017/05/27/confluences/">confluences</a><sup class="print-endnote">[51]</sup>, and other topics. <a href="https://github.com/Azgaar/Fantasy-Map-Generator">Open source</a><sup class="print-endnote">[52]</sup>.</li>
+<li>
+<strong>(2018)</strong><a href="https://www.redblobgames.com/maps/mapgen4/">Mapgen4</a><sup class="print-endnote">[53]</sup> is my successor to mapgen2, with different algorithms that run much faster at a much larger scale. The demo runs with 25k polygons but I’ve also tried it with 1M polygons, which only takes a few seconds. The same core algorithms work with <a href="https://www.redblobgames.com/x/1843-planet-generation/">spheres</a><sup class="print-endnote">[54]</sup> and plate tectonics.</li>
+<li>
+<a href="https://procworld.blogspot.com/2011/07/political-landscape.html">Miguel Cepero of Voxel Farm</a><sup class="print-endnote">[55]</sup> was inspired to make a political landscape map using Voronoi regions, and also <a href="https://procworld.blogspot.com/2016/04/geometry-is-destiny.html">a map generator using tectonic plates</a><sup class="print-endnote">[56]</sup> with an alternative to Voronoi.</li>
+<li>Ryan Guy has a <a href="https://github.com/rlguy/FantasyMapGenerator">project based on Martin’s</a><sup class="print-endnote">[57]</sup>, with some nice diagrams explaining the process.</li>
+<li>Tommy Waters explores <a href="https://eveliosdev.blogspot.com/2016/06/plate-tectonics.html">plate tectonics</a><sup class="print-endnote">[58]</sup>, in which he shows how he’s producing continents, not only islands, so the mountain ranges are not always in the center of the land masses.</li>
+<li>ylcorcronlth explores <a href="https://old.reddit.com/r/proceduralgeneration/comments/4wyida/random_walk_based_moisture_distribution/">moisture calculation based on a random walk</a><sup class="print-endnote">[59]</sup>
+</li>
+<li>Cory Lee has a <a href="https://github.com/iskar909/political-map-generator">political map generator</a><sup class="print-endnote">[60]</sup> using Voronoi regions.</li>
+<li>Jesse Morgan has used ideas from this map generator to build a <a href="https://citygenerator.morgajel.net/">city generator</a><sup class="print-endnote">[61]</sup> (<a href="https://accounts.google.com/ServiceLogin?passive=1209600&amp;osid=1&amp;continue=https://plus.google.com/112661873200782342936/posts&amp;followup=https://plus.google.com/112661873200782342936/posts">project page</a><sup class="print-endnote">[62]</sup> and <a href="https://github.com/CityGenerator/CityGenerator">source code</a><sup class="print-endnote">[63]</sup>)</li>
+<li>Sword &amp; Scroll uses a <a href="https://www.indiedb.com/games/sword-scroll/news/progress-report-6">Voronoi map generator to create political zones</a><sup class="print-endnote">[64]</sup> (baronies)</li>
+<li>Phill Spiess also uses Voronoi and noisy edges for <a href="https://web.archive.org/web/20120307035826/http://devblog.phillipspiess.com/projects/mapgen/">his project</a><sup class="print-endnote">[65]</sup> but no details are posted.</li>
+<li>Christophe Le Besnerais has a <a href="https://github.com/lebesnec/island.js">Javascript version</a><sup class="print-endnote">[66]</sup> that has a more advanced water flow model; luckylooke has a version of it <a href="https://luckylooke.github.io/phaser-islandjs-plugin/">for Phaser.io</a><sup class="print-endnote">[67]</sup>.</li>
+<li>Kaelan Cooter has a <a href="https://github.com/eranimo/hexgen">hexagon world map generator</a><sup class="print-endnote">[68]</sup> with elevation, moisture, biomes, rainfall, aquifers, and territories.</li>
+<li>
+<a href="https://squeakyspacebar.github.io/2017/07/12/Procedural-Map-Generation-With-Voronoi-Diagrams.html">Andy Lo</a><sup class="print-endnote">[69]</sup> has a Voronoi-based map generator in Unity, with <a href="https://github.com/squeakyspacebar/novatellus">source code</a><sup class="print-endnote">[70]</sup>. He uses tectonic plates with uplift to generate the mountains.</li>
+<li>Xiang Wei has a <a href="https://whenitsdone.org/2014/07/29/map-generation-on-spherical-planet-part-i/">spherical world generator</a><sup class="print-endnote">[71]</sup>.</li>
+<li>Alexey Nabrodov wrote a map generator and wrote a <a href="https://averrin.medium.com/%D0%BE%D1%82%D0%B4%D0%B5%D0%BB%D1%8F%D0%B5%D0%BC-%D1%81%D0%B2%D0%B5%D1%82-%D0%BE%D1%82-%D1%82%D1%8C%D0%BC%D1%8B-%D0%B8-%D0%B4%D1%80%D1%83%D0%B3%D0%B8%D0%B5-%D1%81%D0%BF%D0%BE%D1%81%D0%BE%D0%B1%D1%8B-%D1%81%D0%BE%D1%82%D0%B2%D0%BE%D1%80%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BC%D0%B8%D1%80%D0%B0-fbf6ad91127f">page about the process</a><sup class="print-endnote">[72]</sup> (Russian), and released <a href="https://github.com/averrin/mapgen">source code</a><sup class="print-endnote">[73]</sup>.</li>
+<li>
+<a href="https://www.littlecubevalley.com/single-post/2018/08/27/Procedurally-Cascaded-Rivers-and-Biomes">Little Cube Valley</a><sup class="print-endnote">[74]</sup> uses Voronoi maps with aquifers, wind, temperature, drainage, salinity to determine rivers and biomes.</li>
+<li>Luca Morselli’s <a href="http://lucamorselli.me/blog/fantasy_map_generation_via_ising_model/">map generator page</a><sup class="print-endnote">[75]</sup> has <strong>interactive demos</strong> of each step of the generation</li>
+<li>
+<a href="https://jeheydorn.github.io/nortantis/">Nortantis</a><sup class="print-endnote">[76]</sup> uses plate tectonic simulation to create islands and continents</li>
+<li>
+<a href="https://web.archive.org/web/20190328130830/https://nexus-maps.herokuapp.com/">Nexus Maps</a><sup class="print-endnote">[77]</sup> by nexus723 (<a href="https://old.reddit.com/r/proceduralgeneration/comments/a2fjrj/procedurally_generated_regional_and_biome_maps/">reddit</a><sup class="print-endnote">[78]</sup>) uses Voronoi with weather, coastlines, rivers, biomes, settlements, roads, trade routes, nations, ports, and other features.</li>
+<li>
+<a href="https://pvigier.github.io/">Vagabond</a><sup class="print-endnote">[79]</sup> uses Voronoi to construct wilderness maps with rivers, towns, climates, roads, forests.</li>
+</ul>
+<h3 id="languages">
+<span class="section-number">&nbsp;13.2&nbsp;</span><span>Similar algorithms in other programming languages</span><a class="anchor" aria-hidden="true" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#languages">#</a>
+</h3>
+<ul class="org-ul">
+<li>
+<strong>(2022)</strong> I have a <a href="https://www.redblobgames.com/x/2022-voronoi-maps-tutorial/">tutorial showing how to make these types of maps</a><sup class="print-endnote">[80]</sup> with JavaScript code for every step, including rendering.</li>
+<li>Richard Janicek has a <a href="https://github.com/rjanicek/voronoi-map-haxe">Haxe version</a><sup class="print-endnote">[81]</sup> that compiles to Javascript+Canvas, with a <a href="https://web.archive.org/web/20130116215742/https://rjanicek.github.com/voronoi-map-haxe/">demo</a><sup class="print-endnote">[82]</sup> {broken as of 2023}, and also a <a href="https://github.com/rjanicek/voronoi-map-js">Javascript version</a><sup class="print-endnote">[83]</sup>, with a demo.</li>
+<li>Jeff Terrace has contributed patches and also wrote <a href="https://github.com/jterrace/mapgen2/tree/utilities">a utility to convert the XML into COLLADA</a><sup class="print-endnote">[84]</sup>, as well as <a href="https://github.com/jterrace/collada2json">a COLLADA viewer</a><sup class="print-endnote">[85]</sup> in WebGL.</li>
+<li>Alex Schröder has been working on a <a href="https://web.archive.org/web/20120225183657/https://www.flickr.com/photos/kensanata/5685579540/">Perl version</a><sup class="print-endnote">[86]</sup> that generates SVG output. {screenshots broken as of 2023}</li>
+<li>Christopher Garrett has written a <a href="https://github.com/czgarrett/delaunay-ios">Voronoi/Delaunay port for iOS</a><sup class="print-endnote">[87]</sup>.</li>
+<li>Adam Martin maintains a <a href="https://github.com/adamgit/Unity-delaunay">Voronoi/Delaunay port for Unity</a><sup class="print-endnote">[88]</sup>, forked from <a href="https://github.com/jceipek/Unity-delaunay">Julian Ceipek’s port</a><sup class="print-endnote">[89]</sup>.</li>
+<li>Christophe Guebert has written a <a href="https://web.archive.org/web/20111116180131/https://openprocessing.org/visuals/?visualID=30809">Java+Processing version</a><sup class="print-endnote">[90]</sup>.</li>
+<li>Baran Kahyaoglu has written a <a href="https://web.archive.org/web/20120529023153/http://www.barankahyaoglu.com/blog/post/2012/04/28/Map-Generator-source-code-is-available-now!.aspx">C#/.NET version</a><sup class="print-endnote">[91]</sup>, and abhimir has a <a href="https://github.com/abhimir/UnitySimpleMapGenerator">Unity version</a><sup class="print-endnote">[92]</sup> of <a href="https://gamedev.stackexchange.com/users/4708/chrish">Chris Herborth</a><sup class="print-endnote">[93]</sup>’s version of Baran’s code.</li>
+<li>Tommy Waters has <a href="https://github.com/Evelios/procIsland">another Javascript version</a><sup class="print-endnote">[94]</sup>, with <a href="https://github.com/Evelios/procIsland">source</a><sup class="print-endnote">[95]</sup> and a <a href="https://eveliosdev.blogspot.com.au/2016/06/breathing-life-into-map.html">blog post</a><sup class="print-endnote">[96]</sup>.</li>
+<li>Егор Харват has a <a href="https://github.com/zaynyatyi/voronoi-map-nme">Haxe/NME version</a><sup class="print-endnote">[97]</sup>.</li>
+<li>Connor Clark has a <a href="https://github.com/Hoten/Java-Delanuay">Java version</a><sup class="print-endnote">[98]</sup>.</li>
+<li>Kylepixel has a <a href="https://github.com/kylepixel/terrain-generator">Javascript project</a><sup class="print-endnote">[99]</sup> that also uses Voronoi regions for map generation.</li>
+<li>Nuclear Horse Studios has a <a href="https://github.com/NuclearHorseStudios/ManyLandsGenerator">C#/Unity version</a><sup class="print-endnote">[100]</sup> (MIT license).</li>
+<li>Stafford Williams also has a <a href="https://github.com/staff0rd/polygon-map-unity">C#/Unity version</a><sup class="print-endnote">[101]</sup> (MIT license).</li>
+<li>Gareth Higgins has a <a href="https://github.com/Zaneo/VoronoiMapGen">C# map generator</a><sup class="print-endnote">[102]</sup>.</li>
+<li>Martín Candela Calabuig has a <a href="https://github.com/Rellikiox/MapGenerator">C++ version</a><sup class="print-endnote">[103]</sup>.</li>
+<li>Tobias is working on a <a href="https://twitter.com/tobmansf/status/540617232326619136">C++ version</a><sup class="print-endnote">[104]</sup>.</li>
+<li>Spencer Judge has <a href="https://github.com/Sushisource/DnDTG">C++ code</a><sup class="print-endnote">[105]</sup> for a map generator using these techniques.</li>
+<li>BitAlchemists has a <a href="https://bitalchemists.github.io/polygon_map/">Dart version</a><sup class="print-endnote">[106]</sup> and <a href="https://github.com/BitAlchemists/polygon_map">source</a><sup class="print-endnote">[107]</sup> (MIT license).</li>
+<li>Thomas R. Koll has a <a href="https://github.com/tomk32/mapgen2">Lua port</a><sup class="print-endnote">[108]</sup> that he’s using for <a href="http://apri50.com/">Autonomous Planetary Research Individual 50</a><sup class="print-endnote">[109]</sup>.</li>
+<li>
+<a href="https://github.com/ace-design/island/">Island</a><sup class="print-endnote">[110]</sup> is a Scala project that uses techniques similar to the ones on this page.</li>
+<li>
+<a href="https://github.com/feelic/PtolemyJS">PtolemyJS</a><sup class="print-endnote">[111]</sup> is a Javascript game engine that includes a Voronoi region map generator.</li>
+<li>Jay Stevens has a <a href="https://github.com/Jay2645/Unreal-Polygonal-Map-Gen">C++ Unreal 4 version</a><sup class="print-endnote">[112]</sup> (MIT license).</li>
+<li>Carl Wieland has a <a href="https://github.com/utahwithak/MapGen">Swift version</a><sup class="print-endnote">[113]</sup>, no license given.</li>
+<li>Steve Johnstone has a <a href="https://github.com/SteveJohnstone/VoronoiMapGen">C#/Unity version</a><sup class="print-endnote">[114]</sup> (MIT license).</li>
+<li>DeiveEx has a <a href="https://github.com/DeiveEx/Polygon-Map-Generation">C#/Unity version</a><sup class="print-endnote">[115]</sup>, no license given.</li>
+</ul>
+<!-- future: https://terrafirmacraft.com/f/topic/8310-planned-features/ --><!--
+Alternative Nuclear Horse Studio link http://old.reddit.com/r/gamedev/comments/2glxlf/ive_released_manylands_an_open_source_random/
+
+[Chris Herborth](https://gamedev.stackexchange.com/users/4708/chrish) has ported Baran's code to [Unity](https://github.com/Taffer/UnitySimpleMapGenerator).
+
+--><h3 id="other-projects">
+<span class="section-number">&nbsp;13.3&nbsp;</span><span>Other projects</span><a class="anchor" aria-hidden="true" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#other-projects">#</a>
+</h3>
+<!--
+Projects using map generator:
+http://whiskeybarrelstudios.com/?p=857 and http://whiskeybarrelstudios.com/?p=885
+http://heroworlds.blogspot.com/2014/12/so-close-now.html
+https://twitter.com/repanaz/status/614223890269605888
+
+http://www.giantitp.com/forums/showthread.php?418322-Help-fill-in-my-campaign-map
+https://plus.google.com/112495623010694526237/posts/CLivDwXfDYH
+https://github.com/jkriddle/reverend - in progress
+http://ajccom.github.io/voronoi-map/
+http://danmachi.boards.net/thread/16/official-map-eden?page=1&scrollTo=18 - Eden game
+
+http://conquestgame.net/maps - dead
+
+--><ul class="org-ul">
+<li>
+<a href="https://github.com/Terasology/PolyWorld">PolyWorld</a><sup class="print-endnote">[116]</sup> is based on Connor Clark’s Java code, and is now part of the Terasology game (watch <a href="https://www.youtube.com/watch?v=7eOlKa9qa2Y">this video</a><sup class="print-endnote">[117]</sup>).</li>
+<li>
+<a href="https://github.com/kdhillon/besiege">Besiege</a><sup class="print-endnote">[118]</sup> uses these techniques for their procedural map generator.</li>
+<li>
+<a href="https://terrafirmacraft.com/">TerraFirmaCraft 2</a><sup class="print-endnote">[119]</sup> uses these techniques for their game, with a hex grid.</li>
+<li>
+<a href="https://pvigier.github.io/2019/05/12/vagabond-map-generation.html">Vagabond</a><sup class="print-endnote">[120]</sup> uses these techniques for their world generator.</li>
+</ul>
+<p>The map generator wasn’t designed for direct use but Welsh Piper (<a href="http://www.welshpiper.com/nerd-therapy/">encounter tables</a><sup class="print-endnote">[121]</sup>, <a href="http://www.welshpiper.com/minocra-campaign-map/">Minocra</a><sup class="print-endnote">[122]</sup>), <a href="https://kingdomsintrevail.blogspot.com/2012/02/caldera-birth-of-world.html">Kingdoms in Trevail</a><sup class="print-endnote">[123]</sup>, <a href="https://web.archive.org/web/20150924204825/https://crasta.wikia.com/wiki/Crasta">Cresta</a><sup class="print-endnote">[124]</sup>, <a href="https://leifandthorn.com/comic/saturday-sketchbook-world-map/">Life &amp; Thorn</a><sup class="print-endnote">[125]</sup> (comics), and others ( <a href="https://old.reddit.com/r/DnD/comments/2sbr7c/the_map_for_the_campaign_im_starting_tomorrow/">1</a><sup class="print-endnote">[126]</sup>, <a href="https://old.reddit.com/r/DnD/comments/2st84s/just_made_my_first_overland_map_for_a_campaign/">2</a><sup class="print-endnote">[127]</sup>, <a href="https://old.reddit.com/r/DnD/comments/2u5fjj/map_for_the_known_world_in_my_5e_campaign/">3</a><sup class="print-endnote">[128]</sup>, <a href="https://old.reddit.com/r/imaginarymaps/comments/4w5fdy/i_created_an_island_with_cities_roads_railroads/">4</a><sup class="print-endnote">[129]</sup>, <a href="https://old.reddit.com/r/worldbuilding/comments/4ypzih/give_me_some_feedback_on_my_worlds_map_my_biggest/">5</a><sup class="print-endnote">[130]</sup>, <a href="https://old.reddit.com/r/imaginarymaps/comments/5kzzba/i_made_another_island_nation/">6</a><sup class="print-endnote">[131]</sup>, <a href="https://old.reddit.com/r/worldbuilding/comments/5wme1e/made_a_map_of_my_world_sphaira_with/">7</a><sup class="print-endnote">[132]</sup>, <a href="https://togetter.com/li/866956">8</a><sup class="print-endnote">[133]</sup>, <a href="https://twitter.com/halforcdruid/status/978340419607052289">9</a><sup class="print-endnote">[134]</sup>, <a href="https://twitter.com/fenharel/status/1024037692873437184">10</a><sup class="print-endnote">[135]</sup>, <a href="https://vos.tumblr.com/post/162415550753/corianwornen-itsbio-nightshadeis">11</a><sup class="print-endnote">[136]</sup>, <a href="https://davidvs.blogspot.com/2018/11/island-maps.html">12</a><sup class="print-endnote">[137]</sup>, <a href="https://twitter.com/GhostArcher3/status/1212455077786669056">13</a><sup class="print-endnote">[138]</sup> ), are using the map generator to create maps for their projects. You can use the “export PNG” button to export a 2048x2048 PNG that you can then adapt with Photoshop to color, style, and annotate for your own needs.</p></section><section><h2 id="appendix">
+<span class="section-number">&nbsp;14&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#appendix"> Appendix: More map features</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#appendix">#</a>
+</h2>
+<h3 id="modules">
+<span class="section-number">&nbsp;14.1&nbsp;</span><span>Modules</span><a class="anchor" aria-hidden="true" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#modules">#</a>
+</h3>
+<p>I tried to structure the map representation so that modules could annotate them without creating a code dependency. The GUI module <code>mapgen2.as</code> depends on <code>Map.as</code> (core) and <code>Roads.as</code> (non-core), but <code>Maps.as</code> does <em>not</em> depend on <code>Roads.as</code>. Every polygon, edge, and corner in the graph has an index, which can be used as a key into an external table. In <code>Roads.as</code>, there’s a <code>road</code> array that’s indexed by the edge index.</p>
+<p>Where core map code can reference <code>edge.river</code> as a core field, the module can’t do that. Instead, the module references its local variable <code>road[edge.index]</code>. This works for polygon centers and corners as well. It keeps the core clean. If you’re familiar with <a href="https://en.wikipedia.org/wiki/Entity_component_system">ECS</a><sup class="print-endnote">[139]</sup>, you can think of this as a form of components.</p>
+<p>I have three modules: Roads, Lava, and NoisyEdges.</p>
+<h3 id="roads">
+<span class="section-number">&nbsp;14.2&nbsp;</span><span>Roads</span><a class="anchor" aria-hidden="true" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#roads">#</a>
+</h3>
+<p>Realm of the Mad God doesn’t use most of the features of this map generator, but I built a road generator for them. I observed that in the game, people naturally explore rivers. This unfortunately leads them up to the mountains, where they die. I wanted to build some roads that are at right angles to the rivers.</p>
+<p>I calculated contour lines along the corners. Where the contour level changes, there’s a road. It’s a fairly simple algorithm that works most of the time, but sometimes creates tiny loops:</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/roads.png" alt="Roads drawn on a map"></figure><p>Whereas rivers meander along Voronoi edges (blue lines in the diagram above), roads go on Delaunay edges (red lines). Roads don’t get the noisy edge treatment. Instead, they are drawn with splines from edge midpoint to midpoint:</p>
+<figure><img width="400" height="400" src="./Polygonal Map Generation for Games_files/roads-zoomed.png" alt="Close up view of road splines"></figure><p>Most polygons have two neighbors with roads. For them, there’s a regular spline connecting the two edge midpoints. For polygons that have more than two road neighbors, I instead draw an intersection, with splines from all the edge midpoints to the polygon center. In the diagram above, the lower left polygon has an intersection and the upper right polygon has a regular spline.</p>
+<p>Roads cross the edges while rivers follow the edges, so that makes it easy to turn a road into a bridge when it crosses the river.</p>
+<h3 id="lava">
+<span class="section-number">&nbsp;14.3&nbsp;</span><span>Lava</span><a class="anchor" aria-hidden="true" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#lava">#</a>
+</h3>
+<p>Lava and rivers follow the same paths. Lava fissures occur in high dry areas, and are assigned to some subset of the edges. In a game, lava and water will of course be different, but here they only differ in color and placement. Lava gets the noisy edge treatment:</p>
+<figure><img width="375" height="300" src="./Polygonal Map Generation for Games_files/lava.png" alt="Close up of lava fissure"></figure></section><section><h2 id="future">
+<span class="section-number">&nbsp;15&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#future"> Appendix: Future possibilities</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#future">#</a>
+</h2>
+<h3 id="abstract-rendering">
+<span class="section-number">&nbsp;15.1&nbsp;</span><span>Abstract Rendering</span><a class="anchor" aria-hidden="true" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#abstract-rendering">#</a>
+</h3>
+<p>A map should show the relevant portions of the world, not all the details. With this projects I’m generating maps with some level of detail, but it’s not detailed down to the vegetation or towns, and it’s not completely abstract either. It may be possible to render a more abstract map in the style of maps of Middle Earth (such as <a href="http://geektyrant.com/news/2008/10/7/guillermo-del-toro-talks-about-the-entire-pentology-of-middl.html">this one</a><sup class="print-endnote">[140]</sup>). I made some notes about <a href="http://www-cs-students.stanford.edu/~amitp/game-programming/skyrim-maps/">what I want from game maps</a><sup class="print-endnote">[141]</sup>.</p>
+<h3 id="watersheds">
+<span class="section-number">&nbsp;15.2&nbsp;</span><span>Watersheds</span><a class="anchor" aria-hidden="true" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#watersheds">#</a>
+</h3>
+<p>By following the downslope arrows (described in the section on elevation), there’s a path from every polygon corner, along edges, to the coast. I use this to mark every corner with the location where the water would flow out to the ocean. All corners with the same outflow location can be considered to be part of the same watershed.</p>
+<p>The watershed code is incomplete. There’s a watershed view in the demo, but I’m not happy with it. I’ve tried polygon centers and corners as watershed boundaries and neither is quite right. I have put watershed calculations on hold until the day I need them.</p>
+<p>The place I thought watersheds would be useful is for naming <a href="https://en.wikipedia.org/wiki/Drainage_basin">larger regions</a><sup class="print-endnote">[142]</sup>. There are roughly 1000 land polygons on the map in the demo. In a game map it might be nice to have a smaller number of named regions that group together polygons. For example, the XYZ Mountains can be above the XYZ Valley, which might have the XYZ River flowing through it. Players would be able to learn that these features are related. I didn’t get very far with this project but I might come back to it someday.</p>
+<h3 id="impassable-borders">
+<span class="section-number">&nbsp;15.3&nbsp;</span><span>Impassable borders</span><a class="anchor" aria-hidden="true" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#impassable-borders">#</a>
+</h3>
+<p>In this map generator all the borders between polygons are the same. There’s a smooth transition from one to the other. It might be interesting to make some edges discontinuous, so that we can make cliffs, chasms, plateaus, and other sudden elevation changes. See <a href="https://roguelikedeveloper.blogspot.com/2007/07/wilderness-generation-using-voronoi.html">this article</a><sup class="print-endnote">[143]</sup> for ideas on how to make the Voronoi regions interesting for gameplay.</p>
+<h3 id="terrain-analysis">
+<span class="section-number">&nbsp;15.4&nbsp;</span><span>Terrain analysis</span><a class="anchor" aria-hidden="true" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#terrain-analysis">#</a>
+</h3>
+<p>Pathfinding should be fairly fast on a polygonal map, and may be useful for terrain analysis. For example, if two locations are spatially close but pathwise far, that may mean there’s a bay or mountain in the way, and that’d be a good place for a tunnel or bridge. A pathfinder could also help find places where we need bridges to nearby islands. Polygons that show up on paths often might be strategically more valuable than polygons that rarely are used for paths.</p>
+<h3 id="named-areas">
+<span class="section-number">&nbsp;15.5&nbsp;</span><span>Named areas</span><a class="anchor" aria-hidden="true" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#named-areas">#</a>
+</h3>
+<p>As mentioned in the watersheds section, I’d like to name map features. Combined with terrain analysis, names could be assigned to rivers, mountains, lakes, groups of polygons, coastlines, oceans, forests, peninsulas, valleys, etc. Names in an area could be related. For example, the XYZ River could flow from Mount XYZ through the XYZ Valley. I haven’t worked on this in part because I think it helps if it’s for a specific game instead of a generic map generator. Not only should names connect to the game’s theme, there could be items and quests and plot elements that are related. For example, the Sword of XYZ might be found only in the XYZ Valley.</p>
+<h3 id="variable-density">
+<span class="section-number">&nbsp;15.6&nbsp;</span><span>Variable density</span><a class="anchor" aria-hidden="true" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#variable-density">#</a>
+</h3>
+<p>Fortune’s algorithm should work within a polygon to subdivide it into smaller polygons. A map where most of the world is coarse, but some areas are more finely divided, could be interesting. Alternatively, we could place the original points with variable density so that some areas get more polygons than others. For example, we could use <a href="http://devmag.org.za/2009/05/03/poisson-disk-sampling/">Poisson Disk Sampling</a><sup class="print-endnote">[144]</sup> instead of Lloyd’s Algorithm.</p>
+<h3 id="better-edges">
+<span class="section-number">&nbsp;15.7&nbsp;</span><span>Better noisy edges</span><a class="anchor" aria-hidden="true" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#better-edges">#</a>
+</h3>
+<p>I implemented a very simple noisy edge system, with jagged lines. The corners are very visible when you zoom in on the map. A better system might involve curved splines, or a fractal expansion that looks more detailed as you zoom in.</p></section><section><h2 id="process">
+<span class="section-number">&nbsp;16&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#process"> Appendix: Process improvements</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#process">#</a>
+</h2>
+<p>This page started out as three blog posts on the topic: <a href="https://simblob.blogspot.com/2010/09/polygon-map-generation-part-1.html">part 1</a><sup class="print-endnote">[145]</sup> is about polygons, map representation, islands, oceans and lakes and beach and land; <a href="https://simblob.blogspot.com/2010/09/polygon-map-generation-part-2.html">part 2</a><sup class="print-endnote">[146]</sup> is about elevations, rivers, moisture, and biomes; and <a href="https://simblob.blogspot.com/2010/09/polygon-map-generation-part-3.html">part 3</a><sup class="print-endnote">[147]</sup> is about rendering, demo, and source code. Having it all on one page made more sense in the long term.</p>
+<p>For those of you interested in how I got to this point, a brief history:</p>
+<ul class="org-ul">
+<li>In December 2009, Rob and Alex of Wild Shadow Studios had asked me if I had a quick way to generate maps. I had already been thinking about using Perlin/Simplex noise for maps, so I tried it, with <a href="https://simblob.blogspot.com/2010/01/simple-map-generation.html">good results</a><sup class="print-endnote">[148]</sup>. I got something going within a day, and then spent the next month tweaking and trying variations. Most of the variations failed, and taught me that there were limitations with this approach. One month was a good time to stop, so I stopped working on maps and moved on to other small projects — art, animation, monster groups, NPC AI, among others.</li>
+<li>In June 2010, I was inspired to work on maps again. I spent the month sketching out ideas on paper and trying some prototypes. I tried hexagon grids, hexagonal river basins, quadrilateral river generation, volcanos, hills, erosion, weather systems, and a few other things. <strong>Everything failed.</strong> However, I learned a lot by trying these things out. Delaunay triangulations for example didn’t work out, but they led me to Voronoi diagrams. The quadrilateral river generation didn’t work out, but the quadrilaterals were useful later when I worked on noisy edges. The erosion system didn’t work out, but some of the same ideas were useful when I worked on rivers.</li>
+<li>While attending the Procedural Content Generation workshop, I sketched out some more ideas on paper for map generation. During the July 4 long weekend, I implemented these, and they worked really well. I worked out Voronoi polygons, map representation, island generation, noisy edges, elevation, biomes, rivers, and elevation redistribution that weekend. I experienced <a href="https://en.wikipedia.org/wiki/Flow_(psychology)">flow</a><sup class="print-endnote">[149]</sup>. It was great! Most of the core system was in place in only three days.</li>
+<li>Every weekend in July and August, I made improvements, many of them substantial. I also made many changes that didn’t work out, and I deleted them. As the core map features became good, I shifted my focus to the map rendering and the UI. As the map rendering and UI improved, I was able to <em>see</em> more flaws in the maps, and I found lots more bugs I needed to fix. I also made major refactorings to simplify the code that had grown organically.</li>
+<li>By the end of August I found that I was only working on minor things, and decided the project was ready to wrap up. I spent the Labor Day long weekend writing up the results on this page (and the blog posts). Much of my time went into making good diagrams. The diagrams actually exposed more bugs, and I ended up making bug fixes, greatly simplifying one feature (elevation redistribution), and implementing a new feature (moisture redistribution). I also renamed and commented code to make it easier to explain.</li>
+</ul>
+<p>Why am I keeping track of this? It’s because I’m trying to improve the process by which I approach these small (1-3 month) projects. There are some things I want to remember:</p>
+<ol class="org-ol">
+<li>It’s useful to have a <strong>key idea</strong> that drives everything else. The simple maps I did in January were based on Perlin Noise. These maps are based on Voronoi diagrams. I need to pick something and go with it, but only after…</li>
+<li>It sometimes takes a <strong>lot of experimentation</strong> before I run across the right idea. I spent a month on ideas before coming up with Voronoi as the key structure. I need to sketch out lots and lots of ideas.</li>
+<li>I have a <strong>lot of failures</strong>. The key is to fail quickly, not to avoid failing. I need to not get discouraged.</li>
+<li>I got the core system up in three days. <strong>A quick prototype</strong> can tell me a lot about whether an idea’s going to work out. In the early stages I need to focus on a prototype and not worry about making it a high quality system.</li>
+<li>In the very early phase it’s more important to <strong>learn from the system</strong> than to produce good code. I need to ask myself what I’m trying to learn with a prototype.</li>
+<li>
+<strong>Failures are sometimes useful later</strong>. I need to keep them accessible. I’ve been deleting the code as soon as it fails, but maybe I should make lots more git branches and store them there.</li>
+<li>The <strong>ability to see things</strong> can help a great deal in understanding what’s going on. I missed several bugs because I never bothered to build a visualization for that part of the data. I need to display as much as I can.</li>
+<li>There are sometimes <strong>tiny things that seem wrong</strong> that actually mean I have a bug somewhere. I often shrug these things off. Even if it’s not a good time to investigate and fix some bug, I need to track them somewhere so that I can later investigate.</li>
+<li>
+<strong>Writing the blog posts</strong> helped tremendously. It forced me to understand every part of the system, to look at all the data, and to make sure all the code could be understood. It made me question every phase of map generation and improve the ones that were hard to explain. I need to write blog posts much earlier in the process. Explaining is a good way to learn.</li>
+</ol>
+<p>I’ll keep these in mind as I work on future projects.</p></section><section><h2 id="references">
+<span class="section-number">&nbsp;17&nbsp; </span><span><a href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#references"> Appendix: References</a></span><a class="anchor" href="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/#references">#</a>
+</h2>
+<p>Thanks to the <a href="http://www.dungeonleague.com/">Dungeon League blog</a><sup class="print-endnote">[150]</sup> for a great series on procedural map generation, the <a href="http://pcg.wikidot.com/">Procedural Content Generation wiki</a><sup class="print-endnote">[151]</sup> for <a href="http://pcg.wikidot.com/pcg-algorithm:map-generation">ideas for map generation</a><sup class="print-endnote">[152]</sup>, the incomplete <a href="https://www.voronoi.com/wiki/index.php?title=VoroWiki_main_page">Voronoi wiki</a><sup class="print-endnote">[153]</sup> for some useful resources about Voronoi diagrams.</p>
+<p>My thanks to <code>nodename</code> for <a href="https://nodename.github.io/as3delaunay/">as3delaunay</a><sup class="print-endnote">[154]</sup>. It’s an Actionscript 3 library for generating Voronoi and Delaunay graphs. Also my thanks to <code>polygonal</code> for the <a href="http://lab.polygonal.de/2007/04/21/a-good-pseudo-random-number-generator-prng/">PM_PRNG</a><sup class="print-endnote">[155]</sup> random number library, which allows me to use and reset the seed value so that I can reproduce a series of pseudorandom numbers. I used the <a href="https://optipng.sourceforge.net/">OptiPNG library</a><sup class="print-endnote">[156]</sup> to optimize the PNG images on this page.</p>
+<p><a href="https://en.wikipedia.org/wiki/Delaunay_triangulation">Delaunay triangulation</a><sup class="print-endnote">[157]</sup> and <a href="https://en.wikipedia.org/wiki/Voronoi_diagram">Voronoi polygons</a><sup class="print-endnote">[158]</sup> are taught in many graphics classes. For example, see <a href="https://graphics.stanford.edu/courses/cs368-06-spring/handouts/Delaunay_1.pdf">Stanford CS 368</a><sup class="print-endnote">[159]</sup>(PDF). I also looked at <a href="https://en.wikipedia.org/wiki/Relative_neighborhood_graph">relative neighborhood graphs</a><sup class="print-endnote">[160]</sup> and <a href="https://en.wikipedia.org/wiki/Gabriel_graph">Gabriel graphs</a><sup class="print-endnote">[161]</sup> but didn’t use either.</p>
+<p>Delaunay triangulation can be used for maps, in the form of <a href="https://en.wikipedia.org/wiki/Triangulated_irregular_network">triangular irregular networks</a><sup class="print-endnote">[162]</sup>. Voronoi diagrams are also used for maps. For example, see <a href="https://roguelikedeveloper.blogspot.com/2007/07/wilderness-generation-using-voronoi.html">this blog post about using Voronoi for Unangband biomes</a><sup class="print-endnote">[163]</sup>.</p>
+<p><a href="https://en.wikipedia.org/wiki/Fortune&#39;s_algorithm">Fortune’s Algorithm</a><sup class="print-endnote">[164]</sup> is one of several algorithms that can turn a set of points into Voronoi polygons. It’s implemented in <code>as3delaunay</code>. <a href="https://en.wikipedia.org/wiki/Lloyd&#39;s_algorithm">Lloyd Relaxation</a><sup class="print-endnote">[165]</sup> is used to improve the distribution of random points. It decreases the irregularity of the Voronoi polygons.</p>
+<p>The Voronoi wiki has some incomplete pages on <a href="https://www.voronoi.com/wiki/index.php?title=PAN_graphs">graph representation</a><sup class="print-endnote">[166]</sup> and <a href="https://www.voronoi.com/wiki/index.php?title=Spatial_Data_Structures">edge representation</a><sup class="print-endnote">[167]</sup>, as well two pages that helped me with river generation: <a href="https://www.voronoi.com/wiki/index.php?title=Rivers_and_watersheds">rivers and watersheds</a><sup class="print-endnote">[168]</sup> and <a href="https://www.voronoi.com/wiki/index.php?title=Crust_and_Skeleton">crust and skeleton</a><sup class="print-endnote">[169]</sup>.</p>
+<p>The <a href="http://www.reliefshading.com/">Relief Shading Website</a><sup class="print-endnote">[170]</sup> has some <a href="http://www.reliefshading.com/examples/">images of shaded relief maps</a><sup class="print-endnote">[171]</sup>, as well as design guidelines for shading and coloring. I am sad to say I did not have time to apply these techniques. I also studied Bing and Google maps to see how they draw various features; see <a href="https://web.archive.org/web/20101223024222/https://www.41latitude.com/post/897973389/bing-maps-redesign">this article</a><sup class="print-endnote">[172]</sup> and <a href="https://amitp.blogspot.com/2007/09/online-map-sites.html">my blog post</a><sup class="print-endnote">[173]</sup> and <a href="http://infosthetics.com/archives/2010/06/bing_destination_map_automatic_napkin_sketching_of_maps.html">this article</a><sup class="print-endnote">[174]</sup>.</p>
+<p>The <a href="http://pcg.wikidot.com/pcg-algorithm:whittaker-diagram">Whittaker diagram</a><sup class="print-endnote">[175]</sup> is one way to predict common biomes given climate. Wikipedia has a page listing <a href="https://en.wikipedia.org/wiki/Biome">biome classification schemes and various biomes</a><sup class="print-endnote">[176]</sup>.</p>
+<p>Wikipedia also has a nice <a href="https://en.wikipedia.org/wiki/List_of_landforms">list of landforms</a><sup class="print-endnote">[177]</sup> that one might want to generate in a game map generator. I did not explore these for this project.</p>
+<p>Ken Perlin created Perlin Noise, and then he made a sequel, <a href="https://github.com/stegu/perlin-noise/blob/master/simplexnoise.pdf">Simplex Noise</a><sup class="print-endnote">[178]</sup> [PDF]. For this project I used Perlin Noise for the overall island shape. I used Perlin instead of Simplex because Flash included it in the standard library, but I use Simplex for all my newer projects. Joe Slayton has a page on <a href="https://web.archive.org/web/20140718034013/http://www.ridgenet.net/~jslayton/FunWithWilburVol6/">how to turn perlin noise into islands</a><sup class="print-endnote">[179]</sup>. I was looking for “blue noise”, which led me to <a href="https://web.archive.org/web/20060410123742/https://www.cs.virginia.edu/~gfx/pubs/antimony/">Dunbar and Humphreys’s paper on noise generation</a><sup class="print-endnote">[180]</sup> and <a href="http://johanneskopf.de/publications/blue_noise/">recursive Wang tiles</a><sup class="print-endnote">[181]</sup> before I found Lloyd’s algorithm for better random point distribution. I also looked at <a href="https://www.red3d.com/cwr/texsyn/diary.html">Craig Reynold’s textures</a><sup class="print-endnote">[182]</sup> but didn’t have time to do anything with them.</p>
+<p>Also interesting were <a href="https://perso.liris.cnrs.fr/eric.galin/articles.html">these papers about generating worlds</a><sup class="print-endnote">[183]</sup> (the author has continued writing interesting papers since I published this page in 2010), <a href="https://www.gozzys.com/wilderness-maps">Gozzy’s wilderness map generator</a><sup class="print-endnote">[184]</sup>, <a href="https://donjon.bin.sh/world/">donjon’s world generator</a><sup class="print-endnote">[185]</sup>, a <a href="http://gram.cs.mcgill.ca/papers/rudzicz-08-iterated.pdf">paper on procedural road generation</a><sup class="print-endnote">[186]</sup>. <a href="https://en.wikipedia.org/wiki/Straight_skeleton">Straight skeletons</a><sup class="print-endnote">[187]</sup> seemed like they might be useful for defining mountain ranges, but once I discovered how well “distance from coast” worked, I didn’t need anything else. The 3D map generation in <a href="http://www.bay12games.com/dwarves/">Dwarf Fortress</a><sup class="print-endnote">[188]</sup> is pretty neat.</p></section></main><div class="below-divider">
+<p>Email me <a class="email" rel="me" href="mailto:redblobgames@gmail.com">redblobgames@gmail.com</a>, or comment here:</p>
+<div class="print-endnote">
+<h3>Links</h3>
+<ol>
+<li>[1]:&nbsp;https://www.redblobgames.com/maps/mapgen2/</li>
+<li>[2]:&nbsp;https://en.wikipedia.org/wiki/Realm_of_the_Mad_God</li>
+<li>[3]:&nbsp;https://en.wikipedia.org/wiki/Voronoi_diagram</li>
+<li>[4]:&nbsp;https://web.archive.org/web/20171101111828/http://www.voronoi.com/wiki/index.php?title=Voronoi_Applications</li>
+<li>[5]:&nbsp;http://bit-player.org/2011/a-slight-discrepancy</li>
+<li>[6]:&nbsp;https://en.wikipedia.org/wiki/Lloyd’s_algorithm</li>
+<li>[7]:&nbsp;https://en.wikipedia.org/wiki/Centroid#Centroid_of_polygon</li>
+<li>[8]:&nbsp;https://www.redblobgames.com/x/1721-voronoi-alternative/</li>
+<li>[9]:&nbsp;https://www.redblobgames.com/x/1830-jittered-grid/</li>
+<li>[10]:&nbsp;https://en.wikipedia.org/wiki/Graph_theory</li>
+<li>[11]:&nbsp;https://en.wikipedia.org/wiki/Delaunay_triangulation</li>
+<li>[12]:&nbsp;https://mapbox.github.io/delaunator/</li>
+<li>[13]:&nbsp;https://www.redblobgames.com/maps/terrain-from-noise/#islands</li>
+<li>[14]:&nbsp;https://www.redblobgames.com/maps/mapgen4/</li>
+<li>[15]:&nbsp;https://old.reddit.com/r/rpg/comments/187o0v/im_not_sure_what_other_folks_do_but_this_is_how_i/</li>
+<li>[16]:&nbsp;https://imgur.com/a/EwPAy</li>
+<li>[17]:&nbsp;https://imgur.com/a/Pl3qi</li>
+<li>[18]:&nbsp;https://www.redblobgames.com/maps/terrain-from-noise/</li>
+<li>[19]:&nbsp;https://www.redblobgames.com/maps/mapgen4/</li>
+<li>[20]:&nbsp;https://www.voronoi.com/wiki/index.php?title=Rivers_and_watersheds</li>
+<li>[21]:&nbsp;https://www.redblobgames.com/maps/terrain-from-noise/</li>
+<li>[22]:&nbsp;https://www.realmofthemadgod.com/</li>
+<li>[23]:&nbsp;https://www.redblobgames.com/maps/mapgen2/</li>
+<li>[24]:&nbsp;http://pcg.wikidot.com/pcg-algorithm:whittaker-diagram</li>
+<li>[25]:&nbsp;https://www.realmofthemadgod.com/</li>
+<li>[26]:&nbsp;https://github.com/amitp/mapgen2/blob/master/Map.as#L718</li>
+<li>[27]:&nbsp;https://github.com/redblobgames/mapgen2/blob/master/biomes.js</li>
+<li>[28]:&nbsp;https://www.redblobgames.com/maps/terrain-from-noise/#biomes</li>
+<li>[29]:&nbsp;https://www.redblobgames.com/maps/mapgen4/</li>
+<li>[30]:&nbsp;https://en.wikipedia.org/wiki/Holdridge_life_zones</li>
+<li>[31]:&nbsp;https://en.wikipedia.org/wiki/K%C3%B6ppen_climate_classification</li>
+<li>[32]:&nbsp;https://www.shadedrelief.com/hypso/hypso.html</li>
+<li>[33]:&nbsp;https://www.redblobgames.com/x/1725-procedural-elevation/#rendering</li>
+<li>[34]:&nbsp;https://www.redblobgames.com/maps/noisy-edges/</li>
+<li>[35]:&nbsp;https://simblob.blogspot.com/2009/06/noise-in-game-art.html</li>
+<li>[36]:&nbsp;https://github.com/amitp/mapgen2</li>
+<li>[37]:&nbsp;https://www.redblobgames.com/x/2022-voronoi-maps-tutorial/</li>
+<li>[38]:&nbsp;https://github.com/redblobgames/mapgen2/</li>
+<li>[39]:&nbsp;https://www.redblobgames.com/maps/mapgen2/</li>
+<li>[40]:&nbsp;https://web.archive.org/web/20220617041817/http://experilous.com/1/blog/post/procedural-planet-generation</li>
+<li>[41]:&nbsp;https://experilous.com/1/project/planet-generator/2015-04-07/version-2</li>
+<li>[42]:&nbsp;http://mewo2.com/notes/terrain/</li>
+<li>[43]:&nbsp;https://map-gen.netlify.app/</li>
+<li>[44]:&nbsp;https://heredragonsabound.blogspot.com/2016/10/welcome.html</li>
+<li>[45]:&nbsp;https://imgur.com/gallery/z2hnk</li>
+<li>[46]:&nbsp;https://imgur.com/a/rVI6F</li>
+<li>[47]:&nbsp;https://github.com/Azgaar</li>
+<li>[48]:&nbsp;https://azgaar.github.io/Fantasy-Map-Generator/</li>
+<li>[49]:&nbsp;https://azgaar.wordpress.com/</li>
+<li>[50]:&nbsp;https://azgaar.wordpress.com/2017/06/30/biomes-generation-and-rendering/</li>
+<li>[51]:&nbsp;https://azgaar.wordpress.com/2017/05/27/confluences/</li>
+<li>[52]:&nbsp;https://github.com/Azgaar/Fantasy-Map-Generator</li>
+<li>[53]:&nbsp;https://www.redblobgames.com/maps/mapgen4/</li>
+<li>[54]:&nbsp;https://www.redblobgames.com/x/1843-planet-generation/</li>
+<li>[55]:&nbsp;https://procworld.blogspot.com/2011/07/political-landscape.html</li>
+<li>[56]:&nbsp;https://procworld.blogspot.com/2016/04/geometry-is-destiny.html</li>
+<li>[57]:&nbsp;https://github.com/rlguy/FantasyMapGenerator</li>
+<li>[58]:&nbsp;https://eveliosdev.blogspot.com/2016/06/plate-tectonics.html</li>
+<li>[59]:&nbsp;https://old.reddit.com/r/proceduralgeneration/comments/4wyida/random_walk_based_moisture_distribution/</li>
+<li>[60]:&nbsp;https://github.com/iskar909/political-map-generator</li>
+<li>[61]:&nbsp;https://citygenerator.morgajel.net/</li>
+<li>[62]:&nbsp;https://accounts.google.com/ServiceLogin?passive=1209600&amp;osid=1&amp;continue=https://plus.google.com/112661873200782342936/posts&amp;followup=https://plus.google.com/112661873200782342936/posts</li>
+<li>[63]:&nbsp;https://github.com/CityGenerator/CityGenerator</li>
+<li>[64]:&nbsp;https://www.indiedb.com/games/sword-scroll/news/progress-report-6</li>
+<li>[65]:&nbsp;https://web.archive.org/web/20120307035826/http://devblog.phillipspiess.com/projects/mapgen/</li>
+<li>[66]:&nbsp;https://github.com/lebesnec/island.js</li>
+<li>[67]:&nbsp;https://luckylooke.github.io/phaser-islandjs-plugin/</li>
+<li>[68]:&nbsp;https://github.com/eranimo/hexgen</li>
+<li>[69]:&nbsp;https://squeakyspacebar.github.io/2017/07/12/Procedural-Map-Generation-With-Voronoi-Diagrams.html</li>
+<li>[70]:&nbsp;https://github.com/squeakyspacebar/novatellus</li>
+<li>[71]:&nbsp;https://whenitsdone.org/2014/07/29/map-generation-on-spherical-planet-part-i/</li>
+<li>[72]:&nbsp;https://averrin.medium.com/%D0%BE%D1%82%D0%B4%D0%B5%D0%BB%D1%8F%D0%B5%D0%BC-%D1%81%D0%B2%D0%B5%D1%82-%D0%BE%D1%82-%D1%82%D1%8C%D0%BC%D1%8B-%D0%B8-%D0%B4%D1%80%D1%83%D0%B3%D0%B8%D0%B5-%D1%81%D0%BF%D0%BE%D1%81%D0%BE%D0%B1%D1%8B-%D1%81%D0%BE%D1%82%D0%B2%D0%BE%D1%80%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BC%D0%B8%D1%80%D0%B0-fbf6ad91127f</li>
+<li>[73]:&nbsp;https://github.com/averrin/mapgen</li>
+<li>[74]:&nbsp;https://www.littlecubevalley.com/single-post/2018/08/27/Procedurally-Cascaded-Rivers-and-Biomes</li>
+<li>[75]:&nbsp;http://lucamorselli.me/blog/fantasy_map_generation_via_ising_model/</li>
+<li>[76]:&nbsp;https://jeheydorn.github.io/nortantis/</li>
+<li>[77]:&nbsp;https://web.archive.org/web/20190328130830/https://nexus-maps.herokuapp.com/</li>
+<li>[78]:&nbsp;https://old.reddit.com/r/proceduralgeneration/comments/a2fjrj/procedurally_generated_regional_and_biome_maps/</li>
+<li>[79]:&nbsp;https://pvigier.github.io/</li>
+<li>[80]:&nbsp;https://www.redblobgames.com/x/2022-voronoi-maps-tutorial/</li>
+<li>[81]:&nbsp;https://github.com/rjanicek/voronoi-map-haxe</li>
+<li>[82]:&nbsp;https://web.archive.org/web/20130116215742/https://rjanicek.github.com/voronoi-map-haxe/</li>
+<li>[83]:&nbsp;https://github.com/rjanicek/voronoi-map-js</li>
+<li>[84]:&nbsp;https://github.com/jterrace/mapgen2/tree/utilities</li>
+<li>[85]:&nbsp;https://github.com/jterrace/collada2json</li>
+<li>[86]:&nbsp;https://web.archive.org/web/20120225183657/https://www.flickr.com/photos/kensanata/5685579540/</li>
+<li>[87]:&nbsp;https://github.com/czgarrett/delaunay-ios</li>
+<li>[88]:&nbsp;https://github.com/adamgit/Unity-delaunay</li>
+<li>[89]:&nbsp;https://github.com/jceipek/Unity-delaunay</li>
+<li>[90]:&nbsp;https://web.archive.org/web/20111116180131/https://openprocessing.org/visuals/?visualID=30809</li>
+<li>[91]:&nbsp;https://web.archive.org/web/20120529023153/http://www.barankahyaoglu.com/blog/post/2012/04/28/Map-Generator-source-code-is-available-now!.aspx</li>
+<li>[92]:&nbsp;https://github.com/abhimir/UnitySimpleMapGenerator</li>
+<li>[93]:&nbsp;https://gamedev.stackexchange.com/users/4708/chrish</li>
+<li>[94]:&nbsp;https://github.com/Evelios/procIsland</li>
+<li>[95]:&nbsp;https://github.com/Evelios/procIsland</li>
+<li>[96]:&nbsp;https://eveliosdev.blogspot.com.au/2016/06/breathing-life-into-map.html</li>
+<li>[97]:&nbsp;https://github.com/zaynyatyi/voronoi-map-nme</li>
+<li>[98]:&nbsp;https://github.com/Hoten/Java-Delanuay</li>
+<li>[99]:&nbsp;https://github.com/kylepixel/terrain-generator</li>
+<li>[100]:&nbsp;https://github.com/NuclearHorseStudios/ManyLandsGenerator</li>
+<li>[101]:&nbsp;https://github.com/staff0rd/polygon-map-unity</li>
+<li>[102]:&nbsp;https://github.com/Zaneo/VoronoiMapGen</li>
+<li>[103]:&nbsp;https://github.com/Rellikiox/MapGenerator</li>
+<li>[104]:&nbsp;https://twitter.com/tobmansf/status/540617232326619136</li>
+<li>[105]:&nbsp;https://github.com/Sushisource/DnDTG</li>
+<li>[106]:&nbsp;https://bitalchemists.github.io/polygon_map/</li>
+<li>[107]:&nbsp;https://github.com/BitAlchemists/polygon_map</li>
+<li>[108]:&nbsp;https://github.com/tomk32/mapgen2</li>
+<li>[109]:&nbsp;http://apri50.com/</li>
+<li>[110]:&nbsp;https://github.com/ace-design/island/</li>
+<li>[111]:&nbsp;https://github.com/feelic/PtolemyJS</li>
+<li>[112]:&nbsp;https://github.com/Jay2645/Unreal-Polygonal-Map-Gen</li>
+<li>[113]:&nbsp;https://github.com/utahwithak/MapGen</li>
+<li>[114]:&nbsp;https://github.com/SteveJohnstone/VoronoiMapGen</li>
+<li>[115]:&nbsp;https://github.com/DeiveEx/Polygon-Map-Generation</li>
+<li>[116]:&nbsp;https://github.com/Terasology/PolyWorld</li>
+<li>[117]:&nbsp;https://www.youtube.com/watch?v=7eOlKa9qa2Y</li>
+<li>[118]:&nbsp;https://github.com/kdhillon/besiege</li>
+<li>[119]:&nbsp;https://terrafirmacraft.com/</li>
+<li>[120]:&nbsp;https://pvigier.github.io/2019/05/12/vagabond-map-generation.html</li>
+<li>[121]:&nbsp;http://www.welshpiper.com/nerd-therapy/</li>
+<li>[122]:&nbsp;http://www.welshpiper.com/minocra-campaign-map/</li>
+<li>[123]:&nbsp;https://kingdomsintrevail.blogspot.com/2012/02/caldera-birth-of-world.html</li>
+<li>[124]:&nbsp;https://web.archive.org/web/20150924204825/https://crasta.wikia.com/wiki/Crasta</li>
+<li>[125]:&nbsp;https://leifandthorn.com/comic/saturday-sketchbook-world-map/</li>
+<li>[126]:&nbsp;https://old.reddit.com/r/DnD/comments/2sbr7c/the_map_for_the_campaign_im_starting_tomorrow/</li>
+<li>[127]:&nbsp;https://old.reddit.com/r/DnD/comments/2st84s/just_made_my_first_overland_map_for_a_campaign/</li>
+<li>[128]:&nbsp;https://old.reddit.com/r/DnD/comments/2u5fjj/map_for_the_known_world_in_my_5e_campaign/</li>
+<li>[129]:&nbsp;https://old.reddit.com/r/imaginarymaps/comments/4w5fdy/i_created_an_island_with_cities_roads_railroads/</li>
+<li>[130]:&nbsp;https://old.reddit.com/r/worldbuilding/comments/4ypzih/give_me_some_feedback_on_my_worlds_map_my_biggest/</li>
+<li>[131]:&nbsp;https://old.reddit.com/r/imaginarymaps/comments/5kzzba/i_made_another_island_nation/</li>
+<li>[132]:&nbsp;https://old.reddit.com/r/worldbuilding/comments/5wme1e/made_a_map_of_my_world_sphaira_with/</li>
+<li>[133]:&nbsp;https://togetter.com/li/866956</li>
+<li>[134]:&nbsp;https://twitter.com/halforcdruid/status/978340419607052289</li>
+<li>[135]:&nbsp;https://twitter.com/fenharel/status/1024037692873437184</li>
+<li>[136]:&nbsp;https://vos.tumblr.com/post/162415550753/corianwornen-itsbio-nightshadeis</li>
+<li>[137]:&nbsp;https://davidvs.blogspot.com/2018/11/island-maps.html</li>
+<li>[138]:&nbsp;https://twitter.com/GhostArcher3/status/1212455077786669056</li>
+<li>[139]:&nbsp;https://en.wikipedia.org/wiki/Entity_component_system</li>
+<li>[140]:&nbsp;http://geektyrant.com/news/2008/10/7/guillermo-del-toro-talks-about-the-entire-pentology-of-middl.html</li>
+<li>[141]:&nbsp;http://www-cs-students.stanford.edu/~amitp/game-programming/skyrim-maps/</li>
+<li>[142]:&nbsp;https://en.wikipedia.org/wiki/Drainage_basin</li>
+<li>[143]:&nbsp;https://roguelikedeveloper.blogspot.com/2007/07/wilderness-generation-using-voronoi.html</li>
+<li>[144]:&nbsp;http://devmag.org.za/2009/05/03/poisson-disk-sampling/</li>
+<li>[145]:&nbsp;https://simblob.blogspot.com/2010/09/polygon-map-generation-part-1.html</li>
+<li>[146]:&nbsp;https://simblob.blogspot.com/2010/09/polygon-map-generation-part-2.html</li>
+<li>[147]:&nbsp;https://simblob.blogspot.com/2010/09/polygon-map-generation-part-3.html</li>
+<li>[148]:&nbsp;https://simblob.blogspot.com/2010/01/simple-map-generation.html</li>
+<li>[149]:&nbsp;https://en.wikipedia.org/wiki/Flow_(psychology)</li>
+<li>[150]:&nbsp;http://www.dungeonleague.com/</li>
+<li>[151]:&nbsp;http://pcg.wikidot.com/</li>
+<li>[152]:&nbsp;http://pcg.wikidot.com/pcg-algorithm:map-generation</li>
+<li>[153]:&nbsp;https://www.voronoi.com/wiki/index.php?title=VoroWiki_main_page</li>
+<li>[154]:&nbsp;https://nodename.github.io/as3delaunay/</li>
+<li>[155]:&nbsp;http://lab.polygonal.de/2007/04/21/a-good-pseudo-random-number-generator-prng/</li>
+<li>[156]:&nbsp;https://optipng.sourceforge.net/</li>
+<li>[157]:&nbsp;https://en.wikipedia.org/wiki/Delaunay_triangulation</li>
+<li>[158]:&nbsp;https://en.wikipedia.org/wiki/Voronoi_diagram</li>
+<li>[159]:&nbsp;https://graphics.stanford.edu/courses/cs368-06-spring/handouts/Delaunay_1.pdf</li>
+<li>[160]:&nbsp;https://en.wikipedia.org/wiki/Relative_neighborhood_graph</li>
+<li>[161]:&nbsp;https://en.wikipedia.org/wiki/Gabriel_graph</li>
+<li>[162]:&nbsp;https://en.wikipedia.org/wiki/Triangulated_irregular_network</li>
+<li>[163]:&nbsp;https://roguelikedeveloper.blogspot.com/2007/07/wilderness-generation-using-voronoi.html</li>
+<li>[164]:&nbsp;https://en.wikipedia.org/wiki/Fortune’s_algorithm</li>
+<li>[165]:&nbsp;https://en.wikipedia.org/wiki/Lloyd’s_algorithm</li>
+<li>[166]:&nbsp;https://www.voronoi.com/wiki/index.php?title=PAN_graphs</li>
+<li>[167]:&nbsp;https://www.voronoi.com/wiki/index.php?title=Spatial_Data_Structures</li>
+<li>[168]:&nbsp;https://www.voronoi.com/wiki/index.php?title=Rivers_and_watersheds</li>
+<li>[169]:&nbsp;https://www.voronoi.com/wiki/index.php?title=Crust_and_Skeleton</li>
+<li>[170]:&nbsp;http://www.reliefshading.com/</li>
+<li>[171]:&nbsp;http://www.reliefshading.com/examples/</li>
+<li>[172]:&nbsp;https://web.archive.org/web/20101223024222/https://www.41latitude.com/post/897973389/bing-maps-redesign</li>
+<li>[173]:&nbsp;https://amitp.blogspot.com/2007/09/online-map-sites.html</li>
+<li>[174]:&nbsp;http://infosthetics.com/archives/2010/06/bing_destination_map_automatic_napkin_sketching_of_maps.html</li>
+<li>[175]:&nbsp;http://pcg.wikidot.com/pcg-algorithm:whittaker-diagram</li>
+<li>[176]:&nbsp;https://en.wikipedia.org/wiki/Biome</li>
+<li>[177]:&nbsp;https://en.wikipedia.org/wiki/List_of_landforms</li>
+<li>[178]:&nbsp;https://github.com/stegu/perlin-noise/blob/master/simplexnoise.pdf</li>
+<li>[179]:&nbsp;https://web.archive.org/web/20140718034013/http://www.ridgenet.net/~jslayton/FunWithWilburVol6/</li>
+<li>[180]:&nbsp;https://web.archive.org/web/20060410123742/https://www.cs.virginia.edu/~gfx/pubs/antimony/</li>
+<li>[181]:&nbsp;http://johanneskopf.de/publications/blue_noise/</li>
+<li>[182]:&nbsp;https://www.red3d.com/cwr/texsyn/diary.html</li>
+<li>[183]:&nbsp;https://perso.liris.cnrs.fr/eric.galin/articles.html</li>
+<li>[184]:&nbsp;https://www.gozzys.com/wilderness-maps</li>
+<li>[185]:&nbsp;https://donjon.bin.sh/world/</li>
+<li>[186]:&nbsp;http://gram.cs.mcgill.ca/papers/rudzicz-08-iterated.pdf</li>
+<li>[187]:&nbsp;https://en.wikipedia.org/wiki/Straight_skeleton</li>
+<li>[188]:&nbsp;http://www.bay12games.com/dwarves/</li>
+</ol>
+</div>
+<div class="comments" role="complementary">
+<div id="disqus_thread"><button style="padding:1em;width:100%" onclick="$disqus()">Load comments</button></div>
+<script>
+function disqus_config(){this.page.url="http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/"}
+function $disqus(){$disqus=()=>{};$l("https://blobs.disqus.com/embed.js")}
+if(document.location.hash.match(/#comment/))setTimeout($disqus,0)
+else {new IntersectionObserver(e=>{if(e[0].isIntersecting)$disqus()}).observe(document.getElementById('disqus_thread'))}</script><noscript><a href="https://blobs.disqus.com/?url=http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/">View the discussion thread.</a></noscript>
+</div>
+</div>
+<footer><div>
+<address>
+		  Copyright © <time>2025</time><span class="vcard"><a rel="author home copyright" class="url fn n" href="http://www-cs-students.stanford.edu/~amitp/"><span class="given-name"> Amit </span><span class="family-name"> Patel</span></a></span>
+</address>
+<div>
+	      &nbsp;<!-- Created: 1 Sep 2010 --><!-- hhmts start -->Last modified: 23 Feb 2025<!-- hhmts end -->
+</div>
+</div></footer>
+
+
+</body></html>
