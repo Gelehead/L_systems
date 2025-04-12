@@ -1,4 +1,5 @@
 import sys
+import os
 
 def visualize_turtle_graphics(grammar_path, angle=90, step_size=10):
     """
@@ -11,9 +12,16 @@ def visualize_turtle_graphics(grammar_path, angle=90, step_size=10):
     """
     import turtle
     
-    f = open("../"+grammar_path)
+    path = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), grammar_path))
+    
+    print(path.title())
+    # TODO: fix
+    # we have C:\Users\Oscar\Onedrive\Escritorio\Univ\Code\C & C++\L_Systems\Build\Grammars\Gram_Gen.Txt
+    # as output currently, which smh doesnt work so fck this
+    
+    f = open(path)
     instructions = f.readline()
-    #print(instructions[:100])
+    print(instructions[:100])
     f.close()
     
     # Set up the turtle

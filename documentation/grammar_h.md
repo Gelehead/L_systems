@@ -1,10 +1,35 @@
 [summary](main_doc.md)
 # Grammar_h
+
+## UnifiedGrammar
+
+The purpose of this abstract class is to read and handle the grammar files.
+
+#### dimension
+1-3D for now 
+
+#### generation_steps
+The idea behind this is to have our generation split into multiple steps. For example, for the short term goal of generating a SCAD random map : 
+ 1. Land / Water generation
+ 2. height ( / depth ? ) repartition
+ 3. caverns 
+ 4. trees
+
+though each one woud need its own algorithm (urgh)
+
+
+
+
+
+
+
+
+## grammar1D
 ~1 dimension grammar output : you give some rules and it outputs deterministically (for now) a string corresponding to instructions for python turtle
 
 
 
-## attributes
+### attributes
 
 #### m - non terminal symbols
 Main component for grammar expansion
@@ -26,7 +51,9 @@ symbol -> < {symbol, symbol, symbol}, {symbol, symbol}, etc. >
 Mapper from string to symbols to help read grammar files ( should be useful with really big grammars )
 current idea of how to do it :
 
-## Read_grammar
+### functions
+
+#### Read_grammar
 
 shit ton of problems, somehow resolved the 'std::bad_array_new_length' problem with m.reserve(100).
 

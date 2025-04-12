@@ -80,6 +80,8 @@ class symbol : public GrammarElement{
                 }
                 string += "}";
             }
+
+            return string;
         }
 
         // duplicate of !operator
@@ -155,7 +157,7 @@ class symbol : public GrammarElement{
 };
 
 // Overload output operator for symbol
-std::ostream& operator<<(std::ostream& os, const symbol& symb) {
+inline std::ostream& operator<<(std::ostream& os, const symbol& symb) {
     os << "Symbol: " << symb.c;
     
     // ?? shouldnt this be replaced by the vector<symbol> cout method
@@ -182,7 +184,7 @@ std::ostream& operator<<(std::ostream& os, const symbol& symb) {
 }
 
 // Overload output operator for vector of symbols
-std::ostream& operator<<(std::ostream& os, const std::vector<symbol>& sym_vec) {
+inline std::ostream& operator<<(std::ostream& os, const std::vector<symbol>& sym_vec) {
     os << '{';
     for (size_t i = 0; i < sym_vec.size(); i++) {
         os << sym_vec[i].c;
@@ -195,7 +197,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<symbol>& sym_vec) {
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::vector<symbol*>& sym_vec) {
+inline std::ostream& operator<<(std::ostream& os, const std::vector<symbol*>& sym_vec) {
     os << '{';
     for (size_t i = 0; i < sym_vec.size(); i++) {
         os << sym_vec[i]->getChar();
@@ -213,7 +215,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<symbol*>& sym_vec) 
 // ===========================================================================
 
 
-class tile : symbol {
+class symbol_3D : GrammarElement{
 
     int x, y, z;
     double width, length;
