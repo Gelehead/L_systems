@@ -11,6 +11,12 @@
 class grammar;
 std::ostream& operator<<(std::ostream& os, const grammar& gram);
 
+enum GrammarClass {
+    ABSTRACT,
+    GRAMMAR_1D,
+    GRAMMAR_3D
+};
+
 class GrammarUnified {
 public:
     // non terminal symbols
@@ -22,12 +28,16 @@ public:
     // start symbols
     std::vector<GrammarElement*> s;
 
+    GrammarClass gClass = ABSTRACT;
+
     static GrammarUnified* readGrammar(std::string filePath);
     
-    virtual bool canGenerate2D() const = 0;
+    virtual bool is1DGenerator() const = 0;
 
     virtual std::vector<GrammarElement*> generate(int generation, std::vector<GrammarElement*> base) const;
     virtual std::vector<std::vector<GrammarElement*>> generate(int generation, std::vector<std::vector<GrammarElement*>> base) const;
+
+    virtual GrammarClass getGrammarClass() { return gClass; }
 
 protected:
     // "1D" and 2/3D generations 
@@ -46,6 +56,8 @@ public:
     // start symbol
     std::vector<GrammarElement*> s;
 
+    GrammarClass gClass = GRAMMAR_1D;
+
     // rules - using pointers to GrammarElement for map keys to avoid object slicing
     std::map<GrammarElement*, std::vector<std::vector<GrammarElement*>>> r;
 
@@ -59,7 +71,7 @@ public:
     // Default constructor
     grammar();
 
-    bool canGenerate2D() const override;
+    bool is1DGenerator() const override;
 
     // @param generation vector of grammar elements 
     // @return string corresponding to every character concatenated  
@@ -81,7 +93,7 @@ protected:
 class Grammar3D : public GrammarUnified {
     // Implementation to be defined
 public:
-    bool canGenerate2D() const override { return false; }
+    bool is1DGenerator() const override { return false; }
 
 protected:
     std::vector<GrammarElement*> generate1DImp(int generation, std::vector<GrammarElement*> base) const override {

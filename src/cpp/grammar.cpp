@@ -20,15 +20,18 @@ GrammarUnified* GrammarUnified::readGrammar(std::string filePath) {
     return nullptr;
 }
 
+// checks if grammar is 1D L_system
 std::vector<GrammarElement*> GrammarUnified::generate(int generation, std::vector<GrammarElement*> base) const {
-    if (canGenerate2D()) {
+    if (is1DGenerator()) {
+        return generate1DImp(generation, base);
+    }
+    else {
         throw std::runtime_error("This grammar only supports 2D generation");
     }
-    return generate1DImp(generation, base);
 }
 
 std::vector<std::vector<GrammarElement*>> GrammarUnified::generate(int generation, std::vector<std::vector<GrammarElement*>> base) const {
-    if (!canGenerate2D()) {
+    if (!is1DGenerator()) {
         throw std::runtime_error("This grammar does not support 2D generation");
     }
     return generate2pDImp(generation, base);
@@ -44,7 +47,7 @@ grammar::grammar(
 
 grammar::grammar() : m(), t(), s(), r() {}
 
-bool grammar::canGenerate2D() const {
+bool grammar::is1DGenerator() const {
     return true;
 }
 

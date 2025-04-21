@@ -37,7 +37,8 @@ add_executable(perlin_gen
 
 # Set the default grammar file and output path as compile definitions
 # These can be overridden at runtime
-set(DEFAULT_GRAMMAR_FILE "${GRAMMARS_DIR}/test.txt")
+# DEFAULT IS cube_thing.txt
+set(DEFAULT_GRAMMAR_FILE "${GRAMMARS_DIR}/cube_thing.txt")
 set(DEFAULT_OUTPUT_PATH "${CMAKE_BINARY_DIR}/grammars/gram_gen.txt")
 
 target_compile_definitions(grammar_gen PRIVATE 
@@ -61,62 +62,72 @@ install(FILES ${PYTHON_FILES} DESTINATION share/${PROJECT_NAME}/python)
 # Create a platform-independent run script for grammar generator
 if(WIN32)
     # Windows batch file for grammar generator
-    file(WRITE ${CMAKE_BINARY_DIR}/run_grammar.bat "
-@echo off
-set N_GENERATION=5
-set GRAMMAR_FILE=test.txt
-set OUTPUT_GRAMMAR_PATH=\"${CMAKE_BINARY_DIR}/grammars/gram_gen.txt\"
-set PENCIL_SIZE=1
-set ANGLE=90
+    file(
+        WRITE ${CMAKE_BINARY_DIR}/run_grammar.bat 
+        "
+    @echo off
+    set N_GENERATION=%2
+    set GRAMMAR_FILE=%1
+    set OUTPUT_GRAMMAR_PATH=\"${CMAKE_BINARY_DIR}/grammars/%3\"
+    set PENCIL_SIZE=%4
+    set ANGLE=%5
 
-grammar_gen.exe \"${CMAKE_BINARY_DIR}/grammars/%GRAMMAR_FILE%\" %N_GENERATION% %OUTPUT_GRAMMAR_PATH%
+    echo %GRAMMAR_FILE%
 
-cd \"${CMAKE_BINARY_DIR}/python\"
-python interpreter.py %PENCIL_SIZE% %ANGLE% %OUTPUT_GRAMMAR_PATH%
-cd \"${CMAKE_BINARY_DIR}\"
-")
-    
+    cd \"${CMAKE_BINARY_DIR}/Debug\"
+
+    grammar_gen.exe \"${GRAMMARS_DIR}/%GRAMMAR_FILE%\" %N_GENERATION% %OUTPUT_GRAMMAR_PATH%
+
+    cd \"${CMAKE_BINARY_DIR}/python\"
+    python interpreter.py %PENCIL_SIZE% %ANGLE% %OUTPUT_GRAMMAR_PATH%
+    cd \"${CMAKE_BINARY_DIR}\"
+        "
+    )
+        
     # Windows batch file for Perlin noise generator
-    file(WRITE ${CMAKE_BINARY_DIR}/run_perlin.bat "
-@echo off
-set WIDTH=512
-set HEIGHT=512
-set FEATURE_SIZE=64
-set OCTAVES=6
-set PERSISTENCE=0.5
-set OUTPUT_PATH=\"${CMAKE_BINARY_DIR}/noise/perlin_terrain.ppm\"
-set COLORED=1
+    file(
+        WRITE ${CMAKE_BINARY_DIR}/run_perlin.bat 
+        "
+    @echo off
+    set WIDTH=512
+    set HEIGHT=512
+    set FEATURE_SIZE=64
+    set OCTAVES=6
+    set PERSISTENCE=0.5
+    set OUTPUT_PATH=\"${CMAKE_BINARY_DIR}/noise/perlin_terrain.ppm\"
+    set COLORED=1
 
-perlin_gen.exe %WIDTH% %HEIGHT% %FEATURE_SIZE% %OCTAVES% %PERSISTENCE% %OUTPUT_PATH% %COLORED%
-")
+    perlin_gen.exe %WIDTH% %HEIGHT% %FEATURE_SIZE% %OCTAVES% %PERSISTENCE% %OUTPUT_PATH% %COLORED%
+        "
+    )
 else()
     # Unix shell script for grammar generator
     file(WRITE ${CMAKE_BINARY_DIR}/run_grammar.sh "#!/bin/bash
-N_GENERATION=5
-GRAMMAR_FILE=test.txt
-OUTPUT_GRAMMAR_PATH=\"${CMAKE_BINARY_DIR}/grammars/gram_gen.txt\"
-PENCIL_SIZE=1
-ANGLE=90
+    N_GENERATION=5
+    GRAMMAR_FILE=test.txt
+    OUTPUT_GRAMMAR_PATH=\"${CMAKE_BINARY_DIR}/grammars/gram_gen.txt\"
+    PENCIL_SIZE=1
+    ANGLE=90
 
-\"${CMAKE_BINARY_DIR}/grammar_gen\" \"${CMAKE_BINARY_DIR}/grammars/$GRAMMAR_FILE\" $N_GENERATION \"$OUTPUT_GRAMMAR_PATH\"
+    \"${CMAKE_BINARY_DIR}/grammar_gen\" \"${CMAKE_BINARY_DIR}/grammars/$GRAMMAR_FILE\" $N_GENERATION \"$OUTPUT_GRAMMAR_PATH\"
 
-cd \"${CMAKE_BINARY_DIR}/python\"
-python interpreter.py $PENCIL_SIZE $ANGLE \"$OUTPUT_GRAMMAR_PATH\"
-cd \"${CMAKE_BINARY_DIR}\"
-")
-    
-    # Unix shell script for Perlin noise generator
-    file(WRITE ${CMAKE_BINARY_DIR}/run_perlin.sh "#!/bin/bash
-WIDTH=512
-HEIGHT=512
-FEATURE_SIZE=64
-OCTAVES=6
-PERSISTENCE=0.5
-OUTPUT_PATH=\"${CMAKE_BINARY_DIR}/noise/perlin_terrain.ppm\"
-COLORED=1
+    cd \"${CMAKE_BINARY_DIR}/python\"
+    python interpreter.py $PENCIL_SIZE $ANGLE \"$OUTPUT_GRAMMAR_PATH\"
+    cd \"${CMAKE_BINARY_DIR}\"
+    ")
+        
+        # Unix shell script for Perlin noise generator
+        file(WRITE ${CMAKE_BINARY_DIR}/run_perlin.sh "#!/bin/bash
+    WIDTH=512
+    HEIGHT=512
+    FEATURE_SIZE=64
+    OCTAVES=6
+    PERSISTENCE=0.5
+    OUTPUT_PATH=\"${CMAKE_BINARY_DIR}/noise/perlin_terrain.ppm\"
+    COLORED=1
 
-\"${CMAKE_BINARY_DIR}/perlin_gen\" $WIDTH $HEIGHT $FEATURE_SIZE $OCTAVES $PERSISTENCE \"$OUTPUT_PATH\" $COLORED
-")
+    \"${CMAKE_BINARY_DIR}/perlin_gen\" $WIDTH $HEIGHT $FEATURE_SIZE $OCTAVES $PERSISTENCE \"$OUTPUT_PATH\" $COLORED
+    ")
     
     # Make the shell scripts executable
     execute_process(COMMAND chmod +x ${CMAKE_BINARY_DIR}/run_grammar.sh)

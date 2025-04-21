@@ -18,6 +18,13 @@ int main(int argc, char** argv) {
 
     std::ofstream out(outputPath);
 
+    std::cout << argv[1] << std::endl;
+    std::cout << argv[2] << std::endl;
+
+    std::cout << *g << std::endl;
+
+    //std::cout << grammar::vec2string(g->generate(atoi(argv[2]), g->s)) << std::endl;
+
     out << grammar::vec2string(g->generate(atoi(argv[2]), g->s));
     out.close();
 }

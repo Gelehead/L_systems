@@ -32,6 +32,33 @@ class GrammarElement {
         char c;
 };
 
+// Overload output operator for symbol
+inline std::ostream& operator<<(std::ostream& os, const GrammarElement* ge) {
+    os << "Symbol: " << ge->getChar();
+    
+    // ?? shouldnt this be replaced by the vector<symbol> cout method
+    os << " Possible follow-up symbols: ";
+    if (ge->getNextElements().empty()) {
+        os << "{}";
+    } else {
+        os << "{" << std::endl;
+        for ( const std::vector<GrammarElement*>& possibility : ge->getNextElements() ){
+            os << "[" ;
+            for (size_t i = 0; i < possibility.size(); i++) {
+                os << possibility[i]->getChar();
+                if (i < possibility.size() - 1) {
+                    os << ", ";
+                }
+            }
+            os << "]";
+            if ( possibility != ge->getNextElements().back() ) { os << "," << std::endl; }
+        }
+        os << "}";
+    }
+    
+    return os;
+}
+
 // ===========================================================================
 //                                   SYMBOL
 // ===========================================================================
