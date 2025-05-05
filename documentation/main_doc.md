@@ -18,8 +18,11 @@ Only relevant commits will be mentionned, some are just daily commit things to h
 ### [Grammar.h](grammar_h.md)
 small description of grammar.h
 
-### [symbol.h](symbol_h.md)
-small description of symbol.h
+### [Consistuent.h](Consituent.md)
+"Constituent" term coming from ( or at least first heard of in ) "Context-Free Grammars and Constituency Parsing" - Speech and Language Processing. Daniel Jurafsky & James H. Martin.
+
+
+
 
 ### [file.h](file.md)
 small description 
