@@ -1,12 +1,12 @@
 setlocal enabledelayedexpansion
 @echo off
-set N_GENERATION=7
-set GRAMMAR_FILE=herb.txt
+set N_GENERATION=3
+set GRAMMAR_FILE=clove.txt
 set OUTPUT_GRAMMAR_PATH="gram_gen.txt"
 
 ::python script part
 set PENCIL_SIZE=2
-set ANGLE=20
+set ANGLE=90
 
 :: Check if build directory exists, create if not
 if not exist "build" (

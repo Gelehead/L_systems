@@ -1,6 +1,8 @@
 #ifndef TILE_H
 #define TILE_H
 
+#define INT_MAX 2100100100
+
 #include <vector>
 #include "grammar.h"
 #include "noise.h"
@@ -14,32 +16,47 @@ enum TileType {
     MOUNTAIN
 };
 
+// Virtual parent class Tile for every subclass in set dimensions
 class Tile {
-protected:
-    std::vector<double> position;
-    std::vector<double> direction;
+    public:
+        virtual ~Tile() = default;
 
-public:
-    Tile(std::vector<double> pos, std::vector<double> dir);
-    Tile();
-    virtual ~Tile() = default;
+        // propagate / pulse is the signal propagated amongst all nodes a signal(query*)
+        // *see Query file in documentation
+        virtual Consistuent* propagate() const;
+        virtual std::vector<Consistuent> Query() const;
 
-    virtual GrammarElement* propagate() const = 0;
+    private : 
+        Tile* parent;
+        std::vector<Tile> children;
+        std::vector<Tile> neighbours;
+        int entropy = INT_MAX;
+        int range;
 };
 
 class Tile2d : public Tile {
 public:
     double x, y;
-    Tile2d* parent;
-    Tile2d* child;
+
+    Consistuent* propagate() const override;
+    std::vector<Consistuent> Query() const override;
 
     // default initialization 
-    Tile2d(double x);
+    Tile2d(double x, double y);
     Tile2d();
+};
 
-    GrammarElement* propagate() const override;
+class Tile3d : public Tile {
+    public :
+        // should be useful to have double instead of int for subdivision
+        double x, y, z;
 
-    Tile2d* init(int length, int featureSize);
+        Consistuent* propagate() const override;
+        std::vector<Consistuent> Query() const override;
+
+        // initialization
+        Tile3d(double x, double y, double z );
+        Tile3d();
 };
 
 #endif

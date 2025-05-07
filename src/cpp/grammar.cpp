@@ -21,7 +21,7 @@ GrammarUnified* GrammarUnified::readGrammar(std::string filePath) {
 }
 
 // checks if grammar is 1D L_system
-std::vector<GrammarElement*> GrammarUnified::generate(int generation, std::vector<GrammarElement*> base) const {
+std::vector<Consistuent*> GrammarUnified::generate(int generation, std::vector<Consistuent*> base) const {
     if (is1DGenerator()) {
         return generate1DImp(generation, base);
     }
@@ -30,7 +30,7 @@ std::vector<GrammarElement*> GrammarUnified::generate(int generation, std::vecto
     }
 }
 
-std::vector<std::vector<GrammarElement*>> GrammarUnified::generate(int generation, std::vector<std::vector<GrammarElement*>> base) const {
+std::vector<std::vector<Consistuent*>> GrammarUnified::generate(int generation, std::vector<std::vector<Consistuent*>> base) const {
     if (!is1DGenerator()) {
         throw std::runtime_error("This grammar does not support 2D generation");
     }
@@ -39,10 +39,10 @@ std::vector<std::vector<GrammarElement*>> GrammarUnified::generate(int generatio
 
 // grammar implementations
 grammar::grammar(
-    const std::vector<GrammarElement*> non_terminal, 
-    const std::vector<GrammarElement*> terminal, 
-    const std::vector<GrammarElement*> start,
-    std::map<GrammarElement*, std::vector<std::vector<GrammarElement*>>> rules
+    const std::vector<Consistuent*> non_terminal, 
+    const std::vector<Consistuent*> terminal, 
+    const std::vector<Consistuent*> start,
+    std::map<Consistuent*, std::vector<std::vector<Consistuent*>>> rules
 ) : m(non_terminal), t(terminal), s(start), r(rules) {}
 
 grammar::grammar() : m(), t(), s(), r() {}
@@ -51,9 +51,9 @@ bool grammar::is1DGenerator() const {
     return true;
 }
 
-std::string grammar::vec2string(std::vector<GrammarElement*> generation) {
+std::string grammar::vec2string(std::vector<Consistuent*> generation) {
     std::string out = "";
-    for (GrammarElement* s : generation) {
+    for (Consistuent* s : generation) {
         out += s->getChar();
     }
     return out;
@@ -66,16 +66,16 @@ grammar* grammar::read_grammar(std::string filename) {
     }
     
     std::string str;
-    std::vector<GrammarElement*> m, s, t;
-    std::map<GrammarElement*, std::vector<std::vector<GrammarElement*>>> r;
+    std::vector<Consistuent*> m, s, t;
+    std::map<Consistuent*, std::vector<std::vector<Consistuent*>>> r;
 
     // Reserve space for elements
     m.reserve(100);
     t.reserve(100);
     s.reserve(100);
 
-    // map from char to GrammarElement pointer
-    std::map<char, GrammarElement*> mapper;
+    // map from char to Consistuent pointer
+    std::map<char, Consistuent*> mapper;
     
     // Read non-terminal symbols
     std::getline(file, str);
@@ -132,10 +132,10 @@ grammar* grammar::read_grammar(std::string filename) {
             }
 
             // Get the left symbol from the mapper
-            GrammarElement* leftSymbol = mapper.at(left[0]);
+            Consistuent* leftSymbol = mapper.at(left[0]);
             
             // Process right side of the rule
-            std::vector<GrammarElement*> next;
+            std::vector<Consistuent*> next;
             for (char c : right) {
                 if (mapper.find(c) != mapper.end()) {
                     next.push_back(mapper.at(c)); 
@@ -146,7 +146,7 @@ grammar* grammar::read_grammar(std::string filename) {
 
             // Add the rule
             if (r.find(leftSymbol) == r.end()) {
-                r[leftSymbol] = std::vector<std::vector<GrammarElement*>>();
+                r[leftSymbol] = std::vector<std::vector<Consistuent*>>();
             }
             leftSymbol->addToNext(next);
             r[leftSymbol].push_back(next);
@@ -159,17 +159,17 @@ grammar* grammar::read_grammar(std::string filename) {
     return new grammar(m, t, s, r);
 }
 
-std::vector<GrammarElement*> grammar::generate1DImp(int generation, std::vector<GrammarElement*> base) const {
+std::vector<Consistuent*> grammar::generate1DImp(int generation, std::vector<Consistuent*> base) const {
     if (generation <= 0) { return base; }
 
-    std::vector<GrammarElement*> next_gen;
-    for (GrammarElement* sym : base) {
+    std::vector<Consistuent*> next_gen;
+    for (Consistuent* sym : base) {
         if (sym->isTerminal()) {
             next_gen.push_back(sym);
         } else {
             // select randomly the next generation from the rules
-            std::vector<GrammarElement*> generated_vec = sym->selectRandomNext();
-            for (GrammarElement* generated_sym : generated_vec) {
+            std::vector<Consistuent*> generated_vec = sym->selectRandomNext();
+            for (Consistuent* generated_sym : generated_vec) {
                 next_gen.push_back(generated_sym);
             }
         }
@@ -177,7 +177,7 @@ std::vector<GrammarElement*> grammar::generate1DImp(int generation, std::vector<
     return generate(generation-1, next_gen);
 }
 
-std::vector<std::vector<GrammarElement*>> grammar::generate2pDImp(int generation, std::vector<std::vector<GrammarElement*>> base) const {
+std::vector<std::vector<Consistuent*>> grammar::generate2pDImp(int generation, std::vector<std::vector<Consistuent*>> base) const {
     throw std::runtime_error("Not implemented");
 }
 
@@ -216,7 +216,7 @@ std::ostream& operator<<(std::ostream& os, const grammar& gram) {
     // for every grammar element, print it and iterate over its vector elements
     for (const auto& pair : gram.r) {
         os << pair.first->getChar() << std::endl;
-        for (const std::vector<GrammarElement*>& next : pair.second) {
+        for (const std::vector<Consistuent*>& next : pair.second) {
             os << '{';
             for (size_t i = 0; i < next.size(); i++) {
                 os << next[i]->getChar();

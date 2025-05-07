@@ -9,31 +9,31 @@
 #include <chrono>
 
 
-class GrammarElement {
+class Consistuent {
     public :
-        virtual ~GrammarElement() = default;
+        virtual ~Consistuent() = default;
 
         // interface methods
         bool virtual isTerminal() const = 0;
-        virtual std::vector<std::vector<GrammarElement*>> getNextElements() const = 0;
-        virtual void addToNext(const std::vector<GrammarElement*>& elements) = 0;
+        virtual std::vector<std::vector<Consistuent*>> getNextElements() const = 0;
+        virtual void addToNext(const std::vector<Consistuent*>& elements) = 0;
 
         // randomly select next element
-        virtual std::vector<GrammarElement*> selectRandomNext() const = 0;
+        virtual std::vector<Consistuent*> selectRandomNext() const = 0;
         
         virtual char getChar() const = 0;
         virtual std::string toString() const = 0;
 
-        virtual bool operator<(const GrammarElement& s2) const = 0;
-        virtual bool operator==(const GrammarElement& s2) const = 0;
+        virtual bool operator<(const Consistuent& s2) const = 0;
+        virtual bool operator==(const Consistuent& s2) const = 0;
     
     private:
-        std::vector<std::vector<GrammarElement>> next;
+        std::vector<std::vector<Consistuent>> next;
         char c;
 };
 
 // Overload output operator for symbol
-inline std::ostream& operator<<(std::ostream& os, const GrammarElement* ge) {
+inline std::ostream& operator<<(std::ostream& os, const Consistuent* ge) {
     os << "Symbol: " << ge->getChar();
     
     // ?? shouldnt this be replaced by the vector<symbol> cout method
@@ -42,7 +42,7 @@ inline std::ostream& operator<<(std::ostream& os, const GrammarElement* ge) {
         os << "{}";
     } else {
         os << "{" << std::endl;
-        for ( const std::vector<GrammarElement*>& possibility : ge->getNextElements() ){
+        for ( const std::vector<Consistuent*>& possibility : ge->getNextElements() ){
             os << "[" ;
             for (size_t i = 0; i < possibility.size(); i++) {
                 os << possibility[i]->getChar();
@@ -64,10 +64,10 @@ inline std::ostream& operator<<(std::ostream& os, const GrammarElement* ge) {
 // ===========================================================================
 
 
-class symbol : public GrammarElement{
+class symbol : public Consistuent{
     private :
         char c;
-        std::vector<std::vector<GrammarElement*>> next;
+        std::vector<std::vector<Consistuent*>> next;
     
         public :
         symbol(char ch) : c(ch), next() {}
@@ -76,11 +76,11 @@ class symbol : public GrammarElement{
         bool isTerminal() const override { return next.empty(); }
 
         // adds another choice for the next generation
-        void addToNext(const std::vector<GrammarElement*>& elements) override {
+        void addToNext(const std::vector<Consistuent*>& elements) override {
             next.push_back(elements);
         }
 
-        std::vector<std::vector<GrammarElement*>> getNextElements() const override {
+        std::vector<std::vector<Consistuent*>> getNextElements() const override {
             return next;
         }
         char getChar() const override { return c; }
@@ -94,7 +94,7 @@ class symbol : public GrammarElement{
                 string += "{}";
             } else {
                 string += "{" ;
-                for ( const std::vector<GrammarElement*>& possibility : this->next ){
+                for ( const std::vector<Consistuent*>& possibility : this->next ){
                     string += "[" ;
                     for (size_t i = 0; i < possibility.size(); i++) {
                         string += possibility[i]->getChar();
@@ -112,10 +112,10 @@ class symbol : public GrammarElement{
         }
 
         // duplicate of !operator
-        std::vector<GrammarElement*> selectRandomNext() const override{
+        std::vector<Consistuent*> selectRandomNext() const override{
             if (this->isTerminal()) {
                 // Return a vector with only itself if no next symbols
-                return std::vector<GrammarElement*>{const_cast<symbol*>(this)};
+                return std::vector<Consistuent*>{const_cast<symbol*>(this)};
             }
             static std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
             std::uniform_int_distribution<size_t> dist(0, next.size() - 1);
@@ -124,17 +124,17 @@ class symbol : public GrammarElement{
 
         // Return a random symbol in the next vector
         // Note : supposed to be selectRandomNext()
-        std::vector<GrammarElement*> operator!(){
+        std::vector<Consistuent*> operator!(){
             if (this->isTerminal()) {
                 // Return a vector with only itself if no next symbols
-                return std::vector<GrammarElement*>{this};
+                return std::vector<Consistuent*>{this};
             }
             static std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
             std::uniform_int_distribution<size_t> dist(0, next.size() - 1);
             return next.at(dist(rng));
         }
 
-        bool operator<(const GrammarElement& s2) const override {
+        bool operator<(const Consistuent& s2) const override {
             const symbol* other = dynamic_cast<const symbol*>(&s2);
             if (!other) {
                 // Handle comparison with different types
@@ -144,7 +144,7 @@ class symbol : public GrammarElement{
             return this->getChar() < other->getChar();
         }
         
-        bool operator==(const GrammarElement& s2) const override {
+        bool operator==(const Consistuent& s2) const override {
             const symbol* other = dynamic_cast<const symbol*>(&s2);
             if (!other) {
                 return false; // Different types can't be equal
@@ -193,7 +193,7 @@ inline std::ostream& operator<<(std::ostream& os, const symbol& symb) {
         os << "{}";
     } else {
         os << "{" << std::endl;
-        for ( const std::vector<GrammarElement*>& possibility : symb.getNextElements() ){
+        for ( const std::vector<Consistuent*>& possibility : symb.getNextElements() ){
             os << "[" ;
             for (size_t i = 0; i < possibility.size(); i++) {
                 os << possibility[i]->getChar();
@@ -242,7 +242,7 @@ inline std::ostream& operator<<(std::ostream& os, const std::vector<symbol*>& sy
 // ===========================================================================
 
 
-class symbol_3D : GrammarElement{
+class symbol_3D : Consistuent{
 
     int x, y, z;
     double width, length;

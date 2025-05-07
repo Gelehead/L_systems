@@ -32,7 +32,6 @@ public:
                ", Walkable: " + (walkable ? "Yes" : "No") + ")";
     }
 };
-
 // Base MapClass using CRTP for maps of any dimension
 template<typename Derived, size_t Dims>
 class MapClass {
