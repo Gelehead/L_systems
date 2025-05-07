@@ -59,4 +59,11 @@ class Tile3d : public Tile {
         Tile3d();
 };
 
+// should it contain the rules applied to it for the next generation?
+class Cell : public Tile3d {
+    public :
+        double max_lifespan;
+        double remaining_lifespan;
+};
+
 #endif
