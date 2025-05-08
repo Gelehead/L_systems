@@ -57,3 +57,7 @@ Makefile
 __pycache__/
 *.py[cod]
 *$py.class
+
+# npm modules 
+node_modules/
+package-lock.json

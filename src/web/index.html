@@ -1,13 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title> Three.js app </title>
-        <style>
-            body { margin: 0;}
-        </style>
-    </head>
-    <body>
-        <script type="module" src="main.js"></script>
-    </body> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <!-- For development without a build system, use import maps -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.156.1/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.156.1/examples/jsm/"
+            }
+        }
+    </script>
+    
+    <!-- Main application script -->
+    <script type="module" src="js/main.js"></script>
+</body>
 </html>

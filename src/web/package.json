@@ -1,0 +1,28 @@
+{
+    "name": "three-js-orbit-controls",
+    "version": "1.0.0",
+    "description": "A Three.js project with Orbit Controls",
+    "main": "js/main.js",
+    "scripts": {
+        "start": "serve .",
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+    },
+    "keywords": [
+        "three.js",
+        "webgl",
+        "3d",
+        "orbit-controls"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
+    "dependencies": {
+        "three": "^0.156.1",
+        "three-js-orbit-controls": "file:"
+    },
+    "devDependencies": {
+        "serve": "^14.2.1",
+        "vite": "^6.3.5"
+    }
+}
