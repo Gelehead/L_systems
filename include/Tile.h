@@ -31,7 +31,6 @@ class Tile {
         std::vector<Tile> children;
         std::vector<Tile> neighbours;
         int entropy = INT_MAX;
-        int range;
 };
 
 class Tile2d : public Tile {

@@ -1,11 +1,11 @@
 setlocal enabledelayedexpansion
 @echo off
 set N_GENERATION=3
-set GRAMMAR_FILE=clove.txt
+set GRAMMAR_FILE=cube_thing.txt
 set OUTPUT_GRAMMAR_PATH="gram_gen.txt"
 
 ::python script part
-set PENCIL_SIZE=2
+set PENCIL_SIZE=5
 set ANGLE=90
 
 :: Check if build directory exists, create if not

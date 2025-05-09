@@ -13,7 +13,7 @@ export class SceneManager {
     
     createLights(scene) {
         // Add ambient light
-        const ambientLight = new THREE.AmbientLight(0x404040);
+        const ambientLight = new THREE.AmbientLight(0xF0F0F0);
         scene.add(ambientLight);
         
         // Add directional light
@@ -49,12 +49,13 @@ export class SceneManager {
         const {
             radius = 1.5,
             segments = 32,
+            // replaced by normalMaterial
             color = 0xff4040,
             position = { x: 5, y: 1.5, z: 0 }
         } = options;
         
         const geometry = new THREE.SphereGeometry(radius, segments, segments);
-        const material = new THREE.MeshPhongMaterial({ color });
+        const material = new THREE.MeshNormalMaterial();
         const sphere = new THREE.Mesh(geometry, material);
         sphere.position.set(position.x, position.y, position.z);
         scene.add(sphere);

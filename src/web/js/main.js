@@ -66,7 +66,7 @@ function createAdditionalObjects() {
     
     // Yellow torus
     const torusGeometry = new THREE.TorusGeometry(1, 0.4, 16, 100);
-    const torusMaterial = new THREE.MeshPhongMaterial({ color: 0xffff40 }); // Yellow
+    const torusMaterial = new THREE.MeshNormalMaterial();
     const torus = new THREE.Mesh(torusGeometry, torusMaterial);
     torus.position.set(0, 1.5, -5);
     torus.rotation.x = Math.PI / 2;
