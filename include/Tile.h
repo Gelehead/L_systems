@@ -25,6 +25,7 @@ class Tile {
         // *see Query file in documentation
         virtual Consistuent* propagate() const;
         virtual std::vector<Consistuent> Query() const;
+        virtual void assignNeighbours(std::vector<Tile> neighbours);
 
     private : 
         Tile* parent;

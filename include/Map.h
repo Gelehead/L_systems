@@ -8,15 +8,16 @@
 
 /* 
 Other options to consider
- - range ( if not set to dynamic *see Tile_h.md)
+ - range ( if not set to dynamic *see Tile_h.md )
 */
 class Map {
     public : 
-        // graph here 
-        std::vector<int> max_dimensions;
+    std::vector<std::vector<std::vector<Tile>>> graph;
+    std::vector<int> max_dimensions;
 
+        std::vector<Tile> get_neighours(int x, int y, int z);
 
-        virtual Tile* query(Query::Type type);
+        Tile* query(Query::Type type);
 
         Map(int x_length, int y_length);
         Map(int x_length, int y_length, int z_length);

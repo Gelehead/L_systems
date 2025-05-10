@@ -15,23 +15,46 @@ Map::Map(int x_length, int y_length, int z_length) {
     // set max dimensions vector 
     max_dimensions = { x_length, y_length, z_length };
 
-    std::vector<std::vector<std::vector<Tile>>> graph;
+    // !!! IMPORTANT NOTE : when creating smaller tiles, we will need to do a 
+    // search from the closest tile :
+    /* 
+    1. select closest node 
+    2. recursively search ( x/y/z should be like a binary tree)
+    (next closest in x to tile x=3 has x=3.5, then x=3.75 )
+    */
+    std::vector<std::vector<std::vector<Tile>>> graph(x_length,
+        std::vector<std::vector<Tile>>(y_length,
+            std::vector<Tile>(z_length)));
+    
     
     // initialize every tile through first pass
     for (int x = 0; x < max_dimensions[0] ; x++ ){
         for ( int y = 0 ; y < max_dimensions[1] ; y ++ ) {
             for ( int z = 0 ; z < max_dimensions[2] ; z++ ) {
-                graph[x][y][z] = new Tile3d(x, y, z)
+                graph[x][y][z] = Tile3d(x, y, z);
             }
         }
     }
     
-
-
-
-    // initialize neighbours 
+    // initialize neighbours
+    for (int x = 0; x < max_dimensions[0] ; x++ ){
+        for ( int y = 0 ; y < max_dimensions[1] ; y ++ ) {
+            for ( int z = 0 ; z < max_dimensions[2] ; z++ ) {
+                graph[x][x][z].assignNeighbours(get_neighours(x, y, z))
+            }
+        }
+    }
 }
 
-Map::Map() {
+Map::Map() {}
 
+std::vector<Tile> Map::get_neighours(int x, int y, int z){
+    Tile* tile = &graph[x][y][z];
+    std::vector<Tile> neighbours;
+    for (int i = -1 ; i < 2 ; i++) {
+        // trigonometry circle
+        for (int j = 0 ; i < 8 ; i++){
+            if ( i != 0) { neighbours.push_back(this->graph[x+i][y][z]);}
+        }
+    }
 }
