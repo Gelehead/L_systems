@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-
 // Optional separate file for scene creation and management
 export class SceneManager {
     constructor() {
@@ -43,6 +42,35 @@ export class SceneManager {
         // Store for external reference
         this.objects.cube = cube;
         return cube;
+    }
+
+
+    createEmptyCube(scene, options = {}) {
+        // Set default values properly
+        const size = options.size || 5;
+        const position = options.position || { x: 0, y: 0, z: 0 };
+        const color = options.color || 0x00FF41;
+    
+        // Create a box geometry
+        const boxGeometry = new THREE.BoxGeometry(size, size, size);
+        
+        // Create edges geometry
+        const edgesGeometry = new THREE.EdgesGeometry(boxGeometry);
+        
+        // Create line material
+        const lineMaterial = new THREE.LineBasicMaterial({ color: color });
+        
+        // Create the line segments
+        const wireframe = new THREE.LineSegments(edgesGeometry, lineMaterial);
+        wireframe.position.set(position.x, position.y, position.z);
+        
+        // Add to scene
+        scene.add(wireframe);
+        
+        // Store reference
+        this.objects.emptyCube = wireframe;
+        
+        return wireframe;
     }
     
     createSphere(scene, options = {}) {
