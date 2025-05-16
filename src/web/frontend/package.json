@@ -1,13 +1,14 @@
 {
-    "name": "three-js-orbit-controls",
+    "name": "three-js-cellular-automata",
     "version": "1.0.0",
-    "description": "A Three.js project with Orbit Controls",
+    "description": "General all purpose grammar and cellular automata project",
     "main": "js/main.js",
     "scripts": {
         "start": "serve .",
         "dev": "vite",
         "build": "vite build",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "deploy": "vite build && gh-pages -d dist"
     },
     "keywords": [
         "three.js",
@@ -15,14 +16,15 @@
         "3d",
         "orbit-controls"
     ],
-    "author": "Your Name",
+    "author": "Oscar Lavolet",
     "license": "MIT",
     "dependencies": {
+        "gh-pages": "^6.3.0",
         "three": "^0.156.1",
-        "three-js-orbit-controls": "file:"
+        "three-js-cellular-automata": "file:"
     },
     "devDependencies": {
         "serve": "^14.2.1",
-        "vite": "^6.3.5"
+        "vite": "^5.2.0"
     }
 }

@@ -238,7 +238,7 @@ inline std::ostream& operator<<(std::ostream& os, const std::vector<symbol*>& sy
 }
 
 // ===========================================================================
-//                                      TILE
+//                                  3D symbol
 // ===========================================================================
 
 
@@ -246,8 +246,6 @@ class symbol_3D : Consistuent{
 
     int x, y, z;
     double width, length;
-
-
 
 };
 

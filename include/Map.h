@@ -15,7 +15,8 @@ class Map {
     std::vector<std::vector<std::vector<Tile>>> graph;
     std::vector<int> max_dimensions;
 
-        std::vector<Tile> get_neighours(int x, int y, int z);
+        std::vector<Tile3d*> get_neighours(int x, int y, int z);
+        std::vector<Tile2d*> get_neighours(int x, int y);
 
         Tile* query(Query::Type type);
 

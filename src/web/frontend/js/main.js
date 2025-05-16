@@ -2,11 +2,16 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { SceneManager } from './scene.js';
 import { CellularAutomataVisualizer } from './CellularAutomata.js';
+import { format } from 'path';
+import { json } from 'stream/consumers';
+import { output } from 'three/tsl';
+
 
 // Scene, camera, renderer
 let scene, camera, renderer, controls;
 let sceneManager;
-let cellularAutomata; // Add cellular automata variable
+let cellularAutomata; 
+let gramFile, jsonSetupFile;
 
 // Initialize the scene
 function init() {
@@ -145,6 +150,7 @@ function createCellularAutomataUI() {
             <button id="toggle-automata">Hide/Show</button>
             <button id="load-demo">Load Demo Pattern</button>
             <button id="load-file">Load From File</button>
+            <button id="load-setup"> Load Setup </button>
         </div>
         <div style="margin-top: 10px;">
             <label for="position-x">X:</label>
@@ -168,48 +174,117 @@ function createCellularAutomataUI() {
     document.getElementById('load-demo').addEventListener('click', () => {
         createDemoPattern();
     });
-    
-    document.getElementById('load-file').addEventListener('click', () => {
-        // Create a file input element
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.json';
-        fileInput.style.display = 'none';
-        
-        fileInput.addEventListener('change', (event) => {
+
+    document.getElementById('load-setup').addEventListener('click', () => {
+        const setupContainer = document.createElement('div');
+        setupContainer.style.position = 'absolute';
+        setupContainer.style.top = '120px';
+        setupContainer.style.left = '10px';
+        setupContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        setupContainer.style.color = 'white';
+        setupContainer.style.padding = '10px';
+        setupContainer.style.borderRadius = '5px';
+        setupContainer.style.fontFamily = 'Arial, sans-serif';
+
+        setupContainer.innerHTML = `
+            <div>
+                <div style="margin-bottom: 10px; font-weight: bold;">
+                    <p> grammar file </p>
+                    <input type="file" id="upload-gram" accept=".exe" />
+                </div>
+                <div style="margin-bottom: 10px; font-weight: bold;">
+                    <p> JSON file </p>
+                    <input type="file" id="upload-json-setup" accept=".JSON" />
+                </div>
+                <div style="margin-bottom: 10px; font-weight: bold;">
+                    <p> number of generations </p>
+                    <button id="run-1-gen"> run 1 generation </button>
+                    <input type="number" id="n_gen" name="n_gen" min="1" max="100">
+                    <button id="run-n-gen"> run n generations </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(setupContainer);
+
+        document.getElementById('upload-gram').addEventListener('change', (event) => {
             const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    try {
-                        const data = JSON.parse(e.target.result);
-                        cellularAutomata.gridData = data;
-                        cellularAutomata.renderGrid();
-                    } catch (error) {
-                        console.error("Error parsing JSON file:", error);
-                        alert("Error parsing file. Make sure it's a valid JSON file.");
-                    }
-                };
-                reader.readAsText(file);
+            if ( file ) {
+                gramFile = file;
+                console.log("loaded grammar => ", file.name);
             }
-            document.body.removeChild(fileInput);
+        });
+
+        document.getElementById('upload-json-setup').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if ( file ) {
+                jsonSetupFile = file;
+                console.log("loaded json => ", file.name);
+            }
         });
         
-        document.body.appendChild(fileInput);
-        fileInput.click();
-    });
-    
-    // Position sliders
-    document.getElementById('position-x').addEventListener('input', (e) => {
-        cellularAutomata.cellsGroup.position.x = Number(e.target.value);
-    });
-    
-    document.getElementById('position-y').addEventListener('input', (e) => {
-        cellularAutomata.cellsGroup.position.y = Number(e.target.value);
-    });
-    
-    document.getElementById('position-z').addEventListener('input', (e) => {
-        cellularAutomata.cellsGroup.position.z = Number(e.target.value);
+        document.getElementById('run-1-gen').addEventListener('click', () => {
+            // get next generation json
+            const next_gen_json = query_exe_runner(gramFile, jsonSetupFile, 1);
+
+            // update visuals
+            cellularAutomata.gridData = next_gen_json;
+            cellularAutomata.renderGrid();
+
+            // update the current json file
+            jsonSetupFile = next_gen_json;
+        });
+
+        /** Basically saw that i would have more or less the same code twice with 'run-1-gen' and 'run-n-gen' so i made a function
+         * DRY babyyyy
+         * 
+         * @param {*} grammar_file exe file that represents the Cellular Automata logic
+         * @param {*} jsonFile JSON file containing the position and state of tiles at a given generation ( does not take past generations into account )
+         * @param {*} n_gen number of generations we want
+         * 
+         * @return {*} JSON file of the next generation of tiles
+         */
+        async function query_exe_runner(grammar_file, json_file, n_gen) {
+            // format data to give to backend
+            const formData = new FormData();
+            formData.append('exe', grammar_file);
+            formData.append('json', json_file);
+            formData.append('generations', n_gen);
+
+            // send request
+            try {
+                fetch("http://localhost:3000/run", {
+                method: "post",
+                body: formData,
+                });
+                const response = await res.json;
+                console.log(`response : ${response}`);
+                return output;
+            } catch (err) {
+                console.error(`error : ${err}`);
+                return null;
+            }
+        };
+
+        async function delay(ms) {
+            return new Promise( resolve => setTimeout(resolve, ms));
+        }
+        
+        document.getElementById('run-n-gen').addEventListener('click', async () => {
+            for ( i = 0 ; i < document.getElementById(n_gen).value ; i ++){
+                const next_gen_json = await query_exe_runner(gramFile, jsonSetupFile, 1);
+                // executes the function then waits 0.2s
+                is ( next_gen_json ) {
+                    next_gen_json = query_exe_runner(gramFile, jsonSetupFile, 1);
+                    
+                    cellularAutomata.gridData = next_gen_json;
+                    cellularAutomata.renderGrid();
+
+                    jsonSetupFile = next_gen_json;
+                }
+                await delay(200);
+            }
+        });
     });
 }
 

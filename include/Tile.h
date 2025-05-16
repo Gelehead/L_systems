@@ -25,7 +25,7 @@ class Tile {
         // *see Query file in documentation
         virtual Consistuent* propagate() const;
         virtual std::vector<Consistuent> Query() const;
-        virtual void assignNeighbours(std::vector<Tile> neighbours);
+        virtual void assignNeighbours(std::vector<Tile*> neighbours)const;
 
     private : 
         Tile* parent;
@@ -40,6 +40,8 @@ public:
 
     Consistuent* propagate() const override;
     std::vector<Consistuent> Query() const override;
+    void assignNeighbours(std::vector<Tile*> neighbours)const override;
+
 
     // default initialization 
     Tile2d(double x, double y);
@@ -53,6 +55,8 @@ class Tile3d : public Tile {
 
         Consistuent* propagate() const override;
         std::vector<Consistuent> Query() const override;
+        void assignNeighbours(std::vector<Tile*> neighbours)const override;
+    
 
         // initialization
         Tile3d(double x, double y, double z );

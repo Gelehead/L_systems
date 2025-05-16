@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background-color: #222222;
+        }
+
+        canvas { 
+            display: block; 
+        }
+
+        #canvas-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        #info {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-family: Arial, sans-serif;
+            z-index: 100;
+            pointer-events: none;
+        }
+    </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.156.1/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.156.1/examples/jsm/"
+            }
+        }
+    </script>
+  <script type="module" crossorigin src="/L_systems/assets/index-Cuv8KZey.js"></script>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <!-- For development without a build system, use import maps -->
+
+    
+    <!-- Main application script -->
+</body>
+</html>
