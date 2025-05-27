@@ -2,9 +2,6 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { SceneManager } from './scene.js';
 import { CellularAutomataVisualizer } from './CellularAutomata.js';
-import { format } from 'path';
-import { json } from 'stream/consumers';
-import { output } from 'three/tsl';
 
 
 // Scene, camera, renderer
@@ -274,7 +271,7 @@ function createCellularAutomataUI() {
             for ( i = 0 ; i < document.getElementById(n_gen).value ; i ++){
                 const next_gen_json = await query_exe_runner(gramFile, jsonSetupFile, 1);
                 // executes the function then waits 0.2s
-                is ( next_gen_json ) {
+                if ( next_gen_json ) {
                     next_gen_json = query_exe_runner(gramFile, jsonSetupFile, 1);
                     
                     cellularAutomata.gridData = next_gen_json;

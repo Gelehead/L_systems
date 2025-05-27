@@ -1,5 +1,5 @@
-#include "Tile.h"
 #include "noise.h"
+#include "Map.h"
 
 #define LENGTH 200
 
@@ -15,6 +15,8 @@ int main(int argc, char** argv) {
 
     noise noiseGen(1, LENGTH);
     noiseGen.perlin(12);
+
+    Map* map = Map::read_json("abc");
 
     return 0;
 }

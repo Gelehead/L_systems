@@ -11,6 +11,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 # Create output directories
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/grammars)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/noise)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/maps)
 
 # Define source and include directories relative to project root
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -22,6 +23,14 @@ set(PYTHON_DIR ${SRC_DIR}/Python)
 # Include directories
 include_directories(${INCLUDE_DIR})
 include_directories(${CPP_DIR})
+
+# Add Map/Tile testing executable
+add_executable(Map_test
+    ${CPP_DIR}/Tile_main.cpp
+)
+
+# default map json 
+set(DEFAULT_MAP_JSON "${CMAKE_BINARY_DIR}/maps/default_map.json")
 
 # Add grammar generator executable
 add_executable(grammar_gen 
@@ -98,6 +107,16 @@ if(WIN32)
     set COLORED=1
 
     perlin_gen.exe %WIDTH% %HEIGHT% %FEATURE_SIZE% %OCTAVES% %PERSISTENCE% %OUTPUT_PATH% %COLORED%
+        "
+    )
+
+    file(
+        WRITE ${CMAKE_BINARY_DIR}/map_test.bat
+        "
+    @echo off
+    set JSON_FILE=\"${DEFAULT_MAP_JSON}\"
+    set OUTPUT_FILE=%1
+    Map_test.exe %JSON_FILE% %OUTPUT_FILE%
         "
     )
 else()

@@ -2,6 +2,11 @@
 #define MAP_H
 
 #include <vector>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include "json.hpp"
+
 #include "Tile.h"
 #include "Query.h"
 
@@ -12,8 +17,8 @@ Other options to consider
 */
 class Map {
     public : 
-    std::vector<std::vector<std::vector<Tile>>> graph;
-    std::vector<int> max_dimensions;
+        std::vector<std::vector<std::vector<Tile>>> graph;
+        std::vector<int> max_dimensions;
 
         std::vector<Tile3d*> get_neighours(int x, int y, int z);
         std::vector<Tile2d*> get_neighours(int x, int y);
@@ -23,6 +28,13 @@ class Map {
         Map(int x_length, int y_length);
         Map(int x_length, int y_length, int z_length);
         Map();
+
+        static Map* read_json(std::string filename){
+            // implement nohlmann logic here and transform to tile Map
+
+            return nullptr;
+        }
+
 };
 
 #endif
