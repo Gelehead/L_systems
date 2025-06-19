@@ -19,9 +19,8 @@ though each one woud need its own algorithm (urgh)
 
 
 #### New scope
-We would want to recreate the wave function collapse algorithm but adding situational awareness. Basically recreating the model synthesis idea but 
-
-
+We would want to recreate the wave function collapse algorithm but adding situational awareness. Basically recreating the model synthesis idea but context sensitive.
+ 1. Make a robust multipurpose parser 
 
 
 

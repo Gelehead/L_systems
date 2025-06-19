@@ -14,11 +14,25 @@ GrammarUnified* GrammarUnified::readGrammar(std::string filePath) {
     if (!file.is_open()) {
         throw std::runtime_error("Could not open file: " + filePath);
     }
-    file >> dimension >> type >> generation_steps >> noise_steps;
+    // read variables
+    // tf is noise steps 
+    file >> dimension >> type >> noise_steps;
+
+    std::cout << dimension << std::endl;
+
+
     
     // Implementation needed
     return nullptr;
 }
+
+GrammarUnified::GrammarUnified() : m(), t(), s() {}
+
+GrammarUnified::GrammarUnified(
+    const std::vector<Consistuent*> non_terminal, 
+    const std::vector<Consistuent*> terminal, 
+    const std::vector<Consistuent*> start
+) : m(non_terminal), t(terminal), s(start) {}
 
 // checks if grammar is 1D L_system
 std::vector<Consistuent*> GrammarUnified::generate(int generation, std::vector<Consistuent*> base) const {
@@ -43,9 +57,11 @@ grammar::grammar(
     const std::vector<Consistuent*> terminal, 
     const std::vector<Consistuent*> start,
     std::map<Consistuent*, std::vector<std::vector<Consistuent*>>> rules
-) : m(non_terminal), t(terminal), s(start), r(rules) {}
+) : GrammarUnified(non_terminal, terminal, start), r(rules) {
+    gClass = GRAMMAR_1D;
+}
 
-grammar::grammar() : m(), t(), s(), r() {}
+grammar::grammar() : GrammarUnified(), r() {}
 
 bool grammar::is1DGenerator() const {
     return true;

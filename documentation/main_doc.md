@@ -30,6 +30,7 @@ The backbone of this whole application.
 TODO :
  1. Add positional awareness of grammar
     - Grammar should generate randomly then adapt to its own generation by situational / positional awareness : when some consistuent appear, it should generate / destroy other specific consistuents.
+    (writing this later just to flex but this is known as CSG and i had no idea it existed yet theorized it)
 
 ### [Consistuent.h](Consituent.md)
 "Constituent" term coming from ( or at least first heard of in ) "Context-Free Grammars and Constituency Parsing" - Speech and Language Processing. Daniel Jurafsky & James H. Martin. Proposed by a friend.

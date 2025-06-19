@@ -11,8 +11,10 @@
 class grammar;
 std::ostream& operator<<(std::ostream& os, const grammar& gram);
 
+// TODO: unfinished
 enum GrammarClass {
     ABSTRACT,
+    CS,
     GRAMMAR_1D,
     GRAMMAR_3D
 };
@@ -20,13 +22,21 @@ enum GrammarClass {
 class GrammarUnified {
 public:
     // non terminal symbols
-    std::vector<Consistuent*> nt;
+    std::vector<Consistuent*> m;
 
     // terminal symbols 
     std::vector<Consistuent*> t;
 
     // start symbols
     std::vector<Consistuent*> s;
+
+    GrammarUnified(
+        const std::vector<Consistuent*> non_terminal, 
+        const std::vector<Consistuent*> terminal, 
+        const std::vector<Consistuent*> start
+    );
+
+    GrammarUnified();
 
     GrammarClass gClass = ABSTRACT;
 
@@ -47,16 +57,7 @@ protected:
 
 class grammar : public GrammarUnified {
 public:
-    // non terminal symbols
-    std::vector<Consistuent*> m;
-
-    // terminal symbols
-    std::vector<Consistuent*> t;
-
-    // start symbol
-    std::vector<Consistuent*> s;
-
-    GrammarClass gClass = GRAMMAR_1D;
+    // m, t, s implicitely present thanks to inheritance from GrammarUnified
 
     // rules - using pointers to Consistuent for map keys to avoid object slicing
     std::map<Consistuent*, std::vector<std::vector<Consistuent*>>> r;
@@ -88,6 +89,21 @@ protected:
 
     // never called because canGenerate2D returns false
     std::vector<std::vector<Consistuent*>> generate2pDImp(int generation, std::vector<std::vector<Consistuent*>> base) const override;
+};
+
+class CSgrammar : public grammar {
+public:
+    GrammarClass gClass = CS;
+
+    CSgrammar(
+        const std::vector<Consistuent*> non_terminal, 
+        const std::vector<Consistuent*> terminal, 
+        const std::vector<Consistuent*> start,
+        std::map<Consistuent*, std::vector<std::vector<Consistuent*>>> rules
+    ) : grammar(non_terminal, terminal, start, rules){
+        // additional treatement, idk, TODO
+    }
+
 };
 
 class Grammar3D : public GrammarUnified {
