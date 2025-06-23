@@ -15,6 +15,7 @@ std::ostream& operator<<(std::ostream& os, const grammar& gram);
 enum GrammarClass {
     ABSTRACT,
     CS,
+    HC,
     GRAMMAR_1D,
     GRAMMAR_3D
 };
@@ -40,7 +41,7 @@ public:
 
     GrammarClass gClass = ABSTRACT;
 
-    static GrammarUnified* readGrammar(std::string filePath);
+    static GrammarUnified* read_grammar(std::string filePath);
     
     virtual bool is1DGenerator() const = 0;
 
@@ -78,7 +79,7 @@ public:
     // @return string corresponding to every character concatenated  
     static std::string vec2string(std::vector<Consistuent*> generation);
 
-    static grammar* read_grammar(std::string filename);
+    static grammar* read_grammar(std::string filename, int passLines = 0);
 
     friend std::ostream& operator<<(std::ostream& os, const grammar& gram);
 
@@ -90,20 +91,27 @@ protected:
     // never called because canGenerate2D returns false
     std::vector<std::vector<Consistuent*>> generate2pDImp(int generation, std::vector<std::vector<Consistuent*>> base) const override;
 };
-
-class CSgrammar : public grammar {
+class CSgrammar : public GrammarUnified {
 public:
-    GrammarClass gClass = CS;
+    std::map<std::vector<Consistuent*>, std::vector<std::vector<Consistuent*>>> r;
 
     CSgrammar(
         const std::vector<Consistuent*> non_terminal, 
         const std::vector<Consistuent*> terminal, 
         const std::vector<Consistuent*> start,
-        std::map<Consistuent*, std::vector<std::vector<Consistuent*>>> rules
-    ) : grammar(non_terminal, terminal, start, rules){
-        // additional treatement, idk, TODO
-    }
+        std::map<std::vector<Consistuent*>, std::vector<std::vector<Consistuent*>>> rules
+    );
 
+    CSgrammar();
+
+    static CSgrammar* read_grammar(std::string filePath, int skipLines = 0);
+
+    // Add these missing virtual function overrides:
+    bool is1DGenerator() const override;
+
+protected:
+    std::vector<Consistuent*> generate1DImp(int generation, std::vector<Consistuent*> base) const override;
+    std::vector<std::vector<Consistuent*>> generate2pDImp(int generation, std::vector<std::vector<Consistuent*>> base) const override;
 };
 
 class Grammar3D : public GrammarUnified {

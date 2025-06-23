@@ -1,12 +1,12 @@
 setlocal enabledelayedexpansion
 @echo off
-set N_GENERATION=4
-set GRAMMAR_FILE=cube_thing.txt
+set N_GENERATION=6
+set GRAMMAR_FILE=herb.txt
 set OUTPUT_GRAMMAR_PATH="gram_gen.txt"
 
 ::python script part
-set PENCIL_SIZE=5
-set ANGLE=90
+set PENCIL_SIZE=3
+set ANGLE=22.5
 
 :: Check if build directory exists, create if not
 if not exist "build" (
@@ -25,6 +25,7 @@ run_grammar.bat %GRAMMAR_FILE% %N_GENERATION% %OUTPUT_GRAMMAR_PATH% %PENCIL_SIZE
 cd ..
 
 :: interpret grammar
+echo --- running python interpreter --- 
 cd "..\src\Python" 
 python interpreter.py %PENCIL_SIZE% %ANGLE% %OUTPUT_GRAMMAR_PATH%
 cd "..\..\" 

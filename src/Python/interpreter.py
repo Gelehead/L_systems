@@ -24,7 +24,7 @@ def visualize_turtle_graphics(grammar_path, angle=90, step_size=10):
     
     # go up left
     t.penup()
-    t.goto((-200, 100))
+    t.goto((-300, 100))
     t.pendown()
     t.hideturtle()
     

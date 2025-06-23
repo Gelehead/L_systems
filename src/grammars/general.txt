@@ -1,1 +1,11 @@
-1 CS 0
+1 CS
+S A B
+a b c
+S
+S -> aSAB
+S -> aAB
+BA -> AB
+aA -> ab
+bA -> bb
+bB -> bc
+cB -> cc
