@@ -1,5 +1,5 @@
-F X p m b d
+F X + - [ ]
 f
 X
-X -> FmbbXdpXdpFbpFXdmX
+X -> F-[[X]+X]+F[+FX]-X
 F -> FF

@@ -22,6 +22,9 @@ def visualize_turtle_graphics(grammar_path, angle=90, step_size=10):
     # Set up the turtle
     t = turtle.Turtle()
     
+    screen = turtle.Screen()
+    screen.setup(width=800, height=800, startx=0, starty=0)
+    
     # go up left
     t.penup()
     t.goto((-300, 100))

@@ -11,11 +11,15 @@
 class grammar;
 std::ostream& operator<<(std::ostream& os, const grammar& gram);
 
+class GrammarUnified;
+std::ostream& operator<<(std::ostream& os, const GrammarUnified& g);
+std::ostream& operator<<(std::ostream& os, std::vector<Consistuent> v);
+
 // TODO: unfinished
 enum GrammarClass {
     ABSTRACT,
     CS,
-    HC,
+    CF,
     GRAMMAR_1D,
     GRAMMAR_3D
 };

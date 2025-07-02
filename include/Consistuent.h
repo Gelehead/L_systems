@@ -32,7 +32,18 @@ class Consistuent {
         char c;
 };
 
-// Overload output operator for symbol
+inline std::ostream& operator<<(std::ostream& os, const std::vector<Consistuent*> v){
+    os << "{";
+    for ( size_t i = 0 ; i < v.size() ; i++ ) {
+        os << v.at(i)->getChar();
+        if ( i < v.size() - 1) { os << ", "; }
+    }
+    os << "}";
+    
+    return os;
+}
+
+// Overload output operator for Consistuent
 inline std::ostream& operator<<(std::ostream& os, const Consistuent* ge) {
     os << "Symbol: " << ge->getChar();
     

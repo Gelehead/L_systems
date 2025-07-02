@@ -1,0 +1,8 @@
+1 HC
+X
+a b c e
+
+X -> XaXbXcX
+X -> XbXcX
+X -> XcX
+X -> e

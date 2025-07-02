@@ -74,22 +74,51 @@ if(WIN32)
     file(
         WRITE ${CMAKE_BINARY_DIR}/run_grammar.bat 
         "
-    @echo off
-    set N_GENERATION=%2
-    set GRAMMAR_FILE=%1
-    set OUTPUT_GRAMMAR_PATH=\"${CMAKE_BINARY_DIR}/grammars/%3\"
-    set PENCIL_SIZE=%4
-    set ANGLE=%5
+@echo off
+set N_GENERATION=%2
+set GRAMMAR_FILE=%1
+set OUTPUT_GRAMMAR_PATH=%3
+set PENCIL_SIZE=%4
+set ANGLE=%5
 
-    echo %GRAMMAR_FILE%
+echo Processing grammar file: %GRAMMAR_FILE%
 
-    cd \"${CMAKE_BINARY_DIR}/Debug\"
+REM Try to find grammar_gen.exe in common locations
+set GRAMMAR_EXE=
+if exist \"${CMAKE_BINARY_DIR}\\Release\\grammar_gen.exe\" (
+    set GRAMMAR_EXE=\"${CMAKE_BINARY_DIR}\\Release\\grammar_gen.exe\"
+) else if exist \"${CMAKE_BINARY_DIR}\\Debug\\grammar_gen.exe\" (
+    set GRAMMAR_EXE=\"${CMAKE_BINARY_DIR}\\Debug\\grammar_gen.exe\"
+) else if exist \"${CMAKE_BINARY_DIR}\\grammar_gen.exe\" (
+    set GRAMMAR_EXE=\"${CMAKE_BINARY_DIR}\\grammar_gen.exe\"
+) else if exist \"${CMAKE_BINARY_DIR}\\RelWithDebInfo\\grammar_gen.exe\" (
+    set GRAMMAR_EXE=\"${CMAKE_BINARY_DIR}\\RelWithDebInfo\\grammar_gen.exe\"
+) else if exist \"${CMAKE_BINARY_DIR}\\MinSizeRel\\grammar_gen.exe\" (
+    set GRAMMAR_EXE=\"${CMAKE_BINARY_DIR}\\MinSizeRel\\grammar_gen.exe\"
+) else (
+    echo ERROR: Could not find grammar_gen.exe
+    echo Looked in:
+    echo   ${CMAKE_BINARY_DIR}\\Release\\grammar_gen.exe
+    echo   ${CMAKE_BINARY_DIR}\\Debug\\grammar_gen.exe
+    echo   ${CMAKE_BINARY_DIR}\\grammar_gen.exe
+    echo   ${CMAKE_BINARY_DIR}\\RelWithDebInfo\\grammar_gen.exe
+    echo   ${CMAKE_BINARY_DIR}\\MinSizeRel\\grammar_gen.exe
+    exit /b 1
+)
 
-    grammar_gen.exe \"${GRAMMARS_DIR}/%GRAMMAR_FILE%\" %N_GENERATION% %OUTPUT_GRAMMAR_PATH%
+echo Found executable: %GRAMMAR_EXE%
 
-    cd \"${CMAKE_BINARY_DIR}/python\"
-    python interpreter.py %PENCIL_SIZE% %ANGLE% %OUTPUT_GRAMMAR_PATH%
-    cd \"${CMAKE_BINARY_DIR}\"
+REM Run the grammar generator
+echo Running: %GRAMMAR_EXE% \"${CMAKE_BINARY_DIR}/grammars/%GRAMMAR_FILE%\" %N_GENERATION% \"${CMAKE_BINARY_DIR}/grammars/%OUTPUT_GRAMMAR_PATH%\"
+%GRAMMAR_EXE% \"${CMAKE_BINARY_DIR}/grammars/%GRAMMAR_FILE%\" %N_GENERATION% \"${CMAKE_BINARY_DIR}/grammars/%OUTPUT_GRAMMAR_PATH%\"
+
+if %ERRORLEVEL% neq 0 (
+    echo ERROR: Grammar generation failed with error code %ERRORLEVEL%
+    exit /b %ERRORLEVEL%
+)
+
+echo Grammar generation completed successfully
+echo Output saved to: ${CMAKE_BINARY_DIR}/grammars/%OUTPUT_GRAMMAR_PATH%
         "
     )
         
@@ -97,68 +126,57 @@ if(WIN32)
     file(
         WRITE ${CMAKE_BINARY_DIR}/run_perlin.bat 
         "
-    @echo off
-    set WIDTH=512
-    set HEIGHT=512
-    set FEATURE_SIZE=64
-    set OCTAVES=6
-    set PERSISTENCE=0.5
-    set OUTPUT_PATH=\"${CMAKE_BINARY_DIR}/noise/perlin_terrain.ppm\"
-    set COLORED=1
+@echo off
+set WIDTH=512
+set HEIGHT=512
+set FEATURE_SIZE=64
+set OCTAVES=6
+set PERSISTENCE=0.5
+set OUTPUT_PATH=\"${CMAKE_BINARY_DIR}/noise/perlin_terrain.ppm\"
+set COLORED=1
 
-    perlin_gen.exe %WIDTH% %HEIGHT% %FEATURE_SIZE% %OCTAVES% %PERSISTENCE% %OUTPUT_PATH% %COLORED%
+REM Find perlin_gen.exe
+set PERLIN_EXE=
+if exist \"${CMAKE_BINARY_DIR}/perlin_gen.exe\" (
+    set PERLIN_EXE=\"${CMAKE_BINARY_DIR}/perlin_gen.exe\"
+) else if exist \"${CMAKE_BINARY_DIR}/Debug/perlin_gen.exe\" (
+    set PERLIN_EXE=\"${CMAKE_BINARY_DIR}/Debug/perlin_gen.exe\"
+) else if exist \"${CMAKE_BINARY_DIR}/Release/perlin_gen.exe\" (
+    set PERLIN_EXE=\"${CMAKE_BINARY_DIR}/Release/perlin_gen.exe\"
+) else (
+    echo ERROR: Could not find perlin_gen.exe
+    exit /b 1
+)
+
+%PERLIN_EXE% %WIDTH% %HEIGHT% %FEATURE_SIZE% %OCTAVES% %PERSISTENCE% %OUTPUT_PATH% %COLORED%
         "
     )
 
     file(
         WRITE ${CMAKE_BINARY_DIR}/map_test.bat
         "
-    @echo off
-    set JSON_FILE=\"${DEFAULT_MAP_JSON}\"
-    set OUTPUT_FILE=%1
-    Map_test.exe %JSON_FILE% %OUTPUT_FILE%
+@echo off
+set JSON_FILE=\"${DEFAULT_MAP_JSON}\"
+set OUTPUT_FILE=%1
+
+REM Find Map_test.exe
+set MAP_EXE=
+if exist \"${CMAKE_BINARY_DIR}/Map_test.exe\" (
+    set MAP_EXE=\"${CMAKE_BINARY_DIR}/Map_test.exe\"
+) else if exist \"${CMAKE_BINARY_DIR}/Debug/Map_test.exe\" (
+    set MAP_EXE=\"${CMAKE_BINARY_DIR}/Debug/Map_test.exe\"
+) else if exist \"${CMAKE_BINARY_DIR}/Release/Map_test.exe\" (
+    set MAP_EXE=\"${CMAKE_BINARY_DIR}/Release/Map_test.exe\"
+) else (
+    echo ERROR: Could not find Map_test.exe
+    exit /b 1
+)
+
+%MAP_EXE% %JSON_FILE% %OUTPUT_FILE%
         "
     )
 else()
-    # Unix shell script for grammar generator
-    file(WRITE ${CMAKE_BINARY_DIR}/run_grammar.sh "#!/bin/bash
-    N_GENERATION=5
-    GRAMMAR_FILE=test.txt
-    OUTPUT_GRAMMAR_PATH=\"${CMAKE_BINARY_DIR}/grammars/gram_gen.txt\"
-    PENCIL_SIZE=1
-    ANGLE=90
-
-    \"${CMAKE_BINARY_DIR}/grammar_gen\" \"${CMAKE_BINARY_DIR}/grammars/$GRAMMAR_FILE\" $N_GENERATION \"$OUTPUT_GRAMMAR_PATH\"
-
-    cd \"${CMAKE_BINARY_DIR}/python\"
-    python interpreter.py $PENCIL_SIZE $ANGLE \"$OUTPUT_GRAMMAR_PATH\"
-    cd \"${CMAKE_BINARY_DIR}\"
-    ")
-        
-        # Unix shell script for Perlin noise generator
-        file(WRITE ${CMAKE_BINARY_DIR}/run_perlin.sh "#!/bin/bash
-    WIDTH=512
-    HEIGHT=512
-    FEATURE_SIZE=64
-    OCTAVES=6
-    PERSISTENCE=0.5
-    OUTPUT_PATH=\"${CMAKE_BINARY_DIR}/noise/perlin_terrain.ppm\"
-    COLORED=1
-
-    \"${CMAKE_BINARY_DIR}/perlin_gen\" $WIDTH $HEIGHT $FEATURE_SIZE $OCTAVES $PERSISTENCE \"$OUTPUT_PATH\" $COLORED
-    ")
-    
-    # Make the shell scripts executable
-    execute_process(COMMAND chmod +x ${CMAKE_BINARY_DIR}/run_grammar.sh)
-    execute_process(COMMAND chmod +x ${CMAKE_BINARY_DIR}/run_perlin.sh)
-endif()
-
-# For backward compatibility, create a copy of run_grammar.bat/sh as run.bat/sh
-if(WIN32)
-    configure_file(${CMAKE_BINARY_DIR}/run_grammar.bat ${CMAKE_BINARY_DIR}/run.bat COPYONLY)
-else()
-    configure_file(${CMAKE_BINARY_DIR}/run_grammar.sh ${CMAKE_BINARY_DIR}/run.sh COPYONLY)
-    execute_process(COMMAND chmod +x ${CMAKE_BINARY_DIR}/run.sh)
+    # CODE FOR UNIX HERE 
 endif()
 
 # Add custom targets to run the programs

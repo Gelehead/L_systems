@@ -13,16 +13,14 @@
 */
 int main(int argc, char** argv) {
     
-    // Process grammar first
-    grammar* g = argc > 1 ? grammar::read_grammar(argv[1], 0) : grammar::read_grammar(FIRST_LANGUAGE);
-    
-    std::string outputPath = (argc > 3) ? argv[3] : DEF_OUTPUT_PATH;
+    GrammarUnified *g = GrammarUnified::read_grammar(argv[1]);
 
-    std::ofstream out(outputPath);
+    // grammar* g = argc > 1 ? grammar::read_grammar(argv[1], 0) : grammar::read_grammar(FIRST_LANGUAGE);
 
-    std::cout << *g << std::endl;
+    // std::cout << g->gClass << std::endl;
 
     // no touchey, output logic
+    std::ofstream out(argv[3]);
     out << grammar::vec2string(g->generate(atoi(argv[2]), g->s));
     out.close();
 }

@@ -8,31 +8,48 @@
 GrammarUnified* GrammarUnified::read_grammar(std::string filePath) {
     // TODO:
     // checks the file format with the first line
+    
     std::string type;
     int dimension;
+
     GrammarClass gramClass;
+    
     std::ifstream file(filePath);
     if (!file.is_open()) {
         throw std::runtime_error("Could not open file: " + filePath);
     }
+    
     // read variables
     // tf is noise steps 
     file >> dimension >> type;
-    if (type == "CS") gramClass = CS;
-    else if (type == "HC") gramClass = HC;
-    else throw std::runtime_error("Unknown grammar type: " + type);
+    // std::cout << "type detected : " << type << std::endl;
+    if (type == "CS") {
+        gramClass = CS;
+    } else if (type == "CF") {
+        gramClass = CF;
+    } else {
+        throw std::runtime_error("Unknown grammar type: " + type);
+    }
 
     GrammarUnified* g = nullptr;
-    switch ( gramClass ) {
-    case CS :
-        g = CSgrammar::read_grammar(filePath, 1);
-        break;
-    case HC :
-        if ( dimension == 1 ) { g = grammar::read_grammar(filePath, 1); }
-        if ( dimension != 1 ) { throw std::logic_error("not implemented"); }
+    try {
+        switch ( gramClass ) {
+            case CS :
+                return CSgrammar::read_grammar(filePath, 1);
 
-    default:
-        break;
+            case CF :
+                if ( dimension == 1 ) { 
+                    return grammar::read_grammar(filePath, 1); 
+                }
+                else { 
+                    throw std::logic_error("not implemented"); 
+                }
+
+            default:
+                break;
+        }
+    } catch ( const std::exception& e){
+        throw std::runtime_error("failed to parse " + type + " from " + filePath + " : " + e.what() );
     }
     
     // Implementation needed
@@ -62,6 +79,14 @@ std::vector<std::vector<Consistuent*>> GrammarUnified::generate(int generation, 
         throw std::runtime_error("This grammar does not support 2D generation");
     }
     return generate2pDImp(generation, base);
+}
+
+std::ostream& operator<<(std::ostream& os, const GrammarUnified& g) {
+    os << "Non terminal symbols : " << std::endl << g.m << std::endl;
+    os << "Terminal symbols : " << std::endl << g.t << std::endl;
+    os << "Starting symbol : " << std::endl << g.s << std::endl;
+
+    return os;
 }
 
 // grammar implementations
@@ -161,7 +186,7 @@ grammar* grammar::read_grammar(std::string filename, int passLines) {
             std::string right = match[2].str();
 
             if (left.empty() || mapper.find(left[0]) == mapper.end()) {
-                std::cerr << "Left symbol in rule not found amongst declared symbols: " << left << std::endl;
+                std::cerr << "(CF) Left symbol in rule not found amongst declared symbols: " << left << std::endl;
                 continue;
             }
 
@@ -435,7 +460,7 @@ CSgrammar* CSgrammar::read_grammar(std::string filePath, int skipLines) {
             for (char c : left) {
                 if (c != ' ' && c != '\t') { // Skip whitespace
                     if (mapper.find(c) == mapper.end()) {
-                        std::cerr << "Left symbol in rule not found: " << c << " in rule: " << str << std::endl;
+                        std::cerr << "(CS) Left symbol in rule not found: " << c << " in rule: " << str << std::endl;
                         valid_left = false;
                         break;
                     }

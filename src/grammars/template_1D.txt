@@ -6,6 +6,7 @@
 ...
 <rule n, prob rn>
 
+_______________________________
 rule template (1 dimension):
 non terminal symbol -> concatenation of already declared symbols strings
 
