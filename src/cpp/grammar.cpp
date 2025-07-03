@@ -5,13 +5,12 @@
 #include <regex>
 
 // GrammarUnified implementations
+
+// @param filePath path/to/grammar from called location (usually L_systems\)
+// @return nullptr if no match, result from CS::read_grammar if matched CS, result from CF::read_grammar if matched CF
 GrammarUnified* GrammarUnified::read_grammar(std::string filePath) {
-    // TODO:
-    // checks the file format with the first line
-    
     std::string type;
     int dimension;
-
     GrammarClass gramClass;
     
     std::ifstream file(filePath);
@@ -22,7 +21,6 @@ GrammarUnified* GrammarUnified::read_grammar(std::string filePath) {
     // read variables
     // tf is noise steps 
     file >> dimension >> type;
-    // std::cout << "type detected : " << type << std::endl;
     if (type == "CS") {
         gramClass = CS;
     } else if (type == "CF") {
@@ -31,7 +29,6 @@ GrammarUnified* GrammarUnified::read_grammar(std::string filePath) {
         throw std::runtime_error("Unknown grammar type: " + type);
     }
 
-    GrammarUnified* g = nullptr;
     try {
         switch ( gramClass ) {
             case CS :
@@ -52,8 +49,8 @@ GrammarUnified* GrammarUnified::read_grammar(std::string filePath) {
         throw std::runtime_error("failed to parse " + type + " from " + filePath + " : " + e.what() );
     }
     
-    // Implementation needed
-    return g;
+    // if doesnt match any expected pattern, return nullptr
+    return nullptr;
 }
 
 GrammarUnified::GrammarUnified() : m(), t(), s() {}
@@ -303,11 +300,18 @@ CSgrammar::CSgrammar(
 }
 
 CSgrammar::CSgrammar() : GrammarUnified(), r() {}
-// Add these method implementations to your grammar.cpp file
 
 // First, add the missing virtual function implementations to CSgrammar class
 bool CSgrammar::is1DGenerator() const {
     return true; // Assuming CS grammars generate 1D strings
+}
+
+// recursively apply rules when recognizing a pattern
+// @param base the base consistuent vector
+// @param ruleLengths sorted array of all different rule lengths
+std::vector<Consistuent*> scan(std::vector<Consistuent*> base, int ruleLengths[]){
+    // base case : if consistuent isnt terminal > replace by successor
+    // 
 }
 
 std::vector<Consistuent*> CSgrammar::generate1DImp(int generation, std::vector<Consistuent*> base) const {
@@ -316,59 +320,14 @@ std::vector<Consistuent*> CSgrammar::generate1DImp(int generation, std::vector<C
     }
 
     std::vector<Consistuent*> next_gen;
-    
-    // For context-sensitive grammars, we need to check for pattern matches
-    // across the entire string, not just individual symbols
-    for (size_t i = 0; i < base.size(); ++i) {
-        bool matched = false;
-        
-        // Check all possible rule matches starting at position i
-        for (const auto& rule_pair : r) {
-            const std::vector<Consistuent*>& left_pattern = rule_pair.first;
-            
-            // Check if pattern matches at current position
-            if (i + left_pattern.size() <= base.size()) {
-                bool pattern_matches = true;
-                for (size_t j = 0; j < left_pattern.size(); ++j) {
-                    if (base[i + j] != left_pattern[j]) {
-                        pattern_matches = false;
-                        break;
-                    }
-                }
-                
-                if (pattern_matches) {
-                    // Apply the rule - select random production
-                    const auto& productions = rule_pair.second;
-                    if (!productions.empty()) {
-                        int random_idx = rand() % productions.size();
-                        const auto& replacement = productions[random_idx];
-                        
-                        // Add symbols before the match
-                        for (size_t k = 0; k < i; ++k) {
-                            if (k < next_gen.size()) continue; // Already added
-                            next_gen.push_back(base[k]);
-                        }
-                        
-                        // Add the replacement
-                        for (Consistuent* sym : replacement) {
-                            next_gen.push_back(sym);
-                        }
-                        
-                        // Skip the matched pattern and continue from after it
-                        i += left_pattern.size() - 1; // -1 because loop will increment
-                        matched = true;
-                        break;
-                    }
-                }
-            }
-        }
-        
-        // If no rule matched, copy the original symbol
-        if (!matched && i < base.size()) {
-            next_gen.push_back(base[i]);
+
+    for (int i = 0 ; i < generation ; i++ ){
+        bool stable = false;
+        while ( !stable ) {
+            int a =0;
         }
     }
-    
+
     return generate1DImp(generation - 1, next_gen);
 }
 
@@ -501,4 +460,56 @@ CSgrammar* CSgrammar::read_grammar(std::string filePath, int skipLines) {
     
     file.close();
     return new CSgrammar(m, t, s, r);
+}
+
+// Implementation of the stream operator
+std::ostream& operator<<(std::ostream& os, const CSgrammar& gram) { 
+
+    os << std::string("non terminal symbols -> ");
+    os << '{';
+    for (size_t i = 0; i < gram.m.size(); i++) {
+        os << gram.m[i]->getChar();
+        if (i < gram.m.size() - 1) {
+            os << ", ";
+        }
+    }
+    os << '}' << std::endl;
+    
+    os << std::string("terminal symbols -> ");
+    os << '{';
+    for (size_t i = 0; i < gram.t.size(); i++) {
+        os << gram.t[i]->getChar();
+        if (i < gram.t.size() - 1) {
+            os << ", ";
+        }
+    }
+    os << '}' << std::endl;
+    
+    os << std::string("Start symbols -> ");
+    os << '{';
+    for (size_t i = 0; i < gram.s.size(); i++) {
+        os << gram.s[i]->getChar();
+        if (i < gram.s.size() - 1) {
+            os << ", ";
+        }
+    }
+    os << '}' << std::endl;
+
+    // for every grammar element, print it and iterate over its vector elements
+    for (const auto& pair : gram.r) {
+        os << "for " << pair.first << ":" << std::endl;
+        for (const std::vector<Consistuent*>& next : pair.second) {
+            os << '{';
+            for (size_t i = 0; i < next.size(); i++) {
+                os << next[i]->getChar();
+                if (i < next.size() - 1) {
+                    os << ", ";
+                }
+            }
+            os << '}' << std::endl;
+        }
+        os << "----------" << std::endl;
+    }
+
+    return os;
 }

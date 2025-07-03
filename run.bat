@@ -1,8 +1,8 @@
 @echo off
 setlocal enabledelayedexpansion
 
-set N_GENERATION=25
-set GRAMMAR_FILE=class.txt
+set N_GENERATION=4000
+set GRAMMAR_FILE=test.txt
 set OUTPUT_GRAMMAR_PATH=gram_gen.txt
 
 :: Python script parameters
@@ -23,21 +23,8 @@ if exist "build\Release\grammar_gen.exe" (
     exit /b 1
 )
 
-if not exist "build\Release\test.txt" (
-    type nul > test.txt
-)
-
-:: Run grammar generation
 :: echo Running: %GRAMMAR_EXE% "build\grammars\%GRAMMAR_FILE%" %N_GENERATION% "build\grammars\%OUTPUT_GRAMMAR_PATH%"
-for /l %%x in (1, 1, 100) do (
-    %GRAMMAR_EXE% "build\grammars\%GRAMMAR_FILE%" %N_GENERATION% "build\grammars\%OUTPUT_GRAMMAR_PATH%"
-
-    :: Run python verifying script
-    cd "src/Python"
-    python verifyer.py "..\..\build\grammars\%OUTPUT_GRAMMAR_PATH%" >> "..\..\build\Release\test.txt" 
-    cd ".."
-    cd ".."
-)
+%GRAMMAR_EXE% "build\grammars\%GRAMMAR_FILE%" %N_GENERATION% "build\grammars\%OUTPUT_GRAMMAR_PATH%"
 
 @REM :: Run Python interpreter
 @REM echo -- Running Python interpreter --

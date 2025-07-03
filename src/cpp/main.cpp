@@ -13,7 +13,9 @@
 */
 int main(int argc, char** argv) {
     
-    GrammarUnified *g = GrammarUnified::read_grammar(argv[1]);
+    grammar *g = grammar::read_grammar(argv[1], 1);
+
+    std::cout << *g << std::endl;
 
     // grammar* g = argc > 1 ? grammar::read_grammar(argv[1], 0) : grammar::read_grammar(FIRST_LANGUAGE);
 

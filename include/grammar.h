@@ -15,6 +15,9 @@ class GrammarUnified;
 std::ostream& operator<<(std::ostream& os, const GrammarUnified& g);
 std::ostream& operator<<(std::ostream& os, std::vector<Consistuent> v);
 
+class CSgrammar;
+std::ostream& operator<<(std::ostream& os, const CSgrammar& g);
+
 // TODO: unfinished
 enum GrammarClass {
     ABSTRACT,
