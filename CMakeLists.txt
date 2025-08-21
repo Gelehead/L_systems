@@ -9,9 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 # Create output directories
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/grammars)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/noise)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/maps)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 
 # Define source and include directories relative to project root
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -24,21 +22,18 @@ set(PYTHON_DIR ${SRC_DIR}/Python)
 include_directories(${INCLUDE_DIR})
 include_directories(${CPP_DIR})
 
-# Add Map/Tile testing executable
-add_executable(Map_test
-    ${CPP_DIR}/Tile_main.cpp
-)
-
 # default map json 
 set(DEFAULT_MAP_JSON "${CMAKE_BINARY_DIR}/maps/default_map.json")
 
-# Add grammar generator executable
+# grammar generator executable
 add_executable(grammar_gen 
     ${CPP_DIR}/main.cpp
+    ${CPP_DIR}/GrammarUnified.cpp
+    ${CPP_DIR}/GrammarCS.cpp
     ${CPP_DIR}/grammar.cpp
 )
 
-# Add Perlin noise generator executable
+# Perlin noise generator executable
 add_executable(perlin_gen 
     ${CPP_DIR}/noise_main.cpp
     ${CPP_DIR}/noise.cpp
@@ -48,20 +43,12 @@ add_executable(perlin_gen
 # These can be overridden at runtime
 # DEFAULT IS cube_thing.txt
 set(DEFAULT_GRAMMAR_FILE "${GRAMMARS_DIR}/cube_thing.txt")
-set(DEFAULT_OUTPUT_PATH "${CMAKE_BINARY_DIR}/grammars/gram_gen.txt")
+set(DEFAULT_OUTPUT_PATH "${CMAKE_BINARY_DIR}/out/gram_gen.txt")
 
 target_compile_definitions(grammar_gen PRIVATE 
     DEFAULT_GRAMMAR_FILE="${DEFAULT_GRAMMAR_FILE}"
     DEFAULT_OUTPUT_PATH="${DEFAULT_OUTPUT_PATH}"
 )
-
-# Copy grammar files to build directory
-file(GLOB GRAMMAR_FILES "${GRAMMARS_DIR}/*.txt")
-file(COPY ${GRAMMAR_FILES} DESTINATION ${CMAKE_BINARY_DIR}/grammars)
-
-# Copy Python interpreter scripts
-file(GLOB PYTHON_FILES "${PYTHON_DIR}/*.py")
-file(COPY ${PYTHON_FILES} DESTINATION ${CMAKE_BINARY_DIR}/python)
 
 # Add install rules for better distribution
 install(TARGETS grammar_gen perlin_gen DESTINATION bin)

@@ -1,5 +1,6 @@
-F X + - [ ]
-f
+1 CF 
+X + - [ ]
+F
 X
 X -> F-[[X]+X]+F[+FX]-X
 F -> FF

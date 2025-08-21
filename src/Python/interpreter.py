@@ -23,11 +23,11 @@ def visualize_turtle_graphics(grammar_path, angle=90, step_size=10):
     t = turtle.Turtle()
     
     screen = turtle.Screen()
-    screen.setup(width=800, height=800, startx=0, starty=0)
+    screen.setup(width=1400, height=750, startx=100, starty=50)
     
     # go up left
     t.penup()
-    t.goto((-300, 100))
+    t.goto((-600, 100))
     t.pendown()
     t.hideturtle()
     

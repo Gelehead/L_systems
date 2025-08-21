@@ -9,10 +9,9 @@ def verify(filePath) :
     f.close()
     
     #print(string)
-    a = string.count("a")
-    b = string.count("b")
-    c = string.count("c")
-    v = (a <= b) and (b <= c)
+    z = string.count("0")
+    o = string.count("1")
+    v = z != o
     #v = string.count("0") != string.count("1")
     print(v)
     if v == False : print(string)

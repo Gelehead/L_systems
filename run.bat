@@ -1,12 +1,12 @@
 @echo off
 setlocal enabledelayedexpansion
 
-set N_GENERATION=4000
+set N_GENERATION=2000
 set GRAMMAR_FILE=test.txt
 set OUTPUT_GRAMMAR_PATH=gram_gen.txt
 
 :: Python script parameters
-set PENCIL_SIZE=3
+set PENCIL_SIZE=1
 set ANGLE=22.5
 
 if %1 == 1 (
@@ -24,12 +24,17 @@ if exist "build\Release\grammar_gen.exe" (
 )
 
 :: echo Running: %GRAMMAR_EXE% "build\grammars\%GRAMMAR_FILE%" %N_GENERATION% "build\grammars\%OUTPUT_GRAMMAR_PATH%"
-%GRAMMAR_EXE% "build\grammars\%GRAMMAR_FILE%" %N_GENERATION% "build\grammars\%OUTPUT_GRAMMAR_PATH%"
+%GRAMMAR_EXE% "src\grammars\%GRAMMAR_FILE%" %N_GENERATION% "build\grammars\%OUTPUT_GRAMMAR_PATH%"
 
-@REM :: Run Python interpreter
+:: Run Python interpreter
 @REM echo -- Running Python interpreter --
 @REM cd "src\Python"
 @REM python interpreter.py %PENCIL_SIZE% %ANGLE% "..\..\build\grammars\%OUTPUT_GRAMMAR_PATH%"
 @REM cd "..\..\"
+
+
+echo -- running python tester -- 
+cd "src\Python"
+python verifyer.py "..\..\build\grammars\%OUTPUT_GRAMMAR_PATH%" > "..\..\test.txt"
 
 echo -- Process completed successfully --

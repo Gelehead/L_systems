@@ -1,7 +1,17 @@
 1 CF
-S X
-a
+S P G A B
+0 1 e
 S
-S -> aSa
-S -> SaaX
-X -> aa
+
+S -> P
+S -> G
+
+P -> AP1
+P -> 1
+A -> 0
+A -> e
+
+G -> 0GB
+G -> 0
+B -> 1
+B -> e

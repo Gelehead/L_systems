@@ -9,30 +9,30 @@
 #include <chrono>
 
 
-class Consistuent {
+class Constituent {
     public :
-        virtual ~Consistuent() = default;
+        virtual ~Constituent() = default;
 
         // interface methods
         bool virtual isTerminal() const = 0;
-        virtual std::vector<std::vector<Consistuent*>> getNextElements() const = 0;
-        virtual void addToNext(const std::vector<Consistuent*>& elements) = 0;
+        virtual std::vector<std::vector<Constituent*>> getNextElements() const = 0;
+        virtual void addToNext(const std::vector<Constituent*>& elements) = 0;
 
         // randomly select next element
-        virtual std::vector<Consistuent*> selectRandomNext() const = 0;
+        virtual std::vector<Constituent*> selectRandomNext() const = 0;
         
         virtual char getChar() const = 0;
         virtual std::string toString() const = 0;
 
-        virtual bool operator<(const Consistuent& s2) const = 0;
-        virtual bool operator==(const Consistuent& s2) const = 0;
+        virtual bool operator<(const Constituent& s2) const = 0;
+        virtual bool operator==(const Constituent& s2) const = 0;
     
     private:
-        std::vector<std::vector<Consistuent>> next;
+        std::vector<std::vector<Constituent>> next;
         char c;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const std::vector<Consistuent*> v){
+inline std::ostream& operator<<(std::ostream& os, const std::vector<Constituent*> v){
     os << "{";
     for ( size_t i = 0 ; i < v.size() ; i++ ) {
         os << v.at(i)->getChar();
@@ -43,8 +43,8 @@ inline std::ostream& operator<<(std::ostream& os, const std::vector<Consistuent*
     return os;
 }
 
-// Overload output operator for Consistuent
-inline std::ostream& operator<<(std::ostream& os, const Consistuent* ge) {
+// Overload output operator for Constituent
+inline std::ostream& operator<<(std::ostream& os, const Constituent* ge) {
     os << "Symbol: " << ge->getChar();
     
     // ?? shouldnt this be replaced by the vector<symbol> cout method
@@ -53,7 +53,7 @@ inline std::ostream& operator<<(std::ostream& os, const Consistuent* ge) {
         os << "{}";
     } else {
         os << "{" << std::endl;
-        for ( const std::vector<Consistuent*>& possibility : ge->getNextElements() ){
+        for ( const std::vector<Constituent*>& possibility : ge->getNextElements() ){
             os << "[" ;
             for (size_t i = 0; i < possibility.size(); i++) {
                 os << possibility[i]->getChar();
@@ -75,10 +75,10 @@ inline std::ostream& operator<<(std::ostream& os, const Consistuent* ge) {
 // ===========================================================================
 
 
-class symbol : public Consistuent{
+class symbol : public Constituent{
     private :
         char c;
-        std::vector<std::vector<Consistuent*>> next;
+        std::vector<std::vector<Constituent*>> next;
     
         public :
         symbol(char ch) : c(ch), next() {}
@@ -87,11 +87,11 @@ class symbol : public Consistuent{
         bool isTerminal() const override { return next.empty(); }
 
         // adds another choice for the next generation
-        void addToNext(const std::vector<Consistuent*>& elements) override {
+        void addToNext(const std::vector<Constituent*>& elements) override {
             next.push_back(elements);
         }
 
-        std::vector<std::vector<Consistuent*>> getNextElements() const override {
+        std::vector<std::vector<Constituent*>> getNextElements() const override {
             return next;
         }
         char getChar() const override { return c; }
@@ -105,7 +105,7 @@ class symbol : public Consistuent{
                 string += "{}";
             } else {
                 string += "{" ;
-                for ( const std::vector<Consistuent*>& possibility : this->next ){
+                for ( const std::vector<Constituent*>& possibility : this->next ){
                     string += "[" ;
                     for (size_t i = 0; i < possibility.size(); i++) {
                         string += possibility[i]->getChar();
@@ -123,10 +123,10 @@ class symbol : public Consistuent{
         }
 
         // duplicate of !operator
-        std::vector<Consistuent*> selectRandomNext() const override{
+        std::vector<Constituent*> selectRandomNext() const override{
             if (this->isTerminal()) {
                 // Return a vector with only itself if no next symbols
-                return std::vector<Consistuent*>{const_cast<symbol*>(this)};
+                return std::vector<Constituent*>{const_cast<symbol*>(this)};
             }
             static std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
             std::uniform_int_distribution<size_t> dist(0, next.size() - 1);
@@ -135,17 +135,17 @@ class symbol : public Consistuent{
 
         // Return a random symbol in the next vector
         // Note : supposed to be selectRandomNext()
-        std::vector<Consistuent*> operator!(){
+        std::vector<Constituent*> operator!(){
             if (this->isTerminal()) {
                 // Return a vector with only itself if no next symbols
-                return std::vector<Consistuent*>{this};
+                return std::vector<Constituent*>{this};
             }
             static std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
             std::uniform_int_distribution<size_t> dist(0, next.size() - 1);
             return next.at(dist(rng));
         }
 
-        bool operator<(const Consistuent& s2) const override {
+        bool operator<(const Constituent& s2) const override {
             const symbol* other = dynamic_cast<const symbol*>(&s2);
             if (!other) {
                 // Handle comparison with different types
@@ -155,7 +155,7 @@ class symbol : public Consistuent{
             return this->getChar() < other->getChar();
         }
         
-        bool operator==(const Consistuent& s2) const override {
+        bool operator==(const Constituent& s2) const override {
             const symbol* other = dynamic_cast<const symbol*>(&s2);
             if (!other) {
                 return false; // Different types can't be equal
@@ -204,7 +204,7 @@ inline std::ostream& operator<<(std::ostream& os, const symbol& symb) {
         os << "{}";
     } else {
         os << "{" << std::endl;
-        for ( const std::vector<Consistuent*>& possibility : symb.getNextElements() ){
+        for ( const std::vector<Constituent*>& possibility : symb.getNextElements() ){
             os << "[" ;
             for (size_t i = 0; i < possibility.size(); i++) {
                 os << possibility[i]->getChar();
@@ -253,7 +253,7 @@ inline std::ostream& operator<<(std::ostream& os, const std::vector<symbol*>& sy
 // ===========================================================================
 
 
-class symbol_3D : Consistuent{
+class symbol_3D : Constituent{
 
     int x, y, z;
     double width, length;
