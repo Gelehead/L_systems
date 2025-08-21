@@ -16,56 +16,57 @@ CSgrammar::CSgrammar() : GrammarUnified(), r() {}
 // --- DerivationNode ---
 
 // number of nonterminals
-int CSgrammar::DerivationNode::h_step() {
-    int non_terminal_count = 0;
-    for ( Constituent* c : this->form ) {
-        if ( !c->isTerminal() ) { non_terminal_count++; }
-    }
-    return non_terminal_count;
-}
+// int CSgrammar::DerivationNode::h_step() {
+//     int non_terminal_count = 0;
+//     for ( Constituent* c : this->form ) {
+//         if ( !c->isTerminal() ) { non_terminal_count++; }
+//     }
+//     return non_terminal_count;
+// }
 
 // adds penalty / bonus based on the string length
 // ReLU type shi, 
-int CSgrammar::DerivationNode::h_length_penalty(int max_length) {
-    int size = form.size();
-    if ( size < max_length ) { return pow(size-max_length, 5); }
-    if ( size > max_length ) { return (size-max_length) / 4 ; }
-    else { return 0; }
-}
+// int CSgrammar::DerivationNode::h_length_penalty(int max_length) {
+//     int size = form.size();
+//     if ( size < max_length ) { return pow(size-max_length, 5); }
+//     if ( size > max_length ) { return (size-max_length) / 4 ; }
+//     else { return 0; }
+// }
 
-int scan(
-    CSgrammar::DerivationNode dn
-){
-    // sum of all pattern strings lengths
-    const int MAXS = [dn]{ int sum = 0; for (int s : dn.rule_left_size) sum += s; return sum; }();
+// int scan(
+//     CSgrammar::DerivationNode dn
+// ){
+//     // sum of all pattern strings lengths
+//     const int MAXS = [dn]{ int sum = 0; for (int s : dn.rule_left_size) sum += s; return sum; }();
 
-    // biggest pattern length
-    const int MAXC = [dn] { int max = -999; for (int s : dn.rule_left_size) s > max ? max = s : NULL ; return max; }();
+//     // biggest pattern length
+//     const int MAXC = [dn] { int max = -999; for (int s : dn.rule_left_size) s > max ? max = s : NULL ; return max; }();
 
-    // output function
-    int out[MAXS];
+//     // output function
+//     int out[MAXS];
 
-    // failure function
-    int f[MAXC];
+//     // failure function
+//     int f[MAXC];
 
-    // GOTO function
-    int go[MAXS][MAXC];
+//     // GOTO function
+//     int go[MAXS][MAXC];
 
-    return 1;
-}
+//     return 1;
+// }
 
-int CSgrammar::DerivationNode::buildMatchingMachine(std::string arr[], int k, int MAXS, int out[], int* g[], int f[]){
-    // ahhhhhhhhhhhhhhhhhhhhh do smth
-}
+// int CSgrammar::DerivationNode::buildMatchingMachine(std::string arr[], int k, int MAXS, int out[], int* g[], int f[]){
+//     // ahhhhhhhhhhhhhhhhhhhhh do smth
+//     return 1;
+// }
 
 // TODO : implement logic
 // adds penalty based on number of rules paterns detected
-int CSgrammar::DerivationNode::h_complexity() {
-    for ( int size : rule_left_size ) {
+// int CSgrammar::DerivationNode::h_complexity() {
+//     for ( int size : rule_left_size ) {
 
-    }
-    return 1;
-}
+//     }
+//     return 1;
+// }
 
 CSgrammar::DerivationNode::DerivationNode(
     std::vector<Constituent*> form,
@@ -74,18 +75,18 @@ CSgrammar::DerivationNode::DerivationNode(
 ) 
 : form(form), parent(parent), steps(steps) 
 {
-    int h = W_STEP*h_step() + W_LENGTH_PENALTY*h_length_penalty(MAX_LENGTH) + W_COMPLEXITY*h_complexity();
-    h_score = h;
-    g_score = steps.size();
-    rule_left_size = std::vector<int>();
+    // int h = W_STEP*h_step() + W_LENGTH_PENALTY*h_length_penalty(MAX_LENGTH) + W_COMPLEXITY*h_complexity();
+    // h_score = h;
+    // g_score = steps.size();
+    // rule_left_size = std::vector<int>();
     
-    // add every different pair left side sizes sizes to vector
-    for (auto pair : steps) {
-        // if rule left side size isnt in the vector, add it 
-        if ( std::find(rule_left_size.begin(), rule_left_size.end(), pair.first.size()) != rule_left_size.end() ){
-            rule_left_size.push_back(pair.first.size());
-        }
-    }
+    // // add every different pair left side sizes sizes to vector
+    // for (auto pair : steps) {
+    //     // if rule left side size isnt in the vector, add it 
+    //     if ( std::find(rule_left_size.begin(), rule_left_size.end(), pair.first.size()) != rule_left_size.end() ){
+    //         rule_left_size.push_back(pair.first.size());
+    //     }
+    // }
 }
 
 // First, add the missing virtual function implementations to CSgrammar class

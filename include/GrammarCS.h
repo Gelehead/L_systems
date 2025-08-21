@@ -32,17 +32,17 @@ public:
 
         // heuristics functions
         // count nonterminals
-        int h_step();
+        //int h_step();
         
         // apply penalty if too long
-        int h_length_penalty(int max_length = MAX_LENGTH);
+        //int h_length_penalty(int max_length = MAX_LENGTH);
         
         // count number of patterns present in current string
-        int h_complexity();
+        //int h_complexity();
 
 
         // aho-corasick functions
-        int buildMatchingMachine(std::string arr[], int k, int MAXS, int out[], int* g[], int f[]);
+        //int buildMatchingMachine(std::string arr[], int k, int MAXS, int out[], int* g[], int f[]);
     };
 
     std::map<std::vector<Constituent*>, std::vector<std::vector<Constituent*>>> r;
