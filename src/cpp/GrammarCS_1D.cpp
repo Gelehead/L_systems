@@ -1,8 +1,8 @@
-#include "GrammarCS.h"
+#include "GrammarCS_1D.h"
 #include "Utils.h"
 
 
-CSgrammar::CSgrammar(
+GrammarCS_1D::GrammarCS_1D(
     const std::vector<Constituent*> non_terminal, 
     const std::vector<Constituent*> terminal, 
     const std::vector<Constituent*> start,
@@ -11,87 +11,87 @@ CSgrammar::CSgrammar(
     gClass = CS;
 }
 
-CSgrammar::CSgrammar() : GrammarUnified(), r() {}
+GrammarCS_1D::GrammarCS_1D() : GrammarUnified(), r() {}
 
 // --- DerivationNode ---
 
 // number of nonterminals
-// int CSgrammar::DerivationNode::h_step() {
-//     int non_terminal_count = 0;
-//     for ( Constituent* c : this->form ) {
-//         if ( !c->isTerminal() ) { non_terminal_count++; }
-//     }
-//     return non_terminal_count;
-// }
+int GrammarCS_1D::DerivationNode::h_step() {
+    int non_terminal_count = 0;
+    for ( Constituent* c : this->form ) {
+        if ( !c->isTerminal() ) { non_terminal_count++; }
+    }
+    return non_terminal_count;
+}
 
 // adds penalty / bonus based on the string length
 // ReLU type shi, 
-// int CSgrammar::DerivationNode::h_length_penalty(int max_length) {
-//     int size = form.size();
-//     if ( size < max_length ) { return pow(size-max_length, 5); }
-//     if ( size > max_length ) { return (size-max_length) / 4 ; }
-//     else { return 0; }
-// }
+int GrammarCS_1D::DerivationNode::h_length_penalty(int max_length) {
+    int size = form.size();
+    if ( size < max_length ) { return pow(size-max_length, 5); }
+    if ( size > max_length ) { return (size-max_length) / 4 ; }
+    else { return 0; }
+}
 
-// int scan(
-//     CSgrammar::DerivationNode dn
-// ){
-//     // sum of all pattern strings lengths
-//     const int MAXS = [dn]{ int sum = 0; for (int s : dn.rule_left_size) sum += s; return sum; }();
+int scan(
+    GrammarCS_1D::DerivationNode dn
+){
+    // sum of all pattern strings lengths
+    const int MAXS = [dn]{ int sum = 0; for (int s : dn.rule_left_size) sum += s; return sum; }();
 
-//     // biggest pattern length
-//     const int MAXC = [dn] { int max = -999; for (int s : dn.rule_left_size) s > max ? max = s : NULL ; return max; }();
+    // biggest pattern length
+    const int MAXC = [dn] { int max = -999; for (int s : dn.rule_left_size) s > max ? max = s : NULL ; return max; }();
 
-//     // output function
-//     int out[MAXS];
+    // output function
+    int out[MAXS];
 
-//     // failure function
-//     int f[MAXC];
+    // failure function
+    int f[MAXC];
 
-//     // GOTO function
-//     int go[MAXS][MAXC];
+    // GOTO function
+    int go[MAXS][MAXC];
 
-//     return 1;
-// }
+    return 1;
+}
 
-// int CSgrammar::DerivationNode::buildMatchingMachine(std::string arr[], int k, int MAXS, int out[], int* g[], int f[]){
-//     // ahhhhhhhhhhhhhhhhhhhhh do smth
-//     return 1;
-// }
+int GrammarCS_1D::DerivationNode::buildMatchingMachine(std::string arr[], int k, int MAXS, int out[], int* g[], int f[]){
+    // ahhhhhhhhhhhhhhhhhhhhh do smth
+    return 1;
+}
 
 // TODO : implement logic
 // adds penalty based on number of rules paterns detected
-// int CSgrammar::DerivationNode::h_complexity() {
-//     for ( int size : rule_left_size ) {
+int GrammarCS_1D::DerivationNode::h_complexity() {
+    for ( int size : rule_left_size ) {
 
-//     }
-//     return 1;
-// }
+    }
+    return 1;
+}
 
-CSgrammar::DerivationNode::DerivationNode(
+GrammarCS_1D::DerivationNode::DerivationNode(
     std::vector<Constituent*> form,
     DerivationNode* parent,
     std::vector<std::pair<std::vector<Constituent*>, std::vector<std::vector<Constituent*>>>> steps
 ) 
 : form(form), parent(parent), steps(steps) 
 {
-    // int h = W_STEP*h_step() + W_LENGTH_PENALTY*h_length_penalty(MAX_LENGTH) + W_COMPLEXITY*h_complexity();
-    // h_score = h;
-    // g_score = steps.size();
-    // rule_left_size = std::vector<int>();
+    int h = W_STEP*h_step() + W_LENGTH_PENALTY*h_length_penalty(MAX_LENGTH) + W_COMPLEXITY*h_complexity();
+    h_score = h;
+    g_score = steps.size();
+    rule_left_size = std::vector<int>();
     
-    // // add every different pair left side sizes sizes to vector
-    // for (auto pair : steps) {
-    //     // if rule left side size isnt in the vector, add it 
-    //     if ( std::find(rule_left_size.begin(), rule_left_size.end(), pair.first.size()) != rule_left_size.end() ){
-    //         rule_left_size.push_back(pair.first.size());
-    //     }
-    // }
+    // add every different pair left side sizes sizes to vector
+    for (auto pair : steps) {
+        // if rule left side size isnt in the vector, add it 
+        if ( std::find(rule_left_size.begin(), rule_left_size.end(), pair.first.size()) != rule_left_size.end() ){
+            rule_left_size.push_back(pair.first.size());
+        }
+    }
 }
 
-// First, add the missing virtual function implementations to CSgrammar class
-bool CSgrammar::is1DGenerator() const {
-    return true; // Assuming CS grammars generate 1D strings
+// 
+bool GrammarCS_1D::is1DGenerator() const {
+    return true; 
 }
 
 // A* algo to find quickly convergent solution
@@ -102,7 +102,7 @@ std::vector<Constituent*> a_star(std::vector<Constituent*> base, int ruleLengths
     return std::vector<Constituent*>();
 }
 
-std::vector<Constituent*> CSgrammar::generate1DImp(int generation, std::vector<Constituent*> base) const {
+std::vector<Constituent*> GrammarCS_1D::generate1DImp(int generation, std::vector<Constituent*> base) const {
     if (generation <= 0) { 
         return base; 
     }
@@ -114,12 +114,12 @@ std::vector<Constituent*> CSgrammar::generate1DImp(int generation, std::vector<C
     return std::vector<Constituent*>();
 }
 
-std::vector<std::vector<Constituent*>> CSgrammar::generate2pDImp(int generation, std::vector<std::vector<Constituent*>> base) const {
+std::vector<std::vector<Constituent*>> GrammarCS_1D::generate2pDImp(int generation, std::vector<std::vector<Constituent*>> base) const {
     throw std::runtime_error("2D generation not implemented for CS grammars");
 }
 
-// Fixed read_grammar method for CSgrammar
-CSgrammar* CSgrammar::read_grammar(std::string filePath, int skipLines) {
+// Fixed read_grammar method for GrammarCS_1D
+GrammarCS_1D* GrammarCS_1D::read_grammar(std::string filePath, int skipLines) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         throw std::runtime_error("Could not open file: " + filePath);
@@ -242,11 +242,11 @@ CSgrammar* CSgrammar::read_grammar(std::string filePath, int skipLines) {
     }
     
     file.close();
-    return new CSgrammar(m, t, s, r);
+    return new GrammarCS_1D(m, t, s, r);
 }
 
 // Implementation of the stream operator
-std::ostream& operator<<(std::ostream& os, const CSgrammar& gram) { 
+std::ostream& operator<<(std::ostream& os, const GrammarCS_1D& gram) { 
 
     os << std::string("non terminal symbols -> ");
     os << '{';

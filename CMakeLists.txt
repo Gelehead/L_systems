@@ -29,7 +29,8 @@ set(DEFAULT_MAP_JSON "${CMAKE_BINARY_DIR}/maps/default_map.json")
 add_executable(grammar_gen 
     ${CPP_DIR}/main.cpp
     ${CPP_DIR}/GrammarUnified.cpp
-    ${CPP_DIR}/GrammarCS.cpp
+    ${CPP_DIR}/GrammarCS_1D.cpp
+    ${CPP_DIR}/GrammarCS_3D.cpp
     ${CPP_DIR}/grammar.cpp
 )
 

@@ -222,7 +222,7 @@ function createCellularAutomataUI() {
         
         document.getElementById('run-1-gen').addEventListener('click', () => {
             // get next generation json
-            const next_gen_json = query_exe_runner(gramFile, jsonSetupFile, 1);
+            let next_gen_json = query_exe_runner(gramFile, jsonSetupFile, 1);
 
             // update visuals
             cellularAutomata.gridData = next_gen_json;

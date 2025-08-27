@@ -1,9 +1,9 @@
-#ifndef GRAMMAR_CS_H
-#define GRAMMAR_CS_H
+#ifndef GRAMMAR_CS_1D_H
+#define GRAMMAR_CS_1D_H
 
 #include "GrammarUnified.h"
 
-class CSgrammar : public GrammarUnified {
+class GrammarCS_1D : public GrammarUnified {
 public:
     // Subclass used in the construction of the implicit graph
     // should have its own class ( generalizable to graph A* )
@@ -32,31 +32,31 @@ public:
 
         // heuristics functions
         // count nonterminals
-        //int h_step();
+        int h_step();
         
         // apply penalty if too long
-        //int h_length_penalty(int max_length = MAX_LENGTH);
+        int h_length_penalty(int max_length = MAX_LENGTH);
         
         // count number of patterns present in current string
-        //int h_complexity();
+        int h_complexity();
 
 
         // aho-corasick functions
-        //int buildMatchingMachine(std::string arr[], int k, int MAXS, int out[], int* g[], int f[]);
+        int buildMatchingMachine(std::string arr[], int k, int MAXS, int out[], int* g[], int f[]);
     };
 
     std::map<std::vector<Constituent*>, std::vector<std::vector<Constituent*>>> r;
 
-    CSgrammar(
+    GrammarCS_1D(
         const std::vector<Constituent*> non_terminal, 
         const std::vector<Constituent*> terminal, 
         const std::vector<Constituent*> start,
         std::map<std::vector<Constituent*>, std::vector<std::vector<Constituent*>>> rules
     );
 
-    CSgrammar();
+    GrammarCS_1D();
 
-    static CSgrammar* read_grammar(std::string filePath, int skipLines = 0);
+    static GrammarCS_1D* read_grammar(std::string filePath, int skipLines = 0);
 
     // Add these missing virtual function overrides:
     bool is1DGenerator() const override;
@@ -81,4 +81,4 @@ protected:
     }
 };
 
-#endif GRAMMAR_CS_H
+#endif GRAMMAR_CS_1D_H

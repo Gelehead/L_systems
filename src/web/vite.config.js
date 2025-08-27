@@ -1,6 +1,6 @@
-// vite.config.js
-import { defineConfig } from 'vite';
-
-export default defineConfig({
-  base: "L_systems",
-});
+export default {
+  server: {
+    host: '0.0.0.0',
+    port: 5173
+  }
+}
