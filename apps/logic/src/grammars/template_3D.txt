@@ -1,0 +1,30 @@
+# should be a bin file
+# every 2 base16 number represents 8bits
+# header 
+33 44 43 53 47  # "3DCSG" 3d context sensitive grammar
+01 00           # version 1.00
+00 00 00 02     # number of x layers : 2
+00 00 00 02     # number of y layers : 2
+00 00 00 02     # number of z layers : 2
+00              # data type : int32 
+00 00 00 00 00  # reserved 
+
+
+# rest of values are spread out like
+# ( for our example of x, y, z \in [0,1] )
+
+#        ~JSON representation         |     coordinates    |
+# ------------------------------------| ------------------ |
+{
+  [                                   |                    |
+    [(00 00 00 00), (00 00 80 3F)],   | [(0,0,0), (1,0,0)] |
+    [(00 00 00 40), (00 00 40 40)]    | [(0,1,0), (1,1,0)] |
+  ],                                  |                    |
+  [                                   |                    |
+    [(00 00 80 40), (00 00 A0 40)],   | [(0,0,1), (1,0,1)] |
+    [(00 00 C0 40), (00 00 E0 40)],   | [(0,1,1), (1,1,1)] |
+  ]                                   |                    |
+}                                     |                    |
+
+# and will look like
+00000000 00000000 00000000 00000000   # 4bytes = 1 coordinate

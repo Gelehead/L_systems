@@ -1,0 +1,6 @@
+1 CF
+F X Y
++ -
+FX
+X -> X+YF+
+Y -> -FX-Y

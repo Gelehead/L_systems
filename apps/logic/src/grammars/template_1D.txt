@@ -1,0 +1,6 @@
+dimensions(1) Type(CF/CS)
+non terminals 
+terminals 
+starting string
+------------------
+rules (non terminals -> string of terminals and non terminals)

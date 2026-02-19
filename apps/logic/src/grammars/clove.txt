@@ -1,0 +1,5 @@
+1 CF
+F
+p m
+FpFpFpF
+F -> FpFmFmFFpFpFmF

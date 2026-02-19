@@ -22,8 +22,6 @@ set(PYTHON_DIR ${SRC_DIR}/Python)
 include_directories(${INCLUDE_DIR})
 include_directories(${CPP_DIR})
 
-# default map json 
-set(DEFAULT_MAP_JSON "${CMAKE_BINARY_DIR}/maps/default_map.json")
 
 # grammar generator executable
 add_executable(grammar_gen 
@@ -32,12 +30,6 @@ add_executable(grammar_gen
     ${CPP_DIR}/GrammarCS_1D.cpp
     ${CPP_DIR}/GrammarCS_3D.cpp
     ${CPP_DIR}/grammar.cpp
-)
-
-# Perlin noise generator executable
-add_executable(perlin_gen 
-    ${CPP_DIR}/noise_main.cpp
-    ${CPP_DIR}/noise.cpp
 )
 
 # Set the default grammar file and output path as compile definitions
@@ -51,16 +43,12 @@ target_compile_definitions(grammar_gen PRIVATE
     DEFAULT_OUTPUT_PATH="${DEFAULT_OUTPUT_PATH}"
 )
 
-# Add install rules for better distribution
-install(TARGETS grammar_gen perlin_gen DESTINATION bin)
-install(FILES ${GRAMMAR_FILES} DESTINATION share/${PROJECT_NAME}/grammars)
-install(FILES ${PYTHON_FILES} DESTINATION share/${PROJECT_NAME}/python)
-
 # Create a platform-independent run script for grammar generator
 if(WIN32)
-    # Windows batch file for grammar generator
-    file(
-        WRITE ${CMAKE_BINARY_DIR}/run_grammar.bat 
+  set(RUN_GRAMMAR_SCRIPT run_grammar.bat)
+  # Windows batch file for grammar generator
+  file(
+    WRITE ${CMAKE_BINARY_DIR}/run_grammar.bat 
         "
 @echo off
 set N_GENERATION=%2
@@ -109,86 +97,85 @@ echo Grammar generation completed successfully
 echo Output saved to: ${CMAKE_BINARY_DIR}/grammars/%OUTPUT_GRAMMAR_PATH%
         "
     )
-        
-    # Windows batch file for Perlin noise generator
+  elseif(UNIX)
+  set(RUN_GRAMMAR_SCRIPT run_grammar.sh)
     file(
-        WRITE ${CMAKE_BINARY_DIR}/run_perlin.bat 
-        "
-@echo off
-set WIDTH=512
-set HEIGHT=512
-set FEATURE_SIZE=64
-set OCTAVES=6
-set PERSISTENCE=0.5
-set OUTPUT_PATH=\"${CMAKE_BINARY_DIR}/noise/perlin_terrain.ppm\"
-set COLORED=1
+    # CODE FOR UNIX HERE
+    WRITE ${CMAKE_BINARY_DIR}/run_grammar.sh
+            "
+#!/usr/bin/env bash
+#Arguments
+GRAMMAR_FILE=\"$1\"
+N_GENERATION=\"$2\"
+OUTPUT_GRAMMAR_PATH=\"$3\"
+PENCIL_SIZE=\"$4\"
+ANGLE=\"$5\"
+            
+echo \"Processing grammar file: \$GRAMMAR_FILE\"
+            
+# Try to find grammar_gen in common locations
+GRAMMAR_EXE=\"\"
+            
+if [ -x \"${CMAKE_BINARY_DIR}/Release/grammar_gen\" ]; then
+  GRAMMAR_EXE=\"${CMAKE_BINARY_DIR}/Release/grammar_gen\"
 
-REM Find perlin_gen.exe
-set PERLIN_EXE=
-if exist \"${CMAKE_BINARY_DIR}/perlin_gen.exe\" (
-    set PERLIN_EXE=\"${CMAKE_BINARY_DIR}/perlin_gen.exe\"
-) else if exist \"${CMAKE_BINARY_DIR}/Debug/perlin_gen.exe\" (
-    set PERLIN_EXE=\"${CMAKE_BINARY_DIR}/Debug/perlin_gen.exe\"
-) else if exist \"${CMAKE_BINARY_DIR}/Release/perlin_gen.exe\" (
-    set PERLIN_EXE=\"${CMAKE_BINARY_DIR}/Release/perlin_gen.exe\"
-) else (
-    echo ERROR: Could not find perlin_gen.exe
-    exit /b 1
+  elif [ -x \"${CMAKE_BINARY_DIR}/Debug/grammar_gen\" ]; then
+    GRAMMAR_EXE=\"${CMAKE_BINARY_DIR}/Debug/grammar_gen\"
+
+    elif [ -x \"${CMAKE_BINARY_DIR}/grammar_gen\" ]; then
+      GRAMMAR_EXE=\"${CMAKE_BINARY_DIR}/grammar_gen\"
+
+      elif [ -x \"${CMAKE_BINARY_DIR}/RelWithDebInfo/grammar_gen\" ]; then
+        GRAMMAR_EXE=\"${CMAKE_BINARY_DIR}/RelWithDebInfo/grammar_gen\"
+
+        elif [ -x \"${CMAKE_BINARY_DIR}/MinSizeRel/grammar_gen\" ]; then
+          GRAMMAR_EXE=\"${CMAKE_BINARY_DIR}/MinSizeRel/grammar_gen\"
+
+          else
+            echo \"ERROR: Could not find grammar_gen\"
+            echo \"Looked in:\"
+            echo \"  ${CMAKE_BINARY_DIR}/Release/grammar_gen\"
+            echo \"  ${CMAKE_BINARY_DIR}/Debug/grammar_gen\"
+            echo \"  ${CMAKE_BINARY_DIR}/grammar_gen\"
+            echo \"  ${CMAKE_BINARY_DIR}/RelWithDebInfo/grammar_gen\"
+            echo \"  ${CMAKE_BINARY_DIR}/MinSizeRel/grammar_gen\"
+            exit 1
+          fi
+          
+          echo \"Found executable: \$GRAMMAR_EXE\"
+            
+          # Run the grammar generator
+          echo \"Running: \$GRAMMAR_EXE \\\"${CMAKE_BINARY_DIR}/grammars/\$GRAMMAR_FILE\\\" \$N_GENERATION \\\"${CMAKE_BINARY_DIR}/grammars/\$OUTPUT_GRAMMAR_PATH\\\"\"
+          \"\$GRAMMAR_EXE\" \"${CMAKE_BINARY_DIR}/grammars/\$GRAMMAR_FILE\" \"\$N_GENERATION\" \"${CMAKE_BINARY_DIR}/grammars/\$OUTPUT_GRAMMAR_PATH\"
+            
+          EXIT_CODE=\$?
+          if [ \$EXIT_CODE -ne 0 ]; then
+            echo \"ERROR: Grammar generation failed with error code \$EXIT_CODE\"
+            exit \$EXIT_CODE
+          fi
+            
+          echo \"Grammar generation completed successfully\"
+          echo \"Output saved to: ${CMAKE_BINARY_DIR}/grammars/\$OUTPUT_GRAMMAR_PATH\"
+          "
 )
-
-%PERLIN_EXE% %WIDTH% %HEIGHT% %FEATURE_SIZE% %OCTAVES% %PERSISTENCE% %OUTPUT_PATH% %COLORED%
-        "
-    )
-
-    file(
-        WRITE ${CMAKE_BINARY_DIR}/map_test.bat
-        "
-@echo off
-set JSON_FILE=\"${DEFAULT_MAP_JSON}\"
-set OUTPUT_FILE=%1
-
-REM Find Map_test.exe
-set MAP_EXE=
-if exist \"${CMAKE_BINARY_DIR}/Map_test.exe\" (
-    set MAP_EXE=\"${CMAKE_BINARY_DIR}/Map_test.exe\"
-) else if exist \"${CMAKE_BINARY_DIR}/Debug/Map_test.exe\" (
-    set MAP_EXE=\"${CMAKE_BINARY_DIR}/Debug/Map_test.exe\"
-) else if exist \"${CMAKE_BINARY_DIR}/Release/Map_test.exe\" (
-    set MAP_EXE=\"${CMAKE_BINARY_DIR}/Release/Map_test.exe\"
-) else (
-    echo ERROR: Could not find Map_test.exe
-    exit /b 1
-)
-
-%MAP_EXE% %JSON_FILE% %OUTPUT_FILE%
-        "
-    )
-else()
-    # CODE FOR UNIX HERE 
+            
+# Make the script executable
+file(CHMOD ${CMAKE_BINARY_DIR}/run_grammar.sh
+PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+GROUP_READ GROUP_EXECUTE
+WORLD_READ WORLD_EXECUTE)
 endif()
 
 # Add custom targets to run the programs
 add_custom_target(run_grammar
     DEPENDS grammar_gen
-    COMMAND ${CMAKE_BINARY_DIR}/run_grammar${CMAKE_EXECUTABLE_SUFFIX}
+    COMMAND ${CMAKE_BINARY_DIR}/${RUN_GRAMMAR_SCRIPT}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     COMMENT "Running L-systems generator"
 )
 
-add_custom_target(run_perlin
-    DEPENDS perlin_gen
-    COMMAND ${CMAKE_BINARY_DIR}/run_perlin${CMAKE_EXECUTABLE_SUFFIX}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    COMMENT "Running Perlin noise generator"
-)
-
-# For backward compatibility
-add_custom_target(run
-    DEPENDS grammar_gen
-    COMMAND ${CMAKE_BINARY_DIR}/run${CMAKE_EXECUTABLE_SUFFIX}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    COMMENT "Running L-systems generator"
-)
+# install executable
+install(TARGETS grammar_gen DESTINATION bin)
 
 # Output configuration information
 message(STATUS "L-systems configuration:")

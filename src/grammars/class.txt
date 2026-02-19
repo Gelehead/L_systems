@@ -1,8 +1,0 @@
-1 CF
-X
-a b c e
-X
-X -> XaXbXcX
-X -> XbXcX
-X -> XcX
-X -> e
