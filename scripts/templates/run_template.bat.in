@@ -1,0 +1,7 @@
+@echo off 
+cd "@CMAKE_BINARY_DIR"
+echo Starting grammarEngine...
+bin\grammarEngine.exe %*
+echo.
+echo Process exited with code %ERRORLEVEL%
+pause

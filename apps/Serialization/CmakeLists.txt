@@ -1,0 +1,14 @@
+add_library(Serialization STATIC
+    src/BinaryReader.cpp
+    src/BinaryWriter.cpp
+    src/Format/MapFormat.cpp
+    src/Format/GrammarFormat.cpp
+)
+
+target_include_directories(Serialization PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(Serialization PRIVATE
+    Common
+)

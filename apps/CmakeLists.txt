@@ -1,0 +1,11 @@
+add_library(Common STATIC
+    src/Logger.cpp
+    src/Regions/src/RegionMap.cpp
+    src/Regions/src/Domain.cpp
+    src/Regions/src/Region.cpp
+)
+
+target_include_directories(Common PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/Region/include
+)

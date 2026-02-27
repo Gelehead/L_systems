@@ -3,6 +3,7 @@
 * should be implemented by Domain, region, area, site
 ****************************************************************/
 
+#include "Seed.h"
 #include <stdint.h>
 #include <vector>
 
@@ -18,15 +19,13 @@ namespace grammar
         // smallest 
     };
 
-    enum class 
-
     /***************************************************************
     * Intended to be loaded and unloaded as world is generated
     * always same generation for the same seed
     **************************************************************/
     class IRregion
     {
-        virtual IRegion() = 0;
+        virtual void IRegion() = 0;
         virtual ~IRegion() = default;
 
         virtual Seed seed() = 0;
@@ -42,6 +41,6 @@ namespace grammar
         * are inside the region
         **************************************************************/
         virtual bool contains(std::vector<uint32_t> coordinates, Seed seed) = 0;
-    }
+    };
 }
 

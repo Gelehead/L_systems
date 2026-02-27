@@ -1,66 +1,87 @@
 cmake_minimum_required(VERSION 3.16)
-project(grammar_generation VERSION 0.1.0)
+project(grammarEngine VERSION 0.1.0)
 
-# setup client project 
-set(CLIENT ${CMAKE_CURRENT_SOURCE_DIR}/Client)
-set(CLIENT_INCLUDE ${CLIENT}/include)
-set(CLIENT_SRC ${LOGIC}/src)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# output directories 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
+# submodules 
+find_package(Vulkan REQUIRED)
 
-# setup logic project
-set(LOGIC ${CMAKE_CURRENT_SOURCE_DIR}/Logic)
-set(LOGIC_INCLUDE ${LOGIC}/include)
-set(LOGIC_SRC ${LOGIC}/src)
+set(GLFW_BUILD_DOC      OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+add_subdirectory(vendor/glfw)
+add_subdirectory(vendor/imgui)
+add_subdirectory(vendor/glm)
+add_subdirectory(vendor/vma)
 
+# modules 
+add_subdirectory(apps/Common)
+add_subdirectory(apps/Serialization)
+add_subdirectory(apps/Client)
+add_subdirectory(apps/Logic)
+add_subdirectory(apps/Renderer)
+add_subdirectory(apps/Engine)
 
+# main executable
+add_executable(grammarEngine apps/main.cpp)
 
+target_link_libraries(grammarEngine PRIVATE
+    Engine
+    Client
+)
 
-# setup shared project 
-set(COMMON ${CMAKE_CURRENT_SOURCE_DIR}/Common)
-set(COMMON_INCLUDE ${COMMON}/include)
-set(COMMON_SRC ${COMMON}/src)
-
-
-
-
-# setup include, src and main.cpp
-
-
-
-
-
-# create target path
-
-
-
-
-# Create plateform independant build + run script
+# plateform scripts 
 if(WIN32)
-    set(RUN_GRAMMAR_SCRIPT run_grammar.bat)
-    
-    # windows script ( ideally comes from like win_runner_template.txt )
-
-if(UNIX)
-    set(RUN_GRAMMAR_SCRIPT run_grammar.sh)
-
-    # unix script ( ideally comes from like unix_runner_template.txt )
-
+    set(RUN_SCRIPT_IN ${CMAKE_SOURCE_DIR}/scripts/templates/run_grammar.bat.in)
+    set(RUN_SCRIPT_OUT ${CMAKE_BINARY_DIR}/run.bat)
+elseif(UNIX)
+    set(RUN_SCRIPT_IN ${CMAKE_SOURCE_DIR}/scripts/templates/run_grammar.sh.in)
+    set(RUN_SCRIPT_OUT ${CMAKE_BINARY_DIR}/run.sh)
 else()
-    echo "no macOS support available"
+    message(WARNING "Plateform not supported for run script")
+endif()
 
+if(DEFINED RUN_SCRIPT_IN)
+    configure_file(${RUN_SCRIPT_IN} ${RUN_SCRIPT_OUT} @ONLY)
+    if(UNIX)
+        file(CHMOD ${RUN_SCRIPT_OUT} PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE)
+    endif()
+endif()
 
-# add custom targets 
+# targets 
+add_custom_target(run
+    COMMAND ${CMAKE_BINARY_DIR}/bin/grammarEngine
+    DEPENDS grammarEngine
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMENT "Running MapEngine..."
+)
 
+add_custom_target(run_debug
+    COMMAND ${CMAKE_BINARY_DIR}/bin/grammarEngine --debug
+    DEPENDS grammarEngine
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMENT "Running MapEngine in debug mode..."
+)
 
+# install 
+install(TARGETS grammarEngine DESTINATION bin)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/apps/Data/ DESTINATION data)
 
-#install executable
-
-
-
-# output information in console
-
-
-
-
-# ! ideally keeps console open for debug prints of the app to be displayed in
+# console output
+message(STATUS "")
+message(STATUS "┌─────────────────────────────────────────┐")
+message(STATUS "│           MapEngine ${PROJECT_VERSION}              │")
+message(STATUS "├─────────────────────────────────────────┤")
+message(STATUS "│ Build type    : ${CMAKE_BUILD_TYPE}")
+message(STATUS "│ Compiler      : ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
+message(STATUS "│ C++ Standard  : ${CMAKE_CXX_STANDARD}")
+message(STATUS "│ Output dir    : ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+message(STATUS "│ Vulkan        : ${Vulkan_VERSION}")
+message(STATUS "└─────────────────────────────────────────┘")
+message(STATUS "")

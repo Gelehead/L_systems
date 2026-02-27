@@ -9,7 +9,7 @@
 
 namespace grammar
 {
-    class Generator
+    class Engine
     {
     public:
 
@@ -21,7 +21,7 @@ namespace grammar
         * Will create then set the portfactory 
         ****************************************************************/
 
-        void Generator(
+        void Engine(
             const std::string name 
         );
 
@@ -30,7 +30,7 @@ namespace grammar
         * Destructor                                                   *
         ****************************************************************/
 
-        void ~Generator();
+        void ~Engine();
 
 
         /***************************************************************

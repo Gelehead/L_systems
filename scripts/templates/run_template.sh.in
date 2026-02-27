@@ -1,0 +1,10 @@
+#!/bin/bash
+# used for cmake generation
+cd "@CMAKE_BINARY_DIR@"
+echo "starting grammarEngine..."
+./bin/grammarEngine "$@"
+
+# keep terminal open on crash for debug
+echo ""
+echo "Process exited with code $?"
+echo -p "press any key to close..."
