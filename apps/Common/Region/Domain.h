@@ -4,3 +4,9 @@
 ****************************************************************/
 
 namespace grammar
+{
+    class Domain
+    {
+        // same constructor as 
+    };
+}

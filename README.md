@@ -3,6 +3,13 @@ This is a project about pseudo random procedural generation based on context-fre
 
 For now, the project isn't really more than creating an image of a flower / pant from a set of rules, the lindenmayer way.
 
+# Building and running
+`run.sh` {new, clean, fast} will :
+    - new : download all dependencies and clean build the app, then run
+    - clean : clean build and run
+    - fast : build and run
+
+
 ## Images
 Cube Generation 2
 

@@ -4,6 +4,7 @@
 ****************************************************************/
 
 #include <stdint.h>
+#include <vector>
 
 namespace grammar 
 {
@@ -17,12 +18,30 @@ namespace grammar
         // smallest 
     };
 
+    enum class 
+
+    /***************************************************************
+    * Intended to be loaded and unloaded as world is generated
+    * always same generation for the same seed
+    **************************************************************/
     class IRregion
     {
         virtual IRegion() = 0;
         virtual ~IRegion() = default;
 
-        virtual getContext() = 0;
+        virtual Seed seed() = 0;
+        
+        /***************************************************************
+        * Defined in children class at definition
+        **************************************************************/
+        virtual RegionLevel level() = 0;
+        virtual float influence() = 0;
+
+        /***************************************************************
+        * Tells by deterministic algorithm, using seed, if coordinates 
+        * are inside the region
+        **************************************************************/
+        virtual bool contains(std::vector<uint32_t> coordinates, Seed seed) = 0;
     }
 }
 
