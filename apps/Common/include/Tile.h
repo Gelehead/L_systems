@@ -12,9 +12,13 @@ namespace grammar
     {
         uint16_t TypeId = 0;
         uint8_t flags = 0;
-        uint8_t x;
-        uint8_t y;
-        uint8_t z;
-        
+        uint32_t x;
+        uint32_t y;
+        uint32_t z;
+        uint16_t _reserved;
+
+        Seed seed;
     };
+
+
 }
