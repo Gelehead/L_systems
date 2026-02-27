@@ -1,0 +1,41 @@
+## Client 
+should be the visual application that will support the grammar logic ( or the other way around, wtv )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Copyright (c) 2026 Oscar Lavolet. All Rights Reserved.
