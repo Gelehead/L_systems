@@ -1,7 +1,0 @@
-# ------------------------------------
-# External Dependencies
-# ------------------------------------
-
-# imgui 
-git@github.com:ocornut/imgui.git
-
