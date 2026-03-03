@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MapEngine — Architecture Diagram</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg:        #0a0c10;
+    --surface:   #0f1218;
+    --border:    #1e2530;
+    --border-hi: #2e3a4a;
+
+    --common:    #e8c547;
+    --engine:    #4a9eff;
+    --renderer:  #ff6b6b;
+    --logic:     #4ade80;
+    --serial:    #c084fc;
+    --client:    #fb923c;
+    --vendor:    #475569;
+
+    --text:      #e2e8f0;
+    --muted:     #64748b;
+    --dim:       #334155;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  header {
+    padding: 48px 64px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #fff;
+  }
+  header h1 span { color: var(--engine); }
+  header p {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── Main canvas ── */
+  .canvas {
+    padding: 48px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* ── Row layouts ── */
+  .row {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    position: relative;
+  }
+  .row + .row { margin-top: 0; }
+
+  /* ── Node cards ── */
+  .node {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 22px;
+    position: relative;
+    background: var(--surface);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+  .node:hover {
+    z-index: 10;
+    box-shadow: 0 0 0 1px currentColor, 0 8px 32px rgba(0,0,0,0.6);
+  }
+  .node-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .node-tag {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .node-items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .node-items li {
+    font-size: 10.5px;
+    color: #94a3b8;
+    padding-left: 12px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .node-items li::before {
+    content: '·';
+    position: absolute;
+    left: 0;
+    color: var(--muted);
+  }
+
+  /* ── Color variants ── */
+  .node-common   { --c: var(--common);   border-color: #2a2416; }
+  .node-engine   { --c: var(--engine);   border-color: #142035; }
+  .node-renderer { --c: var(--renderer); border-color: #2a1414; }
+  .node-logic    { --c: var(--logic);    border-color: #142814; }
+  .node-serial   { --c: var(--serial);   border-color: #221428; }
+  .node-client   { --c: var(--client);   border-color: #2a1e10; }
+  .node-vendor   { --c: var(--vendor);   border-color: #1a1f28; }
+  .node-user     { --c: #94a3b8;         border-color: #1e2530; }
+
+  .node:hover { border-color: var(--c) !important; }
+  .node-title { color: var(--c); }
+  .legend-dot { background: var(--c, #fff); }
+
+  /* ── SVG arrows overlay ── */
+  .diagram-wrapper {
+    position: relative;
+  }
+  svg.arrows {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  /* ── Flow annotations ── */
+  .flow-label {
+    font-size: 9px;
+    fill: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── Arrow definitions ── */
+  .arr-common   { stroke: var(--common);   }
+  .arr-engine   { stroke: var(--engine);   }
+  .arr-renderer { stroke: var(--renderer); }
+  .arr-logic    { stroke: var(--logic);    }
+  .arr-serial   { stroke: var(--serial);   }
+  .arr-client   { stroke: var(--client);   }
+  .arr-neutral  { stroke: #475569;         }
+
+  /* ── Section labels ── */
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 700;
+    padding: 16px 0 8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── Connector pipes between nodes ── */
+  .pipe {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 2px;
+    flex-shrink: 0;
+    position: relative;
+    min-width: 48px;
+  }
+  .pipe-label {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    transform: rotate(180deg);
+    white-space: nowrap;
+  }
+
+  /* ── Grid layouts ── */
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; }
+  .col-span-2 { grid-column: span 2; }
+
+  /* ── Flow diagram main layout ── */
+  .flow-diagram {
+    display: grid;
+    grid-template-columns: 200px 1fr 200px;
+    grid-template-rows: auto;
+    gap: 24px;
+    position: relative;
+  }
+
+  /* ── Vertical connector ── */
+  .v-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    gap: 0;
+  }
+  .v-line {
+    width: 1px;
+    flex: 1;
+    min-height: 20px;
+    position: relative;
+  }
+  .v-line::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 1px;
+    background: var(--border-hi);
+  }
+  .arrow-down::after {
+    content: '▼';
+    font-size: 8px;
+    color: var(--muted);
+    position: absolute;
+    bottom: -6px;
+    left: -4px;
+  }
+
+  /* ── Main architecture grid ── */
+  .arch {
+    display: grid;
+    gap: 20px;
+    grid-template-areas:
+      "user    user    user   "
+      "client  engine  .      "
+      ".       engine  .      "
+      "serial  engine  renderer"
+      "logic   engine  renderer"
+      "common  common  common ";
+  }
+
+  .area-user     { grid-area: user; }
+  .area-client   { grid-area: client; }
+  .area-engine   { grid-area: engine; }
+  .area-serial   { grid-area: serial; }
+  .area-logic    { grid-area: logic; }
+  .area-renderer { grid-area: renderer; }
+  .area-common   { grid-area: common; }
+
+  /* ── Interaction table ── */
+  .interaction-section {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+  .interaction-section h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 24px;
+  }
+
+  .flow-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+  .flow-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+  }
+  .flow-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #0f1520;
+    vertical-align: top;
+    line-height: 1.6;
+    color: #94a3b8;
+  }
+  .flow-table tr:hover td { background: #0f1520; }
+  .from-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--badge-bg, #1e2530);
+    color: var(--badge-c, #94a3b8);
+    white-space: nowrap;
+  }
+  .arrow-glyph {
+    color: var(--muted);
+    font-size: 10px;
+    padding: 0 4px;
+  }
+
+  /* ── Double buffer callout ── */
+  .callout {
+    margin-top: 32px;
+    border: 1px solid var(--border-hi);
+    border-left: 3px solid var(--engine);
+    border-radius: 4px;
+    padding: 16px 20px;
+    background: #0d1420;
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.7;
+  }
+  .callout strong {
+    color: var(--engine);
+    font-weight: 600;
+  }
+
+  /* ── Phase timeline ── */
+  .phase-timeline {
+    margin-top: 32px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .phase {
+    flex: 1;
+    min-width: 120px;
+    padding: 14px 12px;
+    border: 1px solid var(--border);
+    border-right: none;
+    position: relative;
+    background: var(--surface);
+  }
+  .phase:last-child { border-right: 1px solid var(--border); border-radius: 0 4px 4px 0; }
+  .phase:first-child { border-radius: 4px 0 0 4px; }
+  .phase-num {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .phase-name {
+    font-size: 10px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    font-family: 'Syne', sans-serif;
+    letter-spacing: 0.02em;
+  }
+  .phase-who {
+    font-size: 9px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .phase-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  /* ── Main diagram nodes arranged manually ── */
+  .diagram-grid {
+    display: grid;
+    grid-template-columns: 220px 24px 1fr 24px 220px;
+    grid-template-rows: auto 32px auto 32px auto 32px auto 32px auto;
+    gap: 0;
+    align-items: start;
+    position: relative;
+  }
+
+  .span-full { grid-column: 1 / -1; }
+
+  /* center col = engine */
+  .col-left   { grid-column: 1; }
+  .col-cl     { grid-column: 2; }
+  .col-center { grid-column: 3; }
+  .col-cr     { grid-column: 4; }
+  .col-right  { grid-column: 5; }
+
+  .row-1 { grid-row: 1; }
+  .row-2 { grid-row: 2; }
+  .row-3 { grid-row: 3; }
+  .row-4 { grid-row: 4; }
+  .row-5 { grid-row: 5; }
+  .row-6 { grid-row: 6; }
+  .row-7 { grid-row: 7; }
+  .row-8 { grid-row: 8; }
+  .row-9 { grid-row: 9; }
+
+  .span-rows-3 { grid-row: span 5; }
+
+  /* ── Connection lines via CSS borders on pseudo-elements ── */
+  .h-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: var(--muted);
+    position: relative;
+    height: 100%;
+  }
+  .h-arrow::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 0; right: 0;
+    height: 1px;
+    background: var(--border-hi);
+    transform: translateY(-50%);
+  }
+  .h-arrow span {
+    background: var(--bg);
+    padding: 0 4px;
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    z-index: 1;
+    position: relative;
+  }
+
+  .v-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    color: var(--muted);
+    position: relative;
+    width: 100%;
+    padding: 4px 0;
+  }
+  .v-arrow::before {
+    content: '';
+    position: absolute;
+    left: 50%; top: 0; bottom: 0;
+    width: 1px;
+    background: var(--border-hi);
+    transform: translateX(-50%);
+  }
+  .v-arrow span {
+    background: var(--bg);
+    padding: 2px 6px;
+    font-size: 8px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    z-index: 1;
+    position: relative;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .engine-tall {
+    grid-column: 3;
+    grid-row: 1 / 10;
+    display: flex;
+    align-items: stretch;
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Map<span>Engine</span> — Information Flow</h1>
+    <p>Module interactions · data paths · threading model</p>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--common)"></div>Common</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--engine)"></div>Engine</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--renderer)"></div>Renderer</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--logic)"></div>Logic</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--serial)"></div>Serialization</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--client)"></div>Client</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--vendor)"></div>Vendor</div>
+  </div>
+</header>
+
+<div class="canvas">
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- MAIN DIAGRAM                                                    -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div class="section-label">01 — Module Map</div>
+
+  <div class="diagram-grid">
+
+    <!-- ── USER INPUT (top, full width) ─────────────────── -->
+    <div class="span-full row-1">
+      <div class="node node-user" style="--c:#94a3b8; display:flex; align-items:center; gap:32px; padding:14px 22px;">
+        <div>
+          <div class="node-title" style="margin-bottom:4px;">User Input</div>
+          <div class="node-tag" style="margin-bottom:0;">keyboard · mouse · window events</div>
+        </div>
+        <div style="display:flex; gap:24px; flex:1; justify-content:center; flex-wrap:wrap;">
+          <span style="font-size:10px; color:#64748b; border:1px solid #1e2530; padding:4px 12px; border-radius:3px;">Camera orbit / pan / zoom</span>
+          <span style="font-size:10px; color:#64748b; border:1px solid #1e2530; padding:4px 12px; border-radius:3px;">Tile placement / removal</span>
+          <span style="font-size:10px; color:#64748b; border:1px solid #1e2530; padding:4px 12px; border-radius:3px;">Generation trigger</span>
+          <span style="font-size:10px; color:#64748b; border:1px solid #1e2530; padding:4px 12px; border-radius:3px;">Save / Load</span>
+          <span style="font-size:10px; color:#64748b; border:1px solid #1e2530; padding:4px 12px; border-radius:3px;">Undo / Redo</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- row 2: vertical arrows down from user -->
+    <div class="col-left row-2">
+      <div class="v-arrow" style="height:32px;"><span>MapCommand</span></div>
+    </div>
+    <div class="col-right row-2">
+      <div class="v-arrow" style="height:32px;"><span>GLFW events</span></div>
+    </div>
+    <div class="col-center row-2">
+      <div class="v-arrow" style="height:32px;"><span>routes all</span></div>
+    </div>
+
+    <!-- ── ENGINE (center column, spans all middle rows) ─── -->
+    <div class="engine-tall">
+      <div class="node node-engine" style="flex:1; min-height:400px;">
+        <div class="node-title">Engine</div>
+        <div class="node-tag">orchestrator · main loop · lifecycle</div>
+        <ul class="node-items">
+          <li>Owns main loop tick</li>
+          <li>Strict init / shutdown order</li>
+          <li>Holds IRenderer interface</li>
+          <li>Owns GenerationScheduler</li>
+          <li>Routes GLFW events</li>
+          <li>Manages MapState double-buffer</li>
+          <li>Dispatches MapCommands</li>
+          <li>Coordinates phase barriers</li>
+        </ul>
+        <div style="margin-top:20px; padding-top:16px; border-top:1px solid #142035;">
+          <div style="font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:10px;">GenerationScheduler phases</div>
+          <div style="display:flex; flex-direction:column; gap:5px;">
+            <div style="font-size:9px; color:#64748b; display:flex; gap:8px; align-items:center;">
+              <span style="color:var(--engine); font-weight:700; min-width:14px;">1</span>
+              <span>RegionMap::generate()</span>
+            </div>
+            <div style="font-size:9px; color:#64748b; display:flex; gap:8px; align-items:center;">
+              <span style="color:var(--engine); font-weight:700; min-width:14px;">2</span>
+              <span>Domain threads → barrier</span>
+            </div>
+            <div style="font-size:9px; color:#64748b; display:flex; gap:8px; align-items:center;">
+              <span style="color:var(--engine); font-weight:700; min-width:14px;">3</span>
+              <span>Region threads → barrier</span>
+            </div>
+            <div style="font-size:9px; color:#64748b; display:flex; gap:8px; align-items:center;">
+              <span style="color:var(--engine); font-weight:700; min-width:14px;">4</span>
+              <span>Tile worker pool → barrier</span>
+            </div>
+            <div style="font-size:9px; color:#64748b; display:flex; gap:8px; align-items:center;">
+              <span style="color:var(--engine); font-weight:700; min-width:14px;">5</span>
+              <span>Border blend (single-thread)</span>
+            </div>
+            <div style="font-size:9px; color:#64748b; display:flex; gap:8px; align-items:center;">
+              <span style="color:var(--engine); font-weight:700; min-width:14px;">6</span>
+              <span>Atomic MapState swap</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CLIENT (left col, row 3) ──────────────────────── -->
+    <div class="col-left row-3">
+      <div class="node node-client">
+        <div class="node-title">Client</div>
+        <div class="node-tag">imgui ui · pages · views · widgets</div>
+        <ul class="node-items">
+          <li>Reads MapState front buffer</li>
+          <li>Dispatches MapCommand queue</li>
+          <li>Never touches GPU directly</li>
+          <li>Tile picker</li>
+          <li>Generation controls</li>
+          <li>Undo / redo stack</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- h-arrow client ↔ engine -->
+    <div class="col-cl row-3">
+      <div class="h-arrow"><span>cmds / state</span></div>
+    </div>
+
+    <!-- ── RENDERER (right col, rows 3-5) ────────────────── -->
+    <div class="col-right row-3" style="grid-row: 3 / 8;">
+      <div class="node node-renderer" style="height:100%;">
+        <div class="node-title">Renderer</div>
+        <div class="node-tag">vulkan · imgui layer · gpu resources</div>
+        <ul class="node-items">
+          <li>VulkanContext (device/queues)</li>
+          <li>VulkanSwapchain + resize</li>
+          <li>VulkanPipeline + SPIR-V</li>
+          <li>MeshBuilder (dirty chunks)</li>
+          <li>ChunkManager (LOD/cull)</li>
+          <li>ImGuiLayer (on top of Vulkan)</li>
+          <li>Shader hot-reload</li>
+          <li>VMA buffer uploads</li>
+        </ul>
+        <div style="margin-top:16px; padding-top:12px; border-top:1px solid #2a1414;">
+          <div style="font-size:9px; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:8px;">Render loop</div>
+          <div style="font-size:9px; color:#64748b; display:flex; flex-direction:column; gap:4px;">
+            <span>→ Read MapState front buffer</span>
+            <span>→ ChunkManager dirty flags</span>
+            <span>→ MeshBuilder (dirty only)</span>
+            <span>→ VulkanPipeline draw call</span>
+            <span>→ ImGuiLayer overlay</span>
+            <span>→ swapchain present</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- h-arrow engine ↔ renderer -->
+    <div class="col-cr row-3" style="grid-row: 3 / 8; display:flex; align-items:center;">
+      <div class="h-arrow" style="height:100%; flex-direction:column; width:100%;">
+        <div style="flex:1; position:relative; width:1px; margin:0 auto; background:var(--border-hi);"></div>
+        <span style="background:var(--bg); padding:4px 2px; font-size:8px; text-transform:uppercase; letter-spacing:0.06em; writing-mode:vertical-rl; transform:rotate(180deg); white-space:nowrap;">IRenderer calls</span>
+        <div style="flex:1; position:relative; width:1px; margin:0 auto; background:var(--border-hi);"></div>
+      </div>
+    </div>
+
+    <!-- row 4: arrow down from client -->
+    <div class="col-left row-4">
+      <div class="v-arrow" style="height:32px;"><span>reads</span></div>
+    </div>
+    <div class="col-cl row-4">
+      <div class="h-arrow"><span>MapState read</span></div>
+    </div>
+
+    <!-- ── SERIALIZATION (left col, row 5) ───────────────── -->
+    <div class="col-left row-5">
+      <div class="node node-serial">
+        <div class="node-title">Serialization</div>
+        <div class="node-tag">binary encode · decode · versioned format</div>
+        <ul class="node-items">
+          <li>BinaryWriter (MapState → .mapbin)</li>
+          <li>BinaryReader (.mapbin → MapState)</li>
+          <li>Version header at byte 0</li>
+          <li>Same codec for disk + Logic</li>
+          <li>GrammarFormat</li>
+          <li>MapFormat migration</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- h-arrow serial ↔ engine -->
+    <div class="col-cl row-5">
+      <div class="h-arrow"><span>.mapbin payload</span></div>
+    </div>
+
+    <!-- row 6: arrow down from serial -->
+    <div class="col-left row-6">
+      <div class="v-arrow" style="height:32px;"><span>.mapbin</span></div>
+    </div>
+    <div class="col-cl row-6">
+      <div class="h-arrow"><span>binary in/out</span></div>
+    </div>
+
+    <!-- ── LOGIC (left col, row 7) ───────────────────────── -->
+    <div class="col-left row-7">
+      <div class="node node-logic">
+        <div class="node-title">Logic</div>
+        <div class="node-tag">grammar expansion · stateless · thread workers</div>
+        <ul class="node-items">
+          <li>GrammarCS_3D / GrammarUnified</li>
+          <li>GeneratorRegistry (tag → ruleset)</li>
+          <li>Reads RegionMap (immutable)</li>
+          <li>Reads SeedSystem (stateless)</li>
+          <li>One instance per tile worker</li>
+          <li>No Vulkan, no MapState, no UI</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- h-arrow logic ↔ engine -->
+    <div class="col-cl row-7">
+      <div class="h-arrow"><span>influence query</span></div>
+    </div>
+
+    <!-- row 8: down arrows to common -->
+    <div class="col-left row-8">
+      <div class="v-arrow" style="height:32px;"><span>depends on</span></div>
+    </div>
+    <div class="col-center row-8">
+      <div class="v-arrow" style="height:32px;"><span>depends on</span></div>
+    </div>
+    <div class="col-right row-8">
+      <div class="v-arrow" style="height:32px;"><span>depends on</span></div>
+    </div>
+
+    <!-- ── COMMON (bottom, full width) ───────────────────── -->
+    <div class="span-full row-9">
+      <div class="node node-common">
+        <div class="node-title" style="margin-bottom:16px;">Common — Shared Foundation</div>
+        <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:16px;">
+          <div>
+            <div style="font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--common); margin-bottom:8px; font-weight:700;">Data</div>
+            <div style="font-size:10px; color:#94a3b8; line-height:1.7;">Tile<br>Chunk<br>MapState<br>MapCommand</div>
+          </div>
+          <div>
+            <div style="font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--common); margin-bottom:8px; font-weight:700;">Seed System</div>
+            <div style="font-size:10px; color:#94a3b8; line-height:1.7;">SeedSystem<br>deriveChunkSeed<br>deriveTileSeed<br>toFloat()</div>
+          </div>
+          <div>
+            <div style="font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--common); margin-bottom:8px; font-weight:700;">Region Hierarchy</div>
+            <div style="font-size:10px; color:#94a3b8; line-height:1.7;">IRegion<br>Domain (L0)<br>Region (L1)<br>Zone / Locale (reserved)</div>
+          </div>
+          <div>
+            <div style="font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--common); margin-bottom:8px; font-weight:700;">RegionMap</div>
+            <div style="font-size:10px; color:#94a3b8; line-height:1.7;">generate(rootSeed)<br>query(tx,ty,tz)<br>blendedInfluence()<br>InfluenceStack</div>
+          </div>
+          <div>
+            <div style="font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--common); margin-bottom:8px; font-weight:700;">Utilities</div>
+            <div style="font-size:10px; color:#94a3b8; line-height:1.7;">Logger<br>GenerationInfluence<br>GeneratorTag<br>Coord contract</div>
+          </div>
+        </div>
+        <div style="margin-top:12px; padding-top:10px; border-top:1px solid #2a2416; font-size:9px; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase;">
+          No dependencies — all modules may link Common · RegionMap immutable after generate() · SeedSystem fully stateless · thread-safe reads
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /diagram-grid -->
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- GENERATION THREAD TIMELINE                                      -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div class="interaction-section">
+    <div class="section-label">02 — Generation Thread Timeline</div>
+    <div class="phase-timeline">
+      <div class="phase">
+        <div class="phase-bar" style="background:var(--common)"></div>
+        <div class="phase-num">Phase 1</div>
+        <div class="phase-name" style="color:var(--common)">RegionMap</div>
+        <div class="phase-who">Main thread<br>Single-threaded<br>Writes RegionMap<br>then locks it</div>
+      </div>
+      <div class="phase">
+        <div class="phase-bar" style="background:var(--engine)"></div>
+        <div class="phase-num">Phase 2</div>
+        <div class="phase-name" style="color:var(--engine)">Domains</div>
+        <div class="phase-who">N Domain threads<br>Reads RegionMap<br>Writes own data<br>→ Barrier</div>
+      </div>
+      <div class="phase">
+        <div class="phase-bar" style="background:var(--engine)"></div>
+        <div class="phase-num">Phase 3</div>
+        <div class="phase-name" style="color:var(--engine)">Regions</div>
+        <div class="phase-who">N Region threads<br>Reads Domain data<br>Writes own data<br>→ Barrier</div>
+      </div>
+      <div class="phase">
+        <div class="phase-bar" style="background:var(--logic)"></div>
+        <div class="phase-num">Phase 4</div>
+        <div class="phase-name" style="color:var(--logic)">Tile Workers</div>
+        <div class="phase-who">Thread pool<br>1 job per chunk<br>Logic stateless<br>No locks → Barrier</div>
+      </div>
+      <div class="phase">
+        <div class="phase-bar" style="background:var(--serial)"></div>
+        <div class="phase-num">Phase 5</div>
+        <div class="phase-name" style="color:var(--serial)">Border Blend</div>
+        <div class="phase-who">Main thread<br>Single-threaded<br>Resolves seams<br>at region borders</div>
+      </div>
+      <div class="phase">
+        <div class="phase-bar" style="background:var(--renderer)"></div>
+        <div class="phase-num">Phase 6</div>
+        <div class="phase-name" style="color:var(--renderer)">Buffer Swap</div>
+        <div class="phase-who">Atomic swap<br>Back → Front<br>Render thread<br>picks up next frame</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- DETAILED INTERACTIONS TABLE                                      -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div class="interaction-section">
+    <div class="section-label">03 — Detailed Interactions</div>
+    <table class="flow-table">
+      <thead>
+        <tr>
+          <th style="width:140px">From</th>
+          <th style="width:24px"></th>
+          <th style="width:140px">To</th>
+          <th style="width:200px">Data / Signal</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="from-badge" style="--badge-bg:#2a1e10;--badge-c:var(--client)">Client</span></td>
+          <td><span class="arrow-glyph">→</span></td>
+          <td><span class="from-badge" style="--badge-bg:#142035;--badge-c:var(--engine)">Engine</span></td>
+          <td>MapCommand queue</td>
+          <td>Client never mutates MapState directly. All actions (tile place, generate, undo) become commands. Engine dequeues and applies them.</td>
+        </tr>
+        <tr>
+          <td><span class="from-badge" style="--badge-bg:#142035;--badge-c:var(--engine)">Engine</span></td>
+          <td><span class="arrow-glyph">→</span></td>
+          <td><span class="from-badge" style="--badge-bg:#2a1e10;--badge-c:var(--client)">Client</span></td>
+          <td>MapState front buffer (read-only ref)</td>
+          <td>Client reads the front buffer every ImGui frame for display. Never sees the back buffer during generation.</td>
+        </tr>
+        <tr>
+          <td><span class="from-badge" style="--badge-bg:#2a1e10;--badge-c:var(--client)">Client</span></td>
+          <td><span class="arrow-glyph">→</span></td>
+          <td><span class="from-badge" style="--badge-bg:#2a1414;--badge-c:var(--renderer)">Renderer</span></td>
+          <td>ImGui draw calls via ImGuiLayer</td>
+          <td>Client widgets call ImGuiLayer methods. ImGuiLayer owns all Vulkan ImGui internals. Client never calls Vulkan directly.</td>
+        </tr>
+        <tr>
+          <td><span class="from-badge" style="--badge-bg:#142035;--badge-c:var(--engine)">Engine</span></td>
+          <td><span class="arrow-glyph">→</span></td>
+          <td><span class="from-badge" style="--badge-bg:#2a1414;--badge-c:var(--renderer)">Renderer</span></td>
+          <td>IRenderer::BeginFrame / DrawScene / EndFrame</td>
+          <td>Engine calls through the IRenderer abstract interface. Renderer owns all GPU resources. Engine never calls vk* functions.</td>
+        </tr>
+        <tr>
+          <td><span class="from-badge" style="--badge-bg:#142035;--badge-c:var(--engine)">Engine</span></td>
+          <td><span class="arrow-glyph">→</span></td>
+          <td><span class="from-badge" style="--badge-bg:#142814;--badge-c:var(--logic)">Logic</span></td>
+          <td>.mapbin payload (via GenerationScheduler)</td>
+          <td>Engine serialises current MapState to .mapbin, passes to tile workers. Each worker calls Logic with a chunk-sized binary payload.</td>
+        </tr>
+        <tr>
+          <td><span class="from-badge" style="--badge-bg:#142814;--badge-c:var(--logic)">Logic</span></td>
+          <td><span class="arrow-glyph">→</span></td>
+          <td><span class="from-badge" style="--badge-bg:#142035;--badge-c:var(--engine)">Engine</span></td>
+          <td>.mapbin result payload</td>
+          <td>Logic returns a binary result per chunk. Engine accumulates into back buffer via BinaryReader. Logic has no return path to Renderer or Client.</td>
+        </tr>
+        <tr>
+          <td><span class="from-badge" style="--badge-bg:#142814;--badge-c:var(--logic)">Logic</span></td>
+          <td><span class="arrow-glyph">→</span></td>
+          <td><span class="from-badge" style="--badge-bg:#2a2416;--badge-c:var(--common)">Common</span></td>
+          <td>RegionMap::blendedInfluence() · SeedSystem::deriveTileSeed()</td>
+          <td>Read-only queries. Both are stateless or immutable during phase 4. No synchronisation needed.</td>
+        </tr>
+        <tr>
+          <td><span class="from-badge" style="--badge-bg:#142035;--badge-c:var(--engine)">Engine</span></td>
+          <td><span class="arrow-glyph">→</span></td>
+          <td><span class="from-badge" style="--badge-bg:#221428;--badge-c:var(--serial)">Serial</span></td>
+          <td>MapState encode / decode trigger</td>
+          <td>On generation trigger: BinaryWriter encodes MapState. On result return: BinaryReader decodes into back buffer. Same codec for disk save/load.</td>
+        </tr>
+        <tr>
+          <td><span class="from-badge" style="--badge-bg:#221428;--badge-c:var(--serial)">Serial</span></td>
+          <td><span class="arrow-glyph">→</span></td>
+          <td><span class="from-badge" style="--badge-bg:#142814;--badge-c:var(--logic)">Logic</span></td>
+          <td>.mapbin buffer (in-memory)</td>
+          <td>Serialization produces the binary payload that Logic consumes. Logic never reads MapState structures directly — only the encoded binary.</td>
+        </tr>
+        <tr>
+          <td><span class="from-badge" style="--badge-bg:#2a1414;--badge-c:var(--renderer)">Renderer</span></td>
+          <td><span class="arrow-glyph">→</span></td>
+          <td><span class="from-badge" style="--badge-bg:#2a2416;--badge-c:var(--common)">Common</span></td>
+          <td>MapState front buffer (read-only)</td>
+          <td>ChunkManager reads MapState to determine dirty chunks. MeshBuilder reads Tile data. Neither modifies MapState.</td>
+        </tr>
+        <tr>
+          <td><span class="from-badge" style="--badge-bg:#142035;--badge-c:var(--engine)">Engine</span></td>
+          <td><span class="arrow-glyph">↔</span></td>
+          <td><span class="from-badge" style="--badge-bg:#2a2416;--badge-c:var(--common)">Common</span></td>
+          <td>MapState double-buffer swap (atomic)</td>
+          <td>At phase 6, Engine atomically swaps front/back MapState pointers. Render thread always reads front. Generation always writes back. No blocking.</td>
+        </tr>
+        <tr>
+          <td><span class="from-badge" style="--badge-bg:#1a1f28;--badge-c:#94a3b8">Vendor</span></td>
+          <td><span class="arrow-glyph">→</span></td>
+          <td><span class="from-badge" style="--badge-bg:#2a1414;--badge-c:var(--renderer)">Renderer</span></td>
+          <td>Vulkan API · GLFW · VMA · ImGui source</td>
+          <td>Vendor libs are dependencies of Renderer only (plus GLFW in Engine for window). Logic, Serialization, Common, Client have zero vendor dependencies.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- DOUBLE BUFFER CALLOUT                                           -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div class="callout">
+    <strong>Double-buffered MapState</strong> — The single most important synchronisation decision in the architecture.
+    Generation writes into a back buffer across all 6 phases. The render thread reads the front buffer every frame without blocking.
+    At phase 6, Engine performs a single atomic pointer swap. The render thread picks up the new state on its next frame.
+    There is no mutex held across a frame boundary. Generation and rendering never contend for the same buffer.
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- DEPENDENCY DIRECTION                                            -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div class="interaction-section">
+    <div class="section-label">04 — Dependency Direction (nothing links upward)</div>
+    <div style="display:flex; align-items:center; gap:0; margin-top:8px; flex-wrap:wrap;">
+
+      <div style="padding:10px 18px; border:1px solid #2a1e10; border-radius:4px; font-size:11px; font-weight:700; color:var(--client); font-family:'Syne',sans-serif; letter-spacing:0.04em; background:#0f0c08;">Client</div>
+      <div style="padding:6px 12px; font-size:9px; color:var(--muted);">links →</div>
+      <div style="padding:10px 18px; border:1px solid #142035; border-radius:4px; font-size:11px; font-weight:700; color:var(--engine); font-family:'Syne',sans-serif; letter-spacing:0.04em; background:#08100f;">Engine</div>
+      <div style="padding:6px 12px; font-size:9px; color:var(--muted);">links →</div>
+      <div style="padding:10px 18px; border:1px solid #2a1414; border-radius:4px; font-size:11px; font-weight:700; color:var(--renderer); font-family:'Syne',sans-serif; letter-spacing:0.04em; background:#0f0808;">Renderer</div>
+      <div style="padding:6px 4px; font-size:9px; color:var(--muted);">,</div>
+      <div style="padding:10px 18px; border:1px solid #142814; border-radius:4px; font-size:11px; font-weight:700; color:var(--logic); font-family:'Syne',sans-serif; letter-spacing:0.04em; background:#080f08;">Logic</div>
+      <div style="padding:6px 4px; font-size:9px; color:var(--muted);">,</div>
+      <div style="padding:10px 18px; border:1px solid #221428; border-radius:4px; font-size:11px; font-weight:700; color:var(--serial); font-family:'Syne',sans-serif; letter-spacing:0.04em; background:#0c080f;">Serial</div>
+      <div style="padding:6px 12px; font-size:9px; color:var(--muted);">all link →</div>
+      <div style="padding:10px 18px; border:1px solid #2a2416; border-radius:4px; font-size:11px; font-weight:700; color:var(--common); font-family:'Syne',sans-serif; letter-spacing:0.04em; background:#0f0c04;">Common</div>
+      <div style="padding:6px 12px; font-size:9px; color:var(--muted);">links →</div>
+      <div style="padding:10px 18px; border:1px solid #1a1f28; border-radius:4px; font-size:11px; font-weight:700; color:#94a3b8; font-family:'Syne',sans-serif; letter-spacing:0.04em; background:#090c10;">nothing</div>
+    </div>
+    <div style="margin-top:12px; font-size:10px; color:var(--muted); line-height:1.7;">
+      Renderer additionally links vendor libs (Vulkan, GLFW, ImGui, GLM, VMA). Logic and Serialization have zero vendor dependencies.
+      Engine links Renderer + Logic + Serialization + Common. Client links Engine + Renderer (for ImGuiLayer only).
+    </div>
+  </div>
+
+</div><!-- /canvas -->
+
+</body>
+</html>

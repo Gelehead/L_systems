@@ -3,6 +3,9 @@
 * should be implemented by Domain, region, area, site
 ****************************************************************/
 
+#ifndef IREGION_H
+#define IREGION_H
+
 #include "Seed.h"
 #include <stdint.h>
 #include <vector>
@@ -25,16 +28,17 @@ namespace grammar
     **************************************************************/
     class IRregion
     {
+    public:
         virtual void IRegion() = 0;
-        virtual ~IRegion() = default;
+        // virtual ~IRegion() = default;
 
-        virtual Seed seed() = 0;
-        
         /***************************************************************
         * Defined in children class at definition
         **************************************************************/
-        virtual RegionLevel level() = 0;
-        virtual float influence() = 0;
+        virtual RegionLevel level() const = 0;
+        virtual float influence()   const = 0;
+        virtual uint32_t id()       const = 0;
+        virtual Seed seed()         const = 0;
 
         /***************************************************************
         * Tells by deterministic algorithm, using seed, if coordinates 
@@ -44,3 +48,4 @@ namespace grammar
     };
 }
 
+#endif // IREGION_H
