@@ -5,8 +5,8 @@
 
 namespace grammar
 {
-    class Domain
+    class Domain : public IRegion
     {
-        // same constructor as 
+        
     };
 }

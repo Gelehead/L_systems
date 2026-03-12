@@ -13,7 +13,7 @@ namespace grammar
 
     // ! make a parent class Constituent to allow polymorphism
     // 25 bytes as of most recent version, might be changed
-    struct Tile
+    struct Tile : public Constituent
     {
         uint16_t TypeID = 0;
         uint8_t flags = 0;
