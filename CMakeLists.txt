@@ -10,7 +10,12 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # submodules 
-find_package(Vulkan REQUIRED)
+# Finding Vlkan
+file(TO_CMAKE_PATH "$ENV{VULKAN_SDK}" VULKAN_SDK_PATH)
+if(VULKAN_SDK_PATH)
+    list(APPEND CMAKE_PREFIX_PATH "${VULKAN_SDK_PATH}")
+endif()
+find_package(Vulkan REQUIRED MODULE)
 
 set(GLFW_BUILD_DOC      OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
@@ -18,7 +23,7 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(vendor/glfw)
 add_subdirectory(vendor/imgui)
 add_subdirectory(vendor/glm)
-add_subdirectory(vendor/vma)
+add_subdirectory(vendor/VulkanMemoryAllocator)
 
 # modules 
 add_subdirectory(apps/Common)
@@ -34,14 +39,15 @@ add_executable(grammarEngine apps/main.cpp)
 target_link_libraries(grammarEngine PRIVATE
     Engine
     Client
+    Vulkan::Vulkan
 )
 
 # plateform scripts 
 if(WIN32)
-    set(RUN_SCRIPT_IN ${CMAKE_SOURCE_DIR}/scripts/templates/run_grammar.bat.in)
+    set(RUN_SCRIPT_IN ${CMAKE_SOURCE_DIR}/scripts/templates/run_template.bat.in)
     set(RUN_SCRIPT_OUT ${CMAKE_BINARY_DIR}/run.bat)
 elseif(UNIX)
-    set(RUN_SCRIPT_IN ${CMAKE_SOURCE_DIR}/scripts/templates/run_grammar.sh.in)
+    set(RUN_SCRIPT_IN ${CMAKE_SOURCE_DIR}/scripts/templates/run_template.sh.in)
     set(RUN_SCRIPT_OUT ${CMAKE_BINARY_DIR}/run.sh)
 else()
     message(WARNING "Plateform not supported for run script")

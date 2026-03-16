@@ -1,10 +1,10 @@
 add_library(Client STATIC
-    src/Pages/src/Visualization.cpp
-    src/Pages/src/Rules.cpp
-    src/Pages/src/Manage.cpp
-    src/Widgets/src/Stepper.cpp
-    src/Widget/src/FileSelctor.cpp
-    src/Views/src/MapView.cpp
+    src/Pages/Visualization.cpp
+    src/Pages/Rules.cpp
+    src/Pages/Manage.cpp
+    src/Widgets/Stepper.cpp
+    src/Widgets/FileSelector.cpp
+    src/Views/MapView.cpp
 )
 
 target_include_directories(Client PUBLIC

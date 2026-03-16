@@ -5,49 +5,55 @@
 #include <iostream>
 #include <stdint.h>
 #include "Seed.h"
+#include <map>
 
 // Term was inspired by a paper suggested by Youssef (https://web.stanford.edu/~jurafsky/slp3/18.pdf)
 namespace grammar
 {
-    // 32bytes Constituent payload used by Binary<writer/reader>
-    // every children should have its all payload that adds to this structure
-    struct Constituent
+    /*******************************************************************
+     * 32 bytes Constituent payload used by Binary<Reader/Writer>
+     * every children should have its all payload that adds to this structure
+     * 7 / 32 bytes used here
+     ********************************************************************/
+    struct ConstituentPayload
     {
         uint16_t TypeID = 0;
         uint8_t flags = 0;
-        Seed seed;
-
-        // 29 other bytes unused (most likely position)
+        Seed seed; // 4 bytes
     };
 
     class Constituent
     {
+    private:
+        std::map<std::vector<Constituent *>, float> _nextElements;
+        bool _terminal;
+        char _rep;
+
     public:
-        // makes a random choice among all possible nextElements
-        virtual std::vector<Constituent&> getNextElements() const = 0;
+        /*******************************************************************
+         * \brief makes a random choice among all possible _nextElements accounting for probabilities
+         * \param seed needs world seed to make generation deterministic
+         * \returns ref of constituent
+         ********************************************************************/
+        virtual std::vector<Constituent *> getNextElements(Seed seed) const = 0;
 
-        // add to next Elements
-        virtual void addToNext(const std::map<std::vector<Constituent*>&, float> elements) const = 0;
+        /*******************************************************************
+         * \brief add Constituent to objects' _nextElements with probability
+         * \param &element reference to Constituent
+         * \param probability : threshold random number has to go over before being considered : [0,1]
+         * \returns
+         ********************************************************************/
+        virtual void addToNext(Constituent *element, float probability) = 0;
 
-        // get representation ( for ASCII / other symbolic representation of system )
-        virtual char getRep() const = 0;
-
-        // implemented here 
-        virtual bool isTerminal();
-        virtual bool operator<(const Constituent& c2)   const = 0;
-        virtual bool operator==(const Consistuent& c2)  const = 0;
-
-    private: 
-        // tells whether 
-        bool terminal;
-        std::map<std::vector<std::vector<Constituent&>*>, float> nextElements;
-        // symbolic representation of consistuent for grammar
-        char rep;
-
+        /*******************************************************************
+         * \brief get representation (ASCII)
+         ********************************************************************/
+        virtual char getRep() { return _rep; }
+        virtual bool isTerminal() { return _terminal; }
 
     protected:
-        virtual Constituent();
-        virtual ~Constituent() = default;
+        Constituent() {};
+        ~Constituent() = default;
     };
 }
 

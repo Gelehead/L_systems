@@ -11,7 +11,7 @@ target_include_directories(Renderer PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_link_libraries(Common PUBLIC
+target_link_libraries(Renderer PUBLIC
     Common
     Vulkan::Vulkan
     glfw
