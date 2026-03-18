@@ -7,7 +7,7 @@
 #include "Seed.h"
 #include <map>
 
-// Term was inspired by a paper suggested by Youssef (https://web.stanford.edu/~jurafsky/slp3/18.pdf)
+// Term was inspired by a paper suggested by Youssef Briki : (https://web.stanford.edu/~jurafsky/slp3/18.pdf)
 namespace grammar
 {
     /*******************************************************************
@@ -22,6 +22,9 @@ namespace grammar
         Seed seed; // 4 bytes
     };
 
+    /*******************************************************************
+     * Building block for the grammar logic, semi abstract class
+     ********************************************************************/
     class Constituent
     {
     private:
@@ -33,17 +36,17 @@ namespace grammar
         /*******************************************************************
          * \brief makes a random choice among all possible _nextElements accounting for probabilities
          * \param seed needs world seed to make generation deterministic
-         * \returns ref of constituent
+         * \returns vector of constituent pointers
          ********************************************************************/
         virtual std::vector<Constituent *> getNextElements(Seed seed) const = 0;
 
         /*******************************************************************
-         * \brief add Constituent to objects' _nextElements with probability
-         * \param &element reference to Constituent
+         * \brief add set of Constituent to objects' _nextElements with probability
+         * \param element vector of Constituent pointers
          * \param probability : threshold random number has to go over before being considered : [0,1]
          * \returns
          ********************************************************************/
-        virtual void addToNext(Constituent *element, float probability) = 0;
+        virtual void addToNext(std::vector<Constituent *> element, float probability) = 0;
 
         /*******************************************************************
          * \brief get representation (ASCII)

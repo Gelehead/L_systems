@@ -1,5 +1,5 @@
 /***************************************************************
- * Tile data structure (with methods?)
+ * 2D Constituent, used for biome mapping
  **************************************************************/
 
 #ifndef TILE_H
@@ -7,13 +7,12 @@
 
 #include <stdint.h>
 #include "Seed.h"
+#include "Constituent.h"
 
 namespace grammar
 {
 
-    // ! make a parent class Constituent to allow polymorphism
-    // 25 bytes as of most recent version, might be changed
-    struct Tile : public Constituent
+    struct TilePayload : public ConstituentPayload
     {
         uint16_t TypeID = 0;
         uint8_t flags = 0;
@@ -24,6 +23,11 @@ namespace grammar
         uint16_t _reserved;
 
         Seed seed;
+    };
+
+    class Tile : public Constituent
+    {
+
     };
 
 }
