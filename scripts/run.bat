@@ -23,7 +23,7 @@ if %ERRORLEVEL% neq 0 (
 :: Build projects
 echo -- Building project --
 cd build
-cmake --build . --config %BUILD_TYPE% --target grammar_gen --target perlin_gen
+cmake --build . --config %BUILD_TYPE% --target grammarEngine
 if %ERRORLEVEL% neq 0 (
     echo ERROR: Build failed
     cd ..
