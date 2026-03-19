@@ -10,18 +10,6 @@
 
 namespace grammar
 {
-    /*******************************************************************
-     * used solely for parsing purposes so far ( readGrammar() calls readGrammarClass() )
-     ********************************************************************/
-    enum GrammarType
-    {
-          ABSTRACT
-        , CS
-        , CF
-        , GRAMMAR_1D
-        , GRAMMAR_3D
-    };
-
     class IGrammar 
     {
     private:
@@ -38,13 +26,25 @@ namespace grammar
         std::map<std::vector<Constituent *>, std::vector<Constituent *>> _rules; 
 
         Seed _seed;
-
     public:
         virtual std::vector<Constituent*> generate(int generation, std::vector<Constituent*> base, Seed seed) = 0;
 
-    private: 
-        virtual IGrammar* read_grammar(std::string filePath) = 0;
-        IGrammar();
+    protected: 
+        IGrammar() = default;
+        ~IGrammar() = default;
+        IGrammar(
+            std::vector<Constituent *> nonTerminal,
+            std::vector<Constituent *> terminal,
+            std::vector<Constituent *> start,
+            std::map<std::vector<Constituent *>, std::vector<Constituent *>> rules,
+            Seed seed
+        )
+        : _nonTerminal(nonTerminal)
+        , _terminal(terminal)
+        , _start(start)
+        , _rules(rules)
+        , _seed(seed)
+        {}
     };
 }
 
