@@ -16,7 +16,7 @@ target_link_libraries(Renderer PUBLIC
     Vulkan::Vulkan
     glfw
     imgui
-    glm
+    glm::glm
     VulkanMemoryAllocator
 )
 

@@ -15,7 +15,7 @@ namespace grammar
 
     public:
         std::vector<Constituent *> generate(int generation, std::vector<Constituent*> base, Seed seed) override;
-        static std::shared_ptr<GrammarCS>* readGrammar(std::string& filePath);
+        static GrammarCS* readGrammar(std::string& filePath);
 
     private : 
         GrammarCS(

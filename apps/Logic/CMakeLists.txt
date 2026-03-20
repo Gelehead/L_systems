@@ -1,7 +1,5 @@
 add_library(Logic STATIC
-    src/cpp/GrammarCS_3D.cpp
-    src/cpp/GrammarCS_1D.cpp
-    src/cpp/Grammar.cpp
+    src/cpp/Grammars/GrammarCS.cpp
     src/cpp/GeneratorRegistry.cpp
 )
 

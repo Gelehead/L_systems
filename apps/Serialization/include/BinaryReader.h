@@ -25,5 +25,8 @@ namespace grammar
         uint32_t readU32();
         uint64_t readU64();
         Tile readTile();
+
+    public: 
+        
     };
 }
