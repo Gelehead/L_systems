@@ -1,20 +1,24 @@
 #ifndef CHUNK_H
 #define CHUNK_H
 
-#include <Constituent.h>
+#include "Constituent.h"
 
-class Chunk : public Constituent {
-public :
-  bool isTerminal() override;
-  // Hides normal Constituent function
-  std::vector<std::vector<Chunk*>> getNextElements() override;
-  void addToNext(const std::vector<Chunk*>& elements) override;
+namespace grammar
+{
   
-
-  
+  class Chunk : public Constituent
+  {
   private:
-    // originally wasnt a vector of pointers, but it should make more sense to have it as that 
-    std::vector<std::vector<Constituent*>> next;
-}
+    // 
+    std::vector<std::vector<std::vector<ConstituenType>>> composition;
+  public:
+    Chunk();
 
-#endif 
+    std::vector<Constituent *> getNextElements(Seed seed) const override;
+    void addToNext(std::vector<Constituent *> element, float probability) override;
+  };
+
+} // namespace grammar
+
+
+#endif // CHUNK_H

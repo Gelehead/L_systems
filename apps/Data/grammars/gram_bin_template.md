@@ -5,6 +5,7 @@
  
  - number of terminals
  - max size of terminals
+    -> X by X by X cube if CS, int
  
  - number of non terminals 
  - max size of non terminals
